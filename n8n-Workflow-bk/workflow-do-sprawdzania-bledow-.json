@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T11:37:23.000Z",
+  "updatedAt": "2025-11-25T11:38:26.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -215,66 +215,6 @@
       "id": "f5122c53-2704-4411-8f48-06e69195d21f",
       "name": "Wait1",
       "webhookId": "336cc6f5-9f85-4088-808e-ac09596c79c1"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n\"index\": \"notices\",\n\"createdAt\": \"2025-10-27T06:58:47.5677181Z\",\n\"assetId\": \"08dd6221-813c-437b-8d19-6678e11a55f5\",\n\"subject\": \"Uszczerbiony kubek!\",\n\"message\": \"Znaleziono uszczerbiony kubek w szawce z naczyniami dla gości. Prośba o wymianę na nowy\",\n\"type\": 0,\n\"createdBy\": \"test test\",\n\"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": [\n\"ff57b48d-0c93-4e9d-8d19-32519adae5f98684434820700654792.jpg\",\n\"52ee9c9e-54e8-4328-950f-13bab0bd3ff74756521684993759038.jpg\",\n\"babf1377-bdfa-4e2a-9c8f-2fa87af3cfc6254830784995343420.jpg\"\n]\n}",
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        496,
-        160
-      ],
-      "id": "a531d50d-6dda-469c-a734-4d38828c1fa8",
-      "name": "Knowshare flow Trello trigger",
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "resource": "folderMessage",
-        "folderId": {
-          "__rl": true,
-          "value": "AAMkADI5YzEwODkzLTUxM2YtNDU4MC04Yjg4LTJjZTZmZTRiOWE2YgAuAAAAAACIIErcp4onS70BA2kb2McNAQDsgIO2TTtOSIfv9pUwaN2NAAQC_18YAAA=",
-          "mode": "list",
-          "cachedResultName": "Knowshare Trello",
-          "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADI5YzEwODkzLTUxM2YtNDU4MC04Yjg4LTJjZTZmZTRiOWE2YgAuAAAAAACIIErcp4onS70BA2kb2McNAQDsgIO2TTtOSIfv9pUwaN2NAAQC_18YAAA%3D"
-        },
-        "limit": 1,
-        "output": "raw",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.microsoftOutlook",
-      "typeVersion": 2,
-      "position": [
-        944,
-        160
-      ],
-      "id": "c8129ec2-76c4-421e-bc96-78e6f67b2b42",
-      "name": "Get newest knowshare notice",
-      "webhookId": "e2507218-fee5-431c-94b5-a294a8027dfd"
     },
     {
       "parameters": {
@@ -562,33 +502,6 @@
       ],
       "id": "82c67baf-f01d-41a4-8810-f3df01dfc950",
       "name": "Sticky Note13"
-    },
-    {
-      "parameters": {
-        "authentication": "nocoDbApiToken",
-        "operation": "getAll",
-        "projectId": "p8ctmuqgmd41gsy",
-        "table": "m9uil5p3apd33zt",
-        "limit": 1,
-        "options": {
-          "sort": {
-            "property": [
-              {
-                "field": "CreatedAt",
-                "direction": "desc"
-              }
-            ]
-          }
-        }
-      },
-      "type": "n8n-nodes-base.nocoDb",
-      "typeVersion": 3,
-      "position": [
-        1184,
-        160
-      ],
-      "id": "3ffa3030-25f6-4afb-b8e3-555c28d44662",
-      "name": "Create latest record"
     }
   ],
   "connections": {
@@ -629,7 +542,7 @@
       "main": [
         [
           {
-            "node": "Knowshare flow Trello trigger",
+            "node": "Wait1",
             "type": "main",
             "index": 0
           }
@@ -680,29 +593,7 @@
       "main": [
         [
           {
-            "node": "Get newest knowshare notice",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Knowshare flow Trello trigger": {
-      "main": [
-        [
-          {
-            "node": "Wait1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get newest knowshare notice": {
-      "main": [
-        [
-          {
-            "node": "Create latest record",
+            "node": "Code5",
             "type": "main",
             "index": 0
           }
@@ -748,24 +639,15 @@
           }
         ]
       ]
-    },
-    "Create latest record": {
-      "main": [
-        [
-          {
-            "node": "Code5",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "settings": {
     "executionOrder": "v1"
   },
   "staticData": null,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "pinData": {
     "Schedule Trigger": [
       {
@@ -785,7 +667,7 @@
       }
     ]
   },
-  "versionId": "61dc5bbc-5589-454b-835e-843050137e3d",
+  "versionId": "eadff0c9-c9db-4494-b1bc-56edc1dec46d",
   "triggerCount": 0,
   "shared": [
     {
