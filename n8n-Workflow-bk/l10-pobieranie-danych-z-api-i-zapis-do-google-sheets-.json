@@ -1,0 +1,256 @@
+{
+  "updatedAt": "2025-11-14T06:46:33.000Z",
+  "createdAt": "2025-11-06T11:20:58.497Z",
+  "id": "1LkWyxPBUfAZTw0t",
+  "name": "L10 pobieranie danych z API i zapis do Google Sheets",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://api.frankfurter.app/latest?from=USD",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "base",
+              "value": "USD"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -384,
+        16
+      ],
+      "id": "69789a30-1be6-4850-8ede-8f1960775d7e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95692033-2623-4af3-ae86-e624496f8d05",
+              "name": "date",
+              "value": "={{$json[\"date\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "80e695ee-33e0-4343-bfa2-d74054786a36",
+              "name": "base",
+              "value": "={{$json[\"base\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "a5f5db30-cc4d-4a7e-8aaf-af59f22890c6",
+              "name": "EUR",
+              "value": "={{$json[\"rates\"][\"EUR\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "8e6aacd2-9ce4-49b4-890e-8e42947dfbd4",
+              "name": "PLN",
+              "value": "={{$json[\"rates\"][\"PLN\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "6b8b7040-7364-443b-bc79-f8483ad9b548",
+              "name": "CzasZapisu",
+              "value": "={{ new Date().toLocaleString('pl-PL', {    timeZone: 'Europe/Warsaw',   day: 'numeric',    month: 'numeric',    year: 'numeric',   hour: '2-digit',    minute: '2-digit',    second: '2-digit'  }) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        16
+      ],
+      "id": "5609b5cc-14fb-4124-b00e-5b76ecef7fdf",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10ZnLPAeUB1jQmeoD8Z3PqAVaBsf5i3ebwP9waqgPYhk",
+          "mode": "list",
+          "cachedResultName": "Kursy walut",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10ZnLPAeUB1jQmeoD8Z3PqAVaBsf5i3ebwP9waqgPYhk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Arkusz1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10ZnLPAeUB1jQmeoD8Z3PqAVaBsf5i3ebwP9waqgPYhk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $json.date }}",
+            "base": "={{ $json.base }}",
+            "EUR": "={{ $json.EUR }}",
+            "PLN": "={{ $json.PLN }}",
+            "WriteTime": "={{ $json.CzasZapisu }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base",
+              "displayName": "base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EUR",
+              "displayName": "EUR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PLN",
+              "displayName": "PLN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "WriteTime",
+              "displayName": "WriteTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        16
+      ],
+      "id": "6ba7a64f-4a66-4d7b-b987-bc6aaf60b482",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fAlBbFhemmXRrwxN",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -704,
+        16
+      ],
+      "id": "12822be7-20d8-4f91-ab54-6c06c312284b",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c806faa6-3464-47c3-9b54-4e7bc35b5b40",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-06T11:20:58.500Z",
+      "createdAt": "2025-11-06T11:20:58.500Z",
+      "role": "workflow:owner",
+      "workflowId": "1LkWyxPBUfAZTw0t",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
