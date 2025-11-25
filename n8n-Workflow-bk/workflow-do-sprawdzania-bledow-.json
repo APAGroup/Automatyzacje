@@ -1,0 +1,75 @@
+{
+  "updatedAt": "2025-11-25T10:08:47.000Z",
+  "createdAt": "2025-11-25T10:04:21.491Z",
+  "id": "54OzgWSzjWohfCn4",
+  "name": "workflow do sprawdzania bledow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        128
+      ],
+      "id": "7d36156b-9435-4217-a372-a26875148178",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c12f331d-b1cf-4e74-b9cf-f157acbec6d7",
+              "name": "imie",
+              "value": "jan",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        192
+      ],
+      "id": "af4e8fc8-3603-46e7-bdbb-637a8ab2e258",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "9951de9b-9ff0-4bc1-b243-5ed724a346f0",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-25T10:04:21.494Z",
+      "createdAt": "2025-11-25T10:04:21.494Z",
+      "role": "workflow:owner",
+      "workflowId": "54OzgWSzjWohfCn4",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
