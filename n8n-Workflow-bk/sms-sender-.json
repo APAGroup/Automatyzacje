@@ -1,0 +1,385 @@
+{
+  "updatedAt": "2025-06-03T06:29:55.000Z",
+  "createdAt": "2025-06-03T06:02:52.888Z",
+  "id": "ZcMEGTFo8JZAorI4",
+  "name": "SMS sender",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "from": "MG57b1eeb171ed820e74d29ebc017e22cc",
+        "to": "={{ $json.phone }}",
+        "message": "=Nowe zgłoszenie jira:\nTytuł: {{ $('Create Task Title').item.json.message.content }}\nTreść:{{ $('Create Task Content by Picture').item.json.message.content }}\nAutor:{{ $('Webhook').item.json.body.reporter }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        520,
+        280
+      ],
+      "id": "682aeb06-f248-41b8-8135-173403abcf3a",
+      "name": "Twilio",
+      "credentials": {
+        "twilioApi": {
+          "id": "io9Fabar1kco9SjR",
+          "name": "Twilio account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        760,
+        360
+      ],
+      "id": "9697d4ff-2015-4b41-8a6c-280ce3795fc6",
+      "name": "Loop Over Items4",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0f1808d1-e65f-4890-be2e-fc57fcd2bb0d",
+              "leftValue": "={{ $json.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5e9ac14f-4018-4dc0-9e68-9ffc456668af",
+              "leftValue": "={{ $('Config').item.json.services.sms.recipients }}",
+              "rightValue": "={{ $('Loop Over Items4').item.json.recipients }}",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        340
+      ],
+      "id": "b2a659b9-8ab1-4d3a-8643-952c452f1b65",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        160
+      ],
+      "id": "d436f3ad-5693-44c1-9385-df33061c974d",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "recipients",
+              "value": "={{ $('Config').item.json.services.sms.recipients }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        160
+      ],
+      "id": "1bb8c22f-3cf7-4a12-9245-fcaffe22feda",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        120,
+        160
+      ],
+      "id": "36f0d34b-b9a4-4048-a5ff-afbdb61176c4",
+      "name": "Aggregate4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "recipient = _input.first().json.recipients\nrecipients = _('Config').first().json.recipients\nphone = recipients[recipient][\"phone\"]\nreturn [{\"phone\": phone}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        120,
+        340
+      ],
+      "id": "5ef823a6-d0fc-40c1-93d3-53994ebed06c",
+      "name": "recipients - sms"
+    },
+    {
+      "parameters": {
+        "content": "## Powiadomienie sms\n\nW ramach tego kroku wysyłąne są powiadomienia sms o zgłoszeniu w knowshare. Wysyłane są do wyłącznie do tych użytkowników znajdujących się w liście ('Config').sms.recipients.",
+        "height": 620,
+        "width": 1040,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        0
+      ],
+      "id": "0d32f9f3-a714-456c-aa51-7774630605d1",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -60,
+        160
+      ],
+      "id": "7969270f-0a9a-434a-8b1a-bc3627e62a4d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "from": "MG57b1eeb171ed820e74d29ebc017e22cc",
+        "to": "+48604874003",
+        "message": "Knowshare - Błąd dostarczenia wiadomości whatsapp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "id": "7f0f5fd4-4e4e-4c5a-b61b-33070e671cef",
+      "name": "Twilio1",
+      "credentials": {
+        "twilioApi": {
+          "id": "io9Fabar1kco9SjR",
+          "name": "Twilio account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "383eb703-b7e1-4528-9e61-e46e185173f4",
+        "authentication": "basicAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        240
+      ],
+      "id": "2434c7b8-3968-46cc-a248-4782c64d49fd",
+      "name": "Webhook1",
+      "webhookId": "383eb703-b7e1-4528-9e61-e46e185173f4",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "kqllUxJbxAFSvtDc",
+          "name": "Unnamed credential 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Powiadomienie sms* (awaryjne)\n\nFlow obejmuje sytuację gdy dany użytkownik miał otrzymać zgłoszenie przez whatsapp, ale zgłoszenie nie zostało dostarczone. Wysyłana jest wtedy wiadomość sms.",
+        "height": 620,
+        "width": 540,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        980,
+        0
+      ],
+      "id": "b5529924-5a85-41bc-8637-bb3f6a461789",
+      "name": "Sticky Note11"
+    }
+  ],
+  "connections": {
+    "Twilio": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "recipients - sms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recipients - sms": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Twilio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0232c1c2-8323-4e16-9d3b-a6599b47ac20",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-06-03T06:02:52.891Z",
+      "createdAt": "2025-06-03T06:02:52.891Z",
+      "role": "workflow:owner",
+      "workflowId": "ZcMEGTFo8JZAorI4",
+      "projectId": "v3iOlUQZPnWy0OLx"
+    }
+  ],
+  "tags": []
+}
