@@ -1,0 +1,1092 @@
+{
+  "updatedAt": "2025-06-03T07:42:17.000Z",
+  "createdAt": "2025-06-03T05:53:47.035Z",
+  "id": "PzcaPMgc95EtuNAU",
+  "name": "Jira task",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "={{ $json.jira_project_id }}",
+          "mode": "id"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "={{ $json.jira_issue_type_id }}",
+          "mode": "id"
+        },
+        "summary": "={{ $json.task_title }}",
+        "additionalFields": {
+          "description": "={{ $json.task_description }}\nZgłaszający: {{ $('Webhook').item.json.body.reporter }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        400
+      ],
+      "id": "fafbe0e9-5ceb-4753-9319-3c4e705b91af",
+      "name": "Jira Cloud Issue by Image",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "9N5May8eRJTHiQDr",
+          "name": "Jira SW Cloud account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Jesteś asystentem pomagającym tworzyć zgłoszenia do systemu Jira. Na podstawie treści od użytkownika stwórz jeden konkretny opis zgłoszenia. Opis złoszenia może mieć max 1000 znaków i musi zawierać konkrety; bez tytułu, sam czysty opis zdarzenia.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $('Create Picture Summary1').item.json.message.content }}"
+            }
+          ]
+        },
+        "options": {
+          "n": 1,
+          "temperature": 0.2,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1260,
+        400
+      ],
+      "id": "a6376f35-eadd-4fde-9e9d-e4a928f04b43",
+      "name": "Create Task Content by Picture",
+      "credentials": {
+        "openAiApi": {
+          "id": "DWFPorbaYyy4AYzM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "issueAttachment",
+        "issueKey": "={{ $('Jira Cloud Issue by Image').item.json.key }}",
+        "binaryPropertyName": "image"
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        3700,
+        720
+      ],
+      "id": "abe65379-a05d-411a-b7f2-e9991eec9182",
+      "name": "Jira Software",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "9N5May8eRJTHiQDr",
+          "name": "Jira SW Cloud account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "object",
+        "operation": "get",
+        "bucketName": "knowshare-bucket",
+        "objectName": "={{ $json.attachment }}",
+        "alt": "media",
+        "binaryPropertyName": "image",
+        "getParameters": {},
+        "encryptionHeaders": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [
+        3540,
+        720
+      ],
+      "id": "3a030c9a-9ab4-4e37-8c3e-51f9102ed1a5",
+      "name": "Google Cloud Storage1",
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "S3tCOMTElkvndwxE",
+          "name": "Google Cloud Storage account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Jesteś asystentem pomagającym tworzyć zgłoszenia do systemu Jira. Na podstawie treści od użytkownika stwórz jeden konkretny tytuł zgłoszenia. Tytuł może mieć nie więcej niż 100 znaków.\n\n\nZwróć jedno zdanie, maksymalnie 100 znaków, opisujące problem użytkownika.  \nBez powtórzeń. Bez rozwinięć. Tylko najważniejsza treść.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $('Create Picture Summary1').item.json.message.content }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 200,
+          "n": 1,
+          "temperature": 0.5,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        960,
+        400
+      ],
+      "id": "9dd17815-317d-42aa-9dde-2106cc3c9d61",
+      "name": "Create Task Title",
+      "credentials": {
+        "openAiApi": {
+          "id": "DWFPorbaYyy4AYzM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Jesteś asystentem pomagającym tworzyć zgłoszenia do systemu Jira. Na podstawie treści od użytkownika stwórz jeden konkretny tytuł zgłoszenia. Tytuł może mieć nie więcej niż 100 znaków.\nZwróć jedno zdanie, maksymalnie 100 znaków, opisujące problem użytkownika.  \nBez powtórzeń. Bez rozwinięć. Tylko najważniejsza treść.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $('Webhook').item.json.body.content.description }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 200,
+          "n": 1,
+          "temperature": 0.3,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        960,
+        600
+      ],
+      "id": "ea0c9037-f373-4392-9e55-dc807ab0f515",
+      "name": "Create Task Title from Text",
+      "credentials": {
+        "openAiApi": {
+          "id": "DWFPorbaYyy4AYzM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jiraVersion": "cloud",
+        "resource": "issue",
+        "operation": "notify",
+        "issueKey": "={{ $('Jira Cloud Issue by Image').item.json.key }}",
+        "jsonParameters": false,
+        "additionalFields": {
+          "htmlBody": "=Dzień dobry,<br> <br> Informujemy o nowym zgłoszeniu w systemie Jira:<br> <br> Tytuł: {{ $('assets params - jira').item.json.task_title }} <br> Opis: {{ $('assets params - jira').item.json.task_description }} <br> Link do zgłoszenia: {{ $('Jira Cloud Issue by Image').item.json.self }} <br> Z poważaniem,<br> System powiadomień Jira",
+          "subject": "Nowe zgłoszenie jira"
+        },
+        "notificationRecipientsUi": {
+          "notificationRecipientsValues": {
+            "reporter": false,
+            "assignee": false,
+            "watchers": false,
+            "voters": false,
+            "users": "={{ $('recipients - jira').item.json.jira_id }}",
+            "groups": []
+          }
+        },
+        "notificationRecipientsRestrictionsUi": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        640
+      ],
+      "id": "507fc0a9-7f0b-4228-85c3-ef32ed39abdf",
+      "name": "Jira Software1",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "9N5May8eRJTHiQDr",
+          "name": "Jira SW Cloud account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://cttp.nazca40.com/twilio_knowshare/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.phone }}\",\n  \"template_name\": \"knowshare_template\",\n  \"language_code\": \"pl\",\n  \"variables\": [\"{{ $('assets params - jira').item.json.task_title }}\", \"{{ $('assets params - jira').item.json.task_description }}\", \"{{ $('Jira Cloud Issue by Image').item.json.self }}\", \"{{ $('Jira Cloud Issue by Image').item.json.key }}\", \"{{ $('Webhook').item.json.body.reporter }}\"]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2320,
+        660
+      ],
+      "id": "8667dd44-1efa-483f-a538-298ccab4db32",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3220,
+        720
+      ],
+      "id": "cf428aab-b5b1-4fba-805d-e219bb49fa82",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3920,
+        380
+      ],
+      "id": "15617ba1-9dd6-44f1-9650-ae0d5502314f",
+      "name": "Loop Over Items",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3740,
+        380
+      ],
+      "id": "84a07bbd-3ab8-4ab5-aa1e-25595085b628",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "fileNames",
+              "value": "={{ $('Webhook').item.json.body.content.fileNames }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3580,
+        380
+      ],
+      "id": "08571563-caca-4038-a48b-bbbdb30a8230",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ab019542-36c9-47de-848e-c9eaa988208e",
+              "leftValue": "={{ $('Start').json.assets_jira }}",
+              "rightValue": "={{ $json.asset_key }}",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        720
+      ],
+      "id": "ec207e2d-d500-4ec2-9fb5-4998f5b8986d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2880,
+        400
+      ],
+      "id": "4c47ac30-4e21-421d-a12d-70b4e8c8134a",
+      "name": "Loop Over Items1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        400
+      ],
+      "id": "98ff8c44-c5ad-48be-9313-33344da64fe8",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "recipients",
+              "value": "={{ $('Config').item.json.services.jira.recipients }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2460,
+        400
+      ],
+      "id": "24b08362-c630-4add-ad14-f1c960bade38",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json, sys\n\nfiles = _('Webhook').first().json.body.content.fileNames\nfiles_number = len(files)\nindex = items.to_py()[0][\"json\"][\"index\"]\n\nreturn [{\"attachment\": files[index]}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3380,
+        720
+      ],
+      "id": "f5b0a39b-c26e-4597-a883-b3d6c788fdab",
+      "name": "Attachment - jira"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "recipient = _input.first().json.recipients\nrecipients = _('Config').first().json.setup.recipients\njira_id = recipients[recipient][\"jira_id\"]\nphone = recipients[recipient][\"phone\"]\nreturn [{\"jira_id\": [jira_id], \"phone\": phone}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        660
+      ],
+      "id": "5e3e733a-92f7-4f6e-bb0f-30dab0d3b3a3",
+      "name": "recipients - jira"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5dc77389-58d0-4ca8-aff4-487928316913",
+              "leftValue": "={{ $('recipients - jira').item.json.jira_id[0] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        660
+      ],
+      "id": "9889543c-9119-44c8-800d-9b0d3fea421c",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "success"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3140,
+        380
+      ],
+      "id": "d5dacf89-e107-4bc7-8f52-a92c06e91fef",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "asset_id = _input.first().json.assetId\nassets_dict = _input.first().json.assets_dict\nasset_key = None\nfor asset in assets_dict.keys():\n    if asset_id == assets_dict[asset][\"id\"]:\n        asset_key = asset\n        break\nreturn [{\"asset_key\": asset_key}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        720
+      ],
+      "id": "312dd365-1aaa-4ff6-a341-495ec983cfc6",
+      "name": "assets params"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "try:\n  title = _('Create Task Title').first().json.message.content\nexcept:\n  title = _('Create Task Title from Text').first().json.message.content\ndescription = _input.first().json.message.content\nasset_id = _('Webhook').first().json.body.assetId\nassets_dict = _('Config').first().json.setup.assets\nfor asset in assets_dict.keys():\n  if assets_dict[asset][\"id\"] == asset_id:\n    jira_project_id = assets_dict[asset][\"jira_project_id\"]\n    jira_issue_type_id = assets_dict[asset][\"jira_issue_type_id\"]\nreturn [{\"jira_project_id\": jira_project_id, \"jira_issue_type_id\":jira_issue_type_id, \"task_title\":title, \"task_description\": description}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1620,
+        400
+      ],
+      "id": "f1871df9-5ac2-4252-a190-d3519773c52e",
+      "name": "assets params - jira"
+    },
+    {
+      "parameters": {
+        "content": "## Zgłoszenie Jira \n",
+        "height": 1060,
+        "width": 3980
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        180
+      ],
+      "id": "27569200-e6dc-4a1c-9ddc-50b737fad236",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 1 - Sprawdzanie warunków\n\nW ramach tego kroku sprawdzany jest warunek dla utworzenia zgłoszenia w Jira. Sprawdzane jest czy asset z którego przyszło zgłoszenie znajduje się w liście assetów w jsonie konfiguracyjnym ('Config').jira.assets. Jeżeli klucz assetu jest obecny w liście, wtedy rozpoczynana jest procedura tworzenia zgłoszenia w Jira wraz z procedurami powiadamiającymi. Następnie w zależności od tego czy analiza dotyczy tylko tekstu czy też obrazu flow wybiera jedną ze ścieżek.",
+        "height": 680,
+        "width": 680,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        240
+      ],
+      "id": "1b2eaba7-0901-41ae-94e1-7f34ab9f9967",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 2 - Tworzenie zgłoszenia\n\nW ramach tego kroku na podstawie opisu tworzone są temat zgłoszenia, jego treść, oraz realizowane jest samo zgłoszenie na Jira. ",
+        "height": 680,
+        "width": 1100,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        240
+      ],
+      "id": "99e4ba27-6984-4129-b981-735d227cd2a7",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3 - Powiadamianie użytkowników Jira (opcjonalne)\n\nW ramach tego kroku wysyłane są powiedomienia o zgłoszeniu Jira. Powiadomienia obejmują whatsapp oraz email, a wysyłane są jeżeli dany użytkownik znajduje się na liście w konfiguracji ('Config').jira.recipients.\n",
+        "height": 680,
+        "width": 1000,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        240
+      ],
+      "id": "d9e17f7f-09b3-4821-b0a3-5b793bf60f09",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 4 - Przekazywanie załączników\n\nW ramach tego kroku załączane pliki są przekazywane do utworzonego zgłoszenia Jira. ",
+        "height": 680,
+        "width": 1000,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        240
+      ],
+      "id": "0754b94f-0cc2-4ad7-8eda-5d04b622509b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Jesteś asystentem pomagającym tworzyć zgłoszenia do systemu Jira. Na podstawie treści od użytkownika stwórz jeden konkretny opis zgłoszenia. Opis złoszenia może mieć max 1000 znaków i musi zawierać konkrety; bez tytułu, sam czysty opis zdarzenia.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $('Webhook').item.json.body.content.description }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 500,
+          "n": 1,
+          "temperature": 0.2,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1260,
+        600
+      ],
+      "id": "90ca9399-2311-43cb-bd4f-00506c31c7fe",
+      "name": "Create Task Content",
+      "credentials": {
+        "openAiApi": {
+          "id": "DWFPorbaYyy4AYzM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "92dbdc9c-4a93-4514-bf6d-a71f53e43803",
+              "leftValue": "={{ $('Webhook').item.json.body.content.fileNames }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        740,
+        500
+      ],
+      "id": "75b04b5e-bab3-474f-96fd-d152ee0d8ba9",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8959c051-0776-4107-814a-5c406f26dc7d",
+              "leftValue": "={{ $('Webhook').item.json.body.content.fileNames }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3320,
+        380
+      ],
+      "id": "da121fc5-4cb6-40d4-a016-c692666bf08b",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "assetId"
+            },
+            {
+              "name": "assets_dict",
+              "type": "object"
+            },
+            {
+              "name": "assets_jira",
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        720
+      ],
+      "id": "8e37b26d-4b2a-4da1-9a38-fa2f074966b4",
+      "name": "Start"
+    }
+  ],
+  "connections": {
+    "Jira Cloud Issue by Image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task Content by Picture": {
+      "main": [
+        [
+          {
+            "node": "assets params - jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Cloud Storage1": {
+      "main": [
+        [
+          {
+            "node": "Jira Software",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task Title": {
+      "main": [
+        [
+          {
+            "node": "Create Task Content by Picture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task Title from Text": {
+      "main": [
+        [
+          {
+            "node": "Create Task Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Attachment - jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "recipients - jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - jira": {
+      "main": [
+        [
+          {
+            "node": "Google Cloud Storage1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recipients - jira": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Jira Software1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assets params": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assets params - jira": {
+      "main": [
+        [
+          {
+            "node": "Jira Cloud Issue by Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task Content": {
+      "main": [
+        [
+          {
+            "node": "assets params - jira",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Create Task Title",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Task Title from Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "assets params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "238286c6-bfb4-4c1e-9c14-917fb7f0f7cb",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-06-03T05:53:47.038Z",
+      "createdAt": "2025-06-03T05:53:47.038Z",
+      "role": "workflow:owner",
+      "workflowId": "PzcaPMgc95EtuNAU",
+      "projectId": "v3iOlUQZPnWy0OLx"
+    }
+  ],
+  "tags": []
+}
