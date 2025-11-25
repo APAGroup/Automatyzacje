@@ -1,0 +1,444 @@
+{
+  "updatedAt": "2025-06-03T07:19:44.000Z",
+  "createdAt": "2025-06-03T05:40:18.860Z",
+  "id": "sd3njWxKPRzaulAA",
+  "name": "Picture summary",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        240
+      ],
+      "id": "21425b3f-3f3c-478a-8d2a-621bf6be13d9",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
+        "height": 480,
+        "width": 1780,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        60
+      ],
+      "id": "f083b2c8-5efc-4ae2-a1df-2e2fe004ffa1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 2 - Tworzenie opisu zbiorczego\n\nW ramach tego kroku uruchamiana jest agregacja powstałych opisów do jednego opisu podsumowującego.",
+        "height": 480,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        60
+      ],
+      "id": "b3cb7624-99b3-421b-b163-aa15a961cc57",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "fileNames",
+              "type": "array"
+            },
+            {
+              "name": "description"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        240
+      ],
+      "id": "a742131b-b601-440f-9d4e-bfa254027b32",
+      "name": "Start"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        260,
+        240
+      ],
+      "id": "46ce29bb-e1d5-4605-9ace-1d478ea27ca5",
+      "name": "Split"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "fileNames",
+              "value": "={{ $json.fileNames }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        240
+      ],
+      "id": "a36f3cf9-8bb9-4b46-866a-26c9ea818edf",
+      "name": "File list"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        460,
+        240
+      ],
+      "id": "d313587b-9a6e-4110-991a-21aabda96885",
+      "name": "Loop",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        320
+      ],
+      "id": "b7ba66e6-c369-45fc-a6cc-d25697b787cd",
+      "name": "Index"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "62ec8387-d979-403a-a2cf-455d56bff842",
+              "leftValue": "={{ $json.index }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        840,
+        320
+      ],
+      "id": "fabd0439-5a94-4fbd-80bd-645e86210c44",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json, sys\n\nfiles = _('Start').first().json.fileNames\nfiles_number = len(files)\nindex = items.to_py()[0][\"json\"][\"index\"]\n\nreturn [{\"attachment\": files[index]}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        320
+      ],
+      "id": "fb122838-b67f-4ed6-8f0a-c5f89ba0de22",
+      "name": "Attachment"
+    },
+    {
+      "parameters": {
+        "resource": "object",
+        "operation": "get",
+        "bucketName": "knowshare-bucket",
+        "objectName": "={{ $json.attachment }}",
+        "alt": "media",
+        "binaryPropertyName": "image",
+        "getParameters": {},
+        "encryptionHeaders": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        320
+      ],
+      "id": "b5c6e5ea-5066-4c6c-b9fa-48b5565cbdd4",
+      "name": "GCS",
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "S3tCOMTElkvndwxE",
+          "name": "Google Cloud Storage account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=Analizuj załączony obraz oraz poniższy opis. Opisz, co znajduje się na zdjęciu w kontekście problemu technicznego. Opis ma być krótki i treściwy.\n\nOpis:  {{ $('Start').item.json.description }}",
+        "inputType": "base64",
+        "binaryPropertyName": "image",
+        "options": {
+          "detail": "auto",
+          "maxTokens": 1000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1460,
+        320
+      ],
+      "id": "8c51c022-497f-48f7-9032-ca22a424ea9b",
+      "name": "Picture Summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "DWFPorbaYyy4AYzM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Opisy:  {{ $json.content }}\nPrzeanalizuj powyższe opisy. na ich podstawie wygeneruj zgłoszenie jira"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1880,
+        240
+      ],
+      "id": "0f0bab0f-4598-45a0-8950-3ff9ef0527ac",
+      "name": "Join summaries",
+      "credentials": {
+        "openAiApi": {
+          "id": "DWFPorbaYyy4AYzM",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Join summaries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "File list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File list": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Index": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment": {
+      "main": [
+        [
+          {
+            "node": "GCS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GCS": {
+      "main": [
+        [
+          {
+            "node": "Picture Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picture Summary": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e84dd2c0-08d7-4ced-af1a-1485852aacf0",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-06-03T05:40:18.863Z",
+      "createdAt": "2025-06-03T05:40:18.863Z",
+      "role": "workflow:owner",
+      "workflowId": "sd3njWxKPRzaulAA",
+      "projectId": "v3iOlUQZPnWy0OLx"
+    }
+  ],
+  "tags": []
+}
