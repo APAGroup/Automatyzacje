@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T10:11:09.000Z",
+  "updatedAt": "2025-11-25T11:20:23.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -39,42 +39,6 @@
       ],
       "id": "af4e8fc8-3603-46e7-bdbb-637a8ab2e258",
       "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n\"index\": \"notices\",\n\"createdAt\": \"2025-10-27T06:58:47.5677181Z\",\n\"assetId\": \"08dd6221-813c-437b-8d19-6678e11a55f5\",\n\"subject\": \"Uszczerbiony kubek!\",\n\"message\": \"Znaleziono uszczerbiony kubek w szawce z naczyniami dla gości. Prośba o wymianę na nowy\",\n\"type\": 0,\n\"createdBy\": \"test test\",\n\"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": [\n\"ff57b48d-0c93-4e9d-8d19-32519adae5f98684434820700654792.jpg\",\n\"52ee9c9e-54e8-4328-950f-13bab0bd3ff74756521684993759038.jpg\",\n\"babf1377-bdfa-4e2a-9c8f-2fa87af3cfc6254830784995343420.jpg\"\n]\n}",
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        80,
-        176
-      ],
-      "id": "fd7ce4a5-ad90-46ab-beeb-d34a710447b6",
-      "name": "Knowshare flow Trello trigger",
-      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -96,7 +60,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "c9fcdb91-bb56-4bce-bb8a-967dc7ecad81",
+  "versionId": "80893b1c-59bd-4f5f-b756-e3a0b6355be5",
   "triggerCount": 0,
   "shared": [
     {
