@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T11:26:25.000Z",
+  "updatedAt": "2025-11-25T14:10:14.000Z",
   "createdAt": "2025-11-13T10:29:25.761Z",
   "id": "vqAzXyaWTrFpHWDm",
   "name": "Backup Test",
@@ -172,8 +172,7 @@
           "id": "qXIY77mLRF001Rr9",
           "name": "GitHub account 5"
         }
-      },
-      "onError": "continueRegularOutput"
+      }
     },
     {
       "parameters": {
@@ -426,7 +425,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "6117cd1b-08e6-42ed-9880-a4cd787821e3",
+  "versionId": "df1cad2e-eac8-4cda-ab94-890131d28db3",
   "triggerCount": 0,
   "shared": [
     {
