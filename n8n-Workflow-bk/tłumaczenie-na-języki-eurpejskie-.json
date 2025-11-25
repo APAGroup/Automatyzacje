@@ -1,0 +1,141 @@
+{
+  "updatedAt": "2025-11-14T12:09:59.000Z",
+  "createdAt": "2025-11-14T08:51:03.525Z",
+  "id": "jdvw9gr4Wp7uXi4J",
+  "name": "Tłumaczenie na języki eurpejskie",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"message\": \"Proszę sprawdzić dane w systemie\",\n  \"task_title\": \"Kontrola hamulców\",\n  \"task_description\": \"Hamulec nożny działa prawidłowo. Przetłumacz zgłosenie na język Holenderski\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1744,
+        80
+      ],
+      "id": "45f11e05-7550-4a5b-8d6b-fca020c03028",
+      "name": "Constants"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1952,
+        80
+      ],
+      "id": "97778b6b-9c66-445d-8b6b-78ee3723b7b8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz surowy tekst z pola \"text\"\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Sprawdź, czy tekst zawiera ```json i usuń jeśli tak\nif (raw.includes(\"```json\")) {\n    raw = raw.replace(/```json\\\\n|```/g, '').replace(/\\\\n/g, '\\n').trim();\n} else {\n    // usuń ewentualne nowe linie i białe znaki z końca\n    raw = raw.trim();\n}\n\n// Spróbuj sparsować JSON\nlet parsed;\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // jeśli JSON jest niepoprawny, zwróć puste pola\n    parsed = {\n        task_title: \"\",\n        task_description: \"\"\n    };\n}\n\n// Zwróć jako JSON dla kolejnych węzłów\nreturn [{ json: parsed }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1072,
+        80
+      ],
+      "id": "e49c62a5-c1c4-41a1-b5c3-00d2c75636db",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Twoim zadaniem jest tłumaczyć pola `task_title` i `task_description` TYLKO wtedy, gdy w polu \"message\" znajduje się wyraźne polecenie tłumaczenia.\n\nPolecenia tłumaczenia mogą zawierać słowa: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\nJeżeli wykryjesz polecenie:\n1. Przetłumacz pola `task_title` i `task_description` na język docelowy wskazany w poleceniu.\n2. Tłumaczenie wykonuj TYLKO jeśli:\n   - tekst źródłowy jest napisany alfabetem łacińskim (litery A–Z oraz znaki diakrytyczne typowe dla europejskich języków łacińskich)\n   - **i język docelowy używa alfabetu łacińskiego** (np. angielski, niemiecki, francuski, hiszpański, włoski, polski, niderlandzki, itp.)\n   Nie tłumacz na języki używające innych alfabetów (np. cyrylica, grecki, arabski, chiński itp.).\n3. Nie zmieniaj struktury zdań poza tłumaczeniem.\n4. Jeżeli język docelowy nie jest jednoznacznie rozpoznany (np. literówka, nieznany język) → zwróć tekst BEZ ZMIAN.\n\n\nJeżeli w polu \"message\" NIE ma polecenia tłumaczenia → zwróć task_title i task_description BEZ ZMIAN.\n\nZawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n{\n  \"task_title\": \"...\",\n  \"task_description\": \"...\"\n}\n"
+            },
+            {
+              "content": "=message: {{$json[\"message\"]}}\ntask_title: {{$json[\"task_title\"]}}\ntask_description: {{$json[\"task_description\"]}}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -1424,
+        80
+      ],
+      "id": "ddfe29ec-f9ed-48ca-bb9f-950d2275ca90",
+      "name": "Translation Option",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Constants": {
+      "main": [
+        [
+          {
+            "node": "Translation Option",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Constants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translation Option": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7d152a5b-53a2-4c66-b99c-91c3eb3fc9ac",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-14T08:51:03.527Z",
+      "createdAt": "2025-11-14T08:51:03.527Z",
+      "role": "workflow:owner",
+      "workflowId": "jdvw9gr4Wp7uXi4J",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
