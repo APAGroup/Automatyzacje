@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T13:01:38.000Z",
+  "updatedAt": "2025-11-25T13:44:08.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "test 3",
@@ -7,18 +7,69 @@
   "isArchived": false,
   "nodes": [
     {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.trello.com/1/cards/{{ $('Create a card').item.json.id }}/attachments",
+        "sendQuery": true,
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "image"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -432,
+        -384
+      ],
+      "id": "f85185da-0d48-47fc-963f-ea567a3e9960",
+      "name": "Add attachment"
+    },
+    {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -112,
-        -128
+        -784,
+        -208
       ],
-      "id": "8ff8e0ce-6373-4b41-9e03-70f7f78cf7a5",
+      "id": "adae0140-ead8-4d4f-8f89-466a978fce8b",
       "name": "When clicking ‘Execute workflow’"
     }
   ],
-  "connections": {},
+  "connections": {
+    "Add attachment": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    }
+  },
   "settings": {
     "executionOrder": "v1"
   },
@@ -27,7 +78,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "4b056cfd-aa90-4854-8f7a-272686eb281a",
+  "versionId": "afadf27d-07c1-455d-ac57-6a72a170bb7a",
   "triggerCount": 0,
   "shared": [
     {
