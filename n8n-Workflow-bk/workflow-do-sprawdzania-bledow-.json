@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T12:12:39.000Z",
+  "updatedAt": "2025-11-25T12:14:01.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -13,10 +13,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -64,
-        -96
+        160,
+        -80
       ],
-      "id": "3ac71869-ddf5-4ceb-9d84-c7c37380cdce",
+      "id": "f47ffe72-2bd7-4ca2-bc62-10f0a276bb9f",
       "name": "Code2"
     },
     {
@@ -42,10 +42,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        2112,
-        448
+        2336,
+        464
       ],
-      "id": "bd75b93e-091b-4643-adb1-4d70ec878ef2",
+      "id": "b2d5094e-d463-4e6e-86ee-e0fe7b952f73",
       "name": "Get row(s)"
     },
     {
@@ -57,10 +57,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        2352,
-        448
+        2576,
+        464
       ],
-      "id": "36ce09f4-ab51-4889-b0d3-9da170954e2a",
+      "id": "9085487e-ad65-4471-bc16-4669b84e1f5f",
       "name": "Aggregate"
     },
     {
@@ -70,10 +70,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2592,
-        448
+        2816,
+        464
       ],
-      "id": "15c80e1b-9163-4310-8ef9-5d881ee50dd2",
+      "id": "438af6af-0084-46b3-951a-defbd00a11f1",
       "name": "Creating report"
     },
     {
@@ -144,10 +144,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        144,
-        -96
+        368,
+        -80
       ],
-      "id": "493575ae-567e-4171-836d-72e121281855",
+      "id": "4d172536-b8f2-4610-93ad-d4f79480aa74",
       "name": "Save cases"
     },
     {
@@ -164,10 +164,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -272,
-        432
+        -48,
+        448
       ],
-      "id": "cadcbec6-7315-4681-be9b-8c3a0c599502",
+      "id": "5f0ba173-a2b2-4926-84a5-41f8fae6ea81",
       "name": "Schedule Trigger"
     },
     {
@@ -182,10 +182,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2832,
-        448
+        3056,
+        464
       ],
-      "id": "1e8eda29-e6ea-4bc3-a592-b5712a91c400",
+      "id": "c55f9988-edca-441b-bbc6-13124cd10d3d",
       "name": "HTTP Request"
     },
     {
@@ -195,10 +195,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1152,
-        336
+        1376,
+        352
       ],
-      "id": "7a06d228-9042-4af0-b971-7fac13dfcc67",
+      "id": "2a13fd89-378f-4881-a97c-863fa957f939",
       "name": "Loop Over Items"
     },
     {
@@ -269,10 +269,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        1296,
-        464
+        1520,
+        480
       ],
-      "id": "88965ede-7608-43b6-846f-62510fc65e06",
+      "id": "6ba32556-b8c0-4df3-a5ca-097002e64048",
       "name": "Save cases1"
     },
     {
@@ -282,10 +282,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1872,
-        448
+        2096,
+        464
       ],
-      "id": "ccac12f3-85aa-4a90-ad1d-3aa45adf7b25",
+      "id": "66f631b2-936e-4494-8982-ac1c01b3ddbb",
       "name": "Wait",
       "webhookId": "f3aea78d-9900-4c68-9e48-81a1414ff5e3"
     },
@@ -296,12 +296,48 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        192,
-        432
+        416,
+        448
       ],
-      "id": "704c28d1-9789-42aa-a7a3-71765ec5d174",
+      "id": "db3998d6-288b-46cd-aa28-43f8c0c68d4a",
       "name": "Wait1",
       "webhookId": "336cc6f5-9f85-4088-808e-ac09596c79c1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n\"index\": \"notices\",\n\"createdAt\": \"2025-10-27T06:58:47.5677181Z\",\n\"assetId\": \"08dd6221-813c-437b-8d19-6678e11a55f5\",\n\"subject\": \"Uszczerbiony kubek!\",\n\"message\": \"Znaleziono uszczerbiony kubek w szawce z naczyniami dla gości. Prośba o wymianę na nowy\",\n\"type\": 0,\n\"createdBy\": \"test test\",\n\"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": [\n\"ff57b48d-0c93-4e9d-8d19-32519adae5f98684434820700654792.jpg\",\n\"52ee9c9e-54e8-4328-950f-13bab0bd3ff74756521684993759038.jpg\",\n\"babf1377-bdfa-4e2a-9c8f-2fa87af3cfc6254830784995343420.jpg\"\n]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        448
+      ],
+      "id": "93cad18b-8965-4484-9e57-7ee27492e057",
+      "name": "Knowshare flow Trello trigger",
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -320,10 +356,10 @@
       "type": "n8n-nodes-base.microsoftOutlook",
       "typeVersion": 2,
       "position": [
-        416,
-        432
+        640,
+        448
       ],
-      "id": "7df64c15-0c2b-49cf-be8c-a343822b2877",
+      "id": "3d77556c-49e3-4110-a935-a4ddfb872c6f",
       "name": "Get newest knowshare notice",
       "webhookId": "e2507218-fee5-431c-94b5-a294a8027dfd"
     },
@@ -334,10 +370,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        896,
-        432
+        1120,
+        448
       ],
-      "id": "0fde370c-3aa7-407e-8e34-39cad42509c1",
+      "id": "a4ca3940-49f3-4152-b923-46b92d25cf31",
       "name": "Code5"
     },
     {
@@ -377,10 +413,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1456,
-        464
+        1680,
+        480
       ],
-      "id": "fed3bbb6-7c97-432a-a9db-35f80767a624",
+      "id": "90e43e9e-899e-4667-86ef-1aa46bee1427",
       "name": "If"
     },
     {
@@ -395,10 +431,10 @@
       "type": "n8n-nodes-base.trello",
       "typeVersion": 1,
       "position": [
-        1616,
-        464
+        1840,
+        480
       ],
-      "id": "dd41668e-81dd-41ba-8aef-79721273fc14",
+      "id": "d868e292-a1cc-4495-a698-f85958f4ff15",
       "name": "Delete a card",
       "credentials": {
         "trelloApi": {
@@ -416,10 +452,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -416,
-        144
+        -192,
+        160
       ],
-      "id": "fc6dfca9-1b57-42db-8de3-de86b7becd1c",
+      "id": "c7a8dae2-9314-4c05-93ac-b0fda02615eb",
       "name": "Sticky Note"
     },
     {
@@ -432,10 +468,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -416,
-        -224
+        -192,
+        -208
       ],
-      "id": "f044007e-f552-4603-a8c0-2b9932f5384d",
+      "id": "95551b26-41a1-4ad0-8a2d-7f22594856e1",
       "name": "Sticky Note1"
     },
     {
@@ -448,10 +484,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -96,
-        240
+        128,
+        256
       ],
-      "id": "ca9bc64d-ae2d-4975-8f21-a59f4739ca62",
+      "id": "bc516149-420d-444f-a115-36ec6d03a028",
       "name": "Sticky Note2"
     },
     {
@@ -464,10 +500,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        352,
-        240
+        576,
+        256
       ],
-      "id": "de415025-9a2f-41cc-bbab-85b9a030cdb7",
+      "id": "d018d3ac-a131-4024-a48e-99fea39d3416",
       "name": "Sticky Note3"
     },
     {
@@ -480,10 +516,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        592,
-        240
+        816,
+        256
       ],
-      "id": "c542256c-15f8-4aef-9f22-04600efb53c1",
+      "id": "eeff70f2-610f-43f4-aebb-b9ccae50bc9b",
       "name": "Sticky Note4"
     },
     {
@@ -496,10 +532,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        832,
-        240
+        1056,
+        256
       ],
-      "id": "aa41bf35-a25a-480a-97e7-3e5854968dc4",
+      "id": "246c6116-8876-4f10-92f1-03284920ae00",
       "name": "Sticky Note5"
     },
     {
@@ -512,10 +548,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1072,
-        240
+        1296,
+        256
       ],
-      "id": "a20c706d-976d-418b-b273-9b1af984a25d",
+      "id": "f2e728f5-1bde-4082-bffa-035053bbf65a",
       "name": "Sticky Note6"
     },
     {
@@ -528,10 +564,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2048,
-        240
+        2272,
+        256
       ],
-      "id": "456587c0-58d5-40ee-ae9f-3e721386b7ad",
+      "id": "2fca3e57-4cbd-46fa-a702-0868baad54e0",
       "name": "Sticky Note7"
     },
     {
@@ -544,10 +580,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2288,
-        240
+        2512,
+        256
       ],
-      "id": "e2fcb029-8e0a-485e-92ef-256e0b3eeb65",
+      "id": "f888626b-3c36-4c07-9493-e0233e84f264",
       "name": "Sticky Note8"
     },
     {
@@ -560,10 +596,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2528,
-        240
+        2752,
+        256
       ],
-      "id": "1ec02c59-ea30-459b-979c-b1060e7f776c",
+      "id": "23bdc7ae-1111-4226-b232-d2fb14dd4762",
       "name": "Sticky Note9"
     },
     {
@@ -576,10 +612,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2768,
-        240
+        2992,
+        256
       ],
-      "id": "d19dc41a-4d98-4b19-8e7f-1ae6fd073823",
+      "id": "b210d19f-7290-4333-8ec4-6cd75feb0eb0",
       "name": "Sticky Note10"
     },
     {
@@ -592,10 +628,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -336,
-        240
+        -112,
+        256
       ],
-      "id": "9f60966f-ec9c-4828-b4db-4e6596c6c44b",
+      "id": "cbbcf209-d4f0-4142-a43a-4df5470ba604",
       "name": "Sticky Note11"
     },
     {
@@ -608,10 +644,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        144,
-        240
+        368,
+        256
       ],
-      "id": "aba8fd00-40a0-4b43-8a9d-b50522018339",
+      "id": "aad74e87-3f42-4b9f-ab4e-3728504ed3f4",
       "name": "Sticky Note12"
     },
     {
@@ -624,10 +660,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1808,
-        240
+        2032,
+        256
       ],
-      "id": "4a23eede-a4ed-4dc1-b0bb-da32be7f8f24",
+      "id": "a5cec15f-a863-4f5f-940c-96280411c639",
       "name": "Sticky Note13"
     },
     {
@@ -651,10 +687,10 @@
       "type": "n8n-nodes-base.nocoDb",
       "typeVersion": 3,
       "position": [
-        656,
-        432
+        880,
+        448
       ],
-      "id": "c188b965-13e4-4751-9c54-895ae36ad6a0",
+      "id": "190637d9-acda-45c1-bf3d-d10b0ac7a372",
       "name": "Create latest record"
     }
   ],
@@ -707,7 +743,7 @@
       "main": [
         [
           {
-            "node": "Wait1",
+            "node": "Knowshare flow Trello trigger",
             "type": "main",
             "index": 0
           }
@@ -759,6 +795,17 @@
         [
           {
             "node": "Get newest knowshare notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowshare flow Trello trigger": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
             "type": "main",
             "index": 0
           }
@@ -854,7 +901,7 @@
       }
     ]
   },
-  "versionId": "8edc9209-ede2-470b-9e63-9926aa24c999",
+  "versionId": "96ad35f2-e0ad-4a6d-ba0f-e21d9d83b0b3",
   "triggerCount": 0,
   "shared": [
     {
