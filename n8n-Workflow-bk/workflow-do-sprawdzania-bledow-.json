@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T12:34:59.000Z",
+  "updatedAt": "2025-11-25T12:40:05.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -17,10 +17,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -5072,
-        816
+        -5056,
+        912
       ],
-      "id": "29b6d955-b621-410f-b204-7ecff9b3144f",
+      "id": "caf35707-4df8-4420-9573-456a0dfb4024",
       "name": "Webhook",
       "webhookId": "9fa3910c-8207-4351-b79b-b74b65ec4a3c"
     },
@@ -52,10 +52,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        -1920,
-        272
+        -1904,
+        368
       ],
-      "id": "c33c9464-10b9-468f-b0e1-4d7659f50bbe",
+      "id": "40791788-136c-493f-af4a-aaea65cd76b8",
       "name": "Create Task Content by Picture",
       "credentials": {
         "openAiApi": {
@@ -93,10 +93,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        -2256,
-        272
+        -2240,
+        368
       ],
-      "id": "e5ab0345-bab8-41c7-b08d-ae679c73f765",
+      "id": "13f69aba-59f2-45f2-b398-10a56f0afa0b",
       "name": "Create Task Title",
       "credentials": {
         "openAiApi": {
@@ -129,10 +129,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        -3280,
-        240
+        -3264,
+        336
       ],
-      "id": "c906081d-e217-48b2-8b95-95989b972c68",
+      "id": "470f6a3f-65ee-4b1d-aca4-12f0cd7e5d3f",
       "name": "Create Picture Summary1",
       "credentials": {
         "openAiApi": {
@@ -162,10 +162,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        -3680,
-        320
+        -3664,
+        416
       ],
-      "id": "456a9019-41c0-4b0c-aa03-5e9356110a6d",
+      "id": "19b7dea5-f88d-4aea-8030-a781a2789198",
       "name": "Create Picture Summary",
       "credentials": {
         "openAiApi": {
@@ -181,10 +181,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1744,
-        336
+        1760,
+        432
       ],
-      "id": "bac51891-817c-4fde-95d7-c82365d1019f",
+      "id": "4e1e1b34-0615-4339-a674-604cd24b9802",
       "name": "Loop Over Items",
       "alwaysOutputData": false
     },
@@ -202,10 +202,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -3440,
-        240
+        -3424,
+        336
       ],
-      "id": "2ecc8b1b-c49b-4e72-a1d8-ba7d2453abbd",
+      "id": "27bd1fd7-5941-4650-ac96-ab75baa33d48",
       "name": "Aggregate"
     },
     {
@@ -216,10 +216,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1120,
-        112
+        1136,
+        208
       ],
-      "id": "6e6a4d8b-0303-41ec-b03f-c6069b791d00",
+      "id": "9f3149d3-a5cb-4280-bcd7-0a93d90f9e61",
       "name": "Split Out1"
     },
     {
@@ -239,10 +239,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        960,
-        112
+        976,
+        208
       ],
-      "id": "dbca09e1-fc8f-4bea-affe-ce0f93d4327b",
+      "id": "ccaae570-20e9-4bf3-9555-890211f69fe6",
       "name": "Edit Fields3"
     },
     {
@@ -254,10 +254,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -5120,
-        240
+        -5104,
+        336
       ],
-      "id": "e71e832c-3ec1-4979-99c6-54cf813af3d3",
+      "id": "7d53e1f4-7d8d-4611-9ca2-ef08e217fead",
       "name": "Loop parameter - chat"
     },
     {
@@ -268,10 +268,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -4960,
-        240
+        -4944,
+        336
       ],
-      "id": "faa91c1e-f85f-44e0-ba93-d32020862e88",
+      "id": "383d4cf3-94ed-4c62-b470-4d23a0300968",
       "name": "Split Out - chat"
     },
     {
@@ -281,10 +281,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -4768,
-        240
+        -4752,
+        336
       ],
-      "id": "94c6834f-0902-47a5-9e75-3560e7fb9e14",
+      "id": "3850691f-2681-4fbc-8702-8ba0ecaa1644",
       "name": "Loop Over Items - chat",
       "alwaysOutputData": false
     },
@@ -297,10 +297,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4128,
-        816
+        -4112,
+        912
       ],
-      "id": "1513ba46-609e-4e21-a05f-546459bd5ba3",
+      "id": "9fd7b082-3eb8-48a1-bb6f-6b1769d9eecd",
       "name": "Config"
     },
     {
@@ -331,10 +331,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -304,
-        912
+        -288,
+        1008
       ],
-      "id": "296c1ee3-9b8c-4218-9af2-487848e706e9",
+      "id": "6815b4a4-95ba-4778-bc76-2c1f5c4b52ed",
       "name": "If"
     },
     {
@@ -344,10 +344,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        5008,
-        880
+        5024,
+        976
       ],
-      "id": "2938c07a-6dcf-4574-9082-d1ecae318652",
+      "id": "a0571ad3-0947-41ea-8fd7-313eecf1be5c",
       "name": "Loop Over Items3",
       "alwaysOutputData": false
     },
@@ -359,10 +359,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        4800,
-        592
+        4816,
+        688
       ],
-      "id": "98240dff-977a-4677-8c73-59a7d2465521",
+      "id": "8e8328d6-8424-489a-a035-d8c211823fb6",
       "name": "Split Out3"
     },
     {
@@ -382,10 +382,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        4496,
-        656
+        4512,
+        752
       ],
-      "id": "1fc975df-8707-45cc-a43f-f47c755653ad",
+      "id": "6aba668c-cb41-4e81-bbb8-20a84b9978f8",
       "name": "Edit Fields6"
     },
     {
@@ -395,10 +395,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4288,
-        320
+        -4272,
+        416
       ],
-      "id": "4ad775fb-0e8c-471f-88b7-63a63a0db573",
+      "id": "94c96e03-6612-4e38-a52c-8726ed5841a7",
       "name": "Attachment - chat"
     },
     {
@@ -439,10 +439,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        4496,
-        864
+        4512,
+        960
       ],
-      "id": "1583d441-049f-4967-891b-ba95fa3fa459",
+      "id": "ce5db03b-7b45-4325-91d5-752af9c0ac35",
       "name": "If3"
     },
     {
@@ -459,10 +459,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        2048,
-        576
+        2064,
+        672
       ],
-      "id": "af0b17dc-1fd1-46a4-84d1-e3383239ef49",
+      "id": "a41ae2ff-027e-4393-9849-5ee315d28a8d",
       "name": "Aggregate2"
     },
     {
@@ -479,10 +479,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        4320,
-        656
+        4336,
+        752
       ],
-      "id": "6b212b54-9fad-4b95-b364-4727ed526d86",
+      "id": "5fbf16c1-7923-4d54-8a9a-601aa6e4a5b8",
       "name": "Aggregate3"
     },
     {
@@ -497,10 +497,10 @@
       "type": "n8n-nodes-base.twilio",
       "typeVersion": 1,
       "position": [
-        3488,
-        688
+        3504,
+        784
       ],
-      "id": "d86151ec-4fd8-41e2-8f3c-935d8778bcd7",
+      "id": "cdc7cf56-f338-4ee4-b9c0-1dc2409b6a0a",
       "name": "Twilio",
       "onError": "continueRegularOutput"
     },
@@ -511,10 +511,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        4000,
-        848
+        4016,
+        944
       ],
-      "id": "6cbdec85-2970-4a9f-bb1c-d98e4b3194a8",
+      "id": "5ea296ad-4b85-43ff-8b48-4dcccbf2a7a6",
       "name": "Loop Over Items4",
       "alwaysOutputData": false
     },
@@ -556,10 +556,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2992,
-        800
+        3008,
+        896
       ],
-      "id": "da6f0ad1-6126-4982-b081-caa43ec3ccad",
+      "id": "968f8df5-71a5-49ab-a663-0d5b57412570",
       "name": "If5"
     },
     {
@@ -570,10 +570,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        3792,
-        592
+        3808,
+        688
       ],
-      "id": "cd3abbad-160b-4bbd-acc7-cc9b3a6bd5bc",
+      "id": "39d1bfc4-3112-4f18-82b5-750ecc30bbb0",
       "name": "Split Out4"
     },
     {
@@ -593,10 +593,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3488,
-        544
+        3504,
+        640
       ],
-      "id": "0d1430da-4799-4e4f-a959-fa3eb9bd27f5",
+      "id": "6a37c3d1-8aaa-412e-bf12-9b908c9ec762",
       "name": "Edit Fields7"
     },
     {
@@ -606,10 +606,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2832,
-        800
+        2848,
+        896
       ],
-      "id": "d088b575-2504-4853-b32f-819dcb37f0ac",
+      "id": "05c570a7-0a02-455f-87da-5f4bedb76d0b",
       "name": "recipients - sms"
     },
     {
@@ -619,10 +619,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4320,
-        864
+        4336,
+        960
       ],
-      "id": "c4db2081-f777-49c9-8b60-0de67f278db5",
+      "id": "a9c293a1-dc4e-4bcd-b2bc-9280386e2d06",
       "name": "recipients - email"
     },
     {
@@ -635,10 +635,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -4528,
-        576
+        -4512,
+        672
       ],
-      "id": "d476fca6-511a-45a7-b0d0-7196b5bfc357",
+      "id": "c0b63df9-b0ac-4fff-b7f3-f8b6fe35b852",
       "name": "Sticky Note"
     },
     {
@@ -651,10 +651,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -5152,
-        64
+        -5136,
+        160
       ],
-      "id": "47d3d513-c385-4a22-acad-fcbb0d21b24c",
+      "id": "e524f18a-0687-4642-80db-abb013af68e6",
       "name": "Sticky Note1"
     },
     {
@@ -667,10 +667,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -3520,
-        64
+        -3504,
+        160
       ],
-      "id": "4318e5b5-cef1-4492-9dd4-d663b7f18cca",
+      "id": "d8c91e19-1c8b-4f4a-8434-e0d1a8be123b",
       "name": "Sticky Note2"
     },
     {
@@ -682,10 +682,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -464,
-        -144
+        -448,
+        -48
       ],
-      "id": "b4518621-2339-425d-b326-c8fc2a07d923",
+      "id": "9554fb5c-c9a0-440f-8427-c9792daf4f0c",
       "name": "Sticky Note3"
     },
     {
@@ -698,10 +698,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -224,
-        192
+        -208,
+        288
       ],
-      "id": "a0859f0f-152b-47c7-9663-541b65fb2cc0",
+      "id": "10ff2f32-3153-4703-afe6-1cd004dec090",
       "name": "Sticky Note5"
     },
     {
@@ -714,10 +714,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        928,
-        -64
+        944,
+        32
       ],
-      "id": "7ca91c9e-1d00-455e-9019-f363d62e4ef9",
+      "id": "ac1bdc15-55a2-4180-8e0e-a4581bbbe277",
       "name": "Sticky Note7"
     },
     {
@@ -730,10 +730,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        4240,
-        480
+        4256,
+        576
       ],
-      "id": "b97c2713-25fe-4838-8a49-33f283944766",
+      "id": "9d6742ae-60d4-4ad2-99ed-df0fb14741ac",
       "name": "Sticky Note9"
     },
     {
@@ -746,10 +746,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2016,
-        368
+        2032,
+        464
       ],
-      "id": "89dbea90-988a-4dcf-bb65-6cc476aa28cf",
+      "id": "7d3f4fb4-4d6c-43d4-ad43-abb648b50a08",
       "name": "Sticky Note10"
     },
     {
@@ -762,10 +762,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -3520,
-        576
+        -3504,
+        672
       ],
-      "id": "0c483e3c-cabd-45e8-8434-61091c8ccffc",
+      "id": "03c9c191-db48-48e7-94e3-eb46ed2b0a34",
       "name": "Sticky Note12"
     },
     {
@@ -796,10 +796,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -2496,
-        528
+        -2480,
+        624
       ],
-      "id": "4891bec5-3d41-4793-997c-a76a96db3582",
+      "id": "888dd7ed-45a3-4976-bc26-49960eb7d52f",
       "name": "If7"
     },
     {
@@ -812,10 +812,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -5152,
-        576
+        -5136,
+        672
       ],
-      "id": "6ce3b37a-fb7d-464b-8610-747ce4e69f36",
+      "id": "e3489683-a225-4d2c-8dd6-c2597c1344f1",
       "name": "Sticky Note13"
     },
     {
@@ -828,10 +828,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -2976,
-        64
+        -2960,
+        160
       ],
-      "id": "03afe4d6-5027-42bb-bc4e-1e29fb27b5f4",
+      "id": "56ab926c-98c6-499e-a546-a9751cfa9268",
       "name": "Sticky Note15"
     },
     {
@@ -844,10 +844,10 @@
       "type": "n8n-nodes-base.microsoftOutlook",
       "typeVersion": 2,
       "position": [
-        4800,
-        752
+        4816,
+        848
       ],
-      "id": "7ab07a8f-6ee9-4c88-9850-b162de3fe99d",
+      "id": "4646a2e6-6b4e-4230-901f-7834a5308817",
       "name": "Send a message",
       "webhookId": "c54de9a7-0df7-4981-bb55-8e27364838a8"
     },
@@ -879,10 +879,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -3312,
-        800
+        -3296,
+        896
       ],
-      "id": "ff01d641-a2f3-468b-9494-9f3e14c4f5ef",
+      "id": "3a376056-9e75-4d77-9043-80408a8bae5d",
       "name": "If there are attachments"
     },
     {
@@ -902,10 +902,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4608,
-        320
+        -4592,
+        416
       ],
-      "id": "98232502-25eb-4814-a59b-4adba06cec84",
+      "id": "996fa549-9b84-4511-bc50-548eb632adbf",
       "name": "Set index"
     },
     {
@@ -935,10 +935,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -4464,
-        320
+        -4448,
+        416
       ],
-      "id": "ff7df947-6875-4a29-a6bc-26dfd0af8f34",
+      "id": "07641923-f291-4b5e-9091-2118d39a634e",
       "name": "Check index"
     },
     {
@@ -950,10 +950,10 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        -4096,
-        320
+        -4080,
+        416
       ],
-      "id": "54d61a3f-fb54-465e-bf3d-4046248a0d3c",
+      "id": "b2a6cc33-9583-49ba-8930-35493d6df921",
       "name": "Fetch image - chat"
     },
     {
@@ -963,10 +963,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -3872,
-        320
+        -3856,
+        416
       ],
-      "id": "aa376cda-9794-4d75-bb95-524002eef082",
+      "id": "27644216-d7c1-49e3-849b-d9b3ee2679a0",
       "name": "Change mime type - chat"
     },
     {
@@ -997,10 +997,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -4848,
-        816
+        -4832,
+        912
       ],
-      "id": "e0db8731-ed20-4394-8fd1-e4902d458042",
+      "id": "a8d58be5-9319-425e-b8ac-ff410225891b",
       "name": "If4"
     },
     {
@@ -1010,10 +1010,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2656,
-        528
+        -2640,
+        624
       ],
-      "id": "39fee539-33d6-4017-9184-449900961583",
+      "id": "93e3f116-0de8-40d7-8a44-b1d26fb2551d",
       "name": "assets params"
     },
     {
@@ -1026,10 +1026,10 @@
       "type": "n8n-nodes-base.trello",
       "typeVersion": 1,
       "position": [
-        -64,
-        512
+        -48,
+        608
       ],
-      "id": "be35f4fc-4c2c-43d3-9525-f827239ee63a",
+      "id": "1b8bafb5-15e9-42ac-9b49-fa708a5d3dea",
       "name": "Create a card",
       "credentials": {
         "trelloApi": {
@@ -1055,10 +1055,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        992,
-        336
+        1008,
+        432
       ],
-      "id": "ba440815-156c-4856-a52c-a43167db6353",
+      "id": "206edb85-e295-4081-a2c4-3e6235788f9a",
       "name": "Set index - trello"
     },
     {
@@ -1068,10 +1068,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1136,
-        336
+        1152,
+        432
       ],
-      "id": "695ed5eb-20d9-48a5-9c1e-a66a9e1b8528",
+      "id": "f5d01dc7-662e-4325-8214-4bc2e74bc9ee",
       "name": "Attachment - trello"
     },
     {
@@ -1083,10 +1083,10 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        1280,
-        336
+        1296,
+        432
       ],
-      "id": "783bfe00-0289-492d-879c-ee10feb7fcd1",
+      "id": "d3e574d2-a4e4-4374-90cb-470ae890b334",
       "name": "Fetch image - trello"
     },
     {
@@ -1096,10 +1096,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1440,
-        336
+        1456,
+        432
       ],
-      "id": "cd43d918-011a-4d56-8b7e-1ba70487a30d",
+      "id": "d41d85c0-8c0f-434d-b0a1-e40a89d2f536",
       "name": "Change mime type - trello"
     },
     {
@@ -1147,10 +1147,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        3792,
-        720
+        3808,
+        816
       ],
-      "id": "ff2545c7-e758-46dc-b573-226e7774b654",
+      "id": "021d51e8-c4c2-42c8-9ee5-8beb296aff40",
       "name": "Update row(s)"
     },
     {
@@ -1174,10 +1174,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        3632,
-        720
+        3648,
+        816
       ],
-      "id": "1a32611d-de69-4287-ac95-c5ccb60c491c",
+      "id": "0700e782-d3fb-49d7-ad0c-2ba1d972d5ba",
       "name": "Get row(s)"
     },
     {
@@ -1202,10 +1202,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        2240,
-        576
+        2256,
+        672
       ],
-      "id": "2b889aec-09ff-4db5-89fb-771b326ee68d",
+      "id": "903d7cef-8210-4404-9841-18f31b613a55",
       "name": "Get sms number"
     },
     {
@@ -1235,10 +1235,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2384,
-        576
+        2400,
+        672
       ],
-      "id": "6c7c3a09-5c10-4919-9d3c-ea8891d16415",
+      "id": "40bffe25-d8a2-44bd-8858-22558c728062",
       "name": "Check sms limit"
     },
     {
@@ -1248,10 +1248,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1392,
-        496
+        -1376,
+        592
       ],
-      "id": "1674e0a3-cd50-4e8e-ad51-cd4c3cbaaa69",
+      "id": "8c102fb8-7ede-415b-ba22-6edccc02ebcd",
       "name": "assets params - trello"
     },
     {
@@ -1279,10 +1279,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        -1120,
-        496
+        -1104,
+        592
       ],
-      "id": "398674d9-e84e-4853-9732-c1edd0c55d64",
+      "id": "d4c58693-3c1a-49a3-9910-1a1d8dd306f8",
       "name": "Translation Option",
       "credentials": {
         "openAiApi": {
@@ -1301,10 +1301,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -1424,
-        256
+        -1408,
+        352
       ],
-      "id": "f53f1e83-3f52-4f8a-bad8-95666eb025e5",
+      "id": "0048eda6-eee3-4abb-8605-e7359620150b",
       "name": "Sticky Note4"
     },
     {
@@ -1314,10 +1314,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -768,
-        496
+        -752,
+        592
       ],
-      "id": "af9bccb3-a194-4eda-a144-6ffb6b1b0557",
+      "id": "612543f9-4c4f-4901-8fe8-d7b45a87dce8",
       "name": "Translation Option - Parse"
     },
     {
@@ -1348,10 +1348,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        512,
-        752
+        528,
+        848
       ],
-      "id": "c468a1c7-ea4d-4039-ab8b-9c673c29d19e",
+      "id": "e9a5b52c-3eba-41d2-a0bb-17fdc37c3b6a",
       "name": "If there are attachments1"
     },
     {
@@ -1364,10 +1364,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        288,
-        480
+        304,
+        576
       ],
-      "id": "9ae41137-6c13-4d9c-b248-915f06a3e5b1",
+      "id": "4994e92d-17d0-4207-9324-fd42f7b54986",
       "name": "Sticky Note8"
     },
     {
@@ -1377,10 +1377,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3264,
-        560
+        3280,
+        656
       ],
-      "id": "267d5dab-dcf5-4e35-ae11-a8ce7c759203",
+      "id": "97edec41-fccd-4a70-b9d0-3661f3ab60dd",
       "name": "SMS Final"
     },
     {
@@ -1408,10 +1408,10 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        2880,
-        560
+        2896,
+        656
       ],
-      "id": "0bc1dc67-d725-43ab-b71f-ed84087f3983",
+      "id": "c4f2d610-5f47-4cbf-830a-51ef7a247ed2",
       "name": "Text shortening",
       "credentials": {
         "openAiApi": {
@@ -1427,10 +1427,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2656,
-        560
+        2672,
+        656
       ],
-      "id": "6e55ace8-0765-4010-a2f8-92a7dda6cb55",
+      "id": "f60c1a6e-612b-47f1-abd3-1c61ffdd62a7",
       "name": "SMS part 1"
     },
     {
@@ -1443,10 +1443,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2608,
-        512
+        2624,
+        608
       ],
-      "id": "60ce38ef-fbdf-4aea-ae22-360dc522eb6d",
+      "id": "c2c4dc68-14b6-4efa-8ff2-68f3acedbb79",
       "name": "Sticky Note6"
     }
   ],
@@ -2163,7 +2163,7 @@
       }
     ]
   },
-  "versionId": "804f99a0-4117-4095-bd18-3bd7ee075c1e",
+  "versionId": "775e86bf-595f-4890-8154-eede4834ff12",
   "triggerCount": 0,
   "shared": [
     {
