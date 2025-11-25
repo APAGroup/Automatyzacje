@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T11:20:23.000Z",
+  "updatedAt": "2025-11-25T11:21:29.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -39,6 +39,24 @@
       ],
       "id": "af4e8fc8-3603-46e7-bdbb-637a8ab2e258",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apaspzoo.webhook.office.com/webhookb2/556a2bd6-5100-4422-8f36-1814da029aa2@cb49c4c6-5d1c-46aa-b78b-73ae7f6dbdf1/IncomingWebhook/2d9ef11a5cba4a82b31bb98563a3a384/57fb8d26-6143-4604-949d-29a1b74c50c2/V2bhoymPhJFvtcYzF6C0ivVbd8K2A5c1ts6pgjczDrMQw1",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": {{ $json.message }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        16,
+        64
+      ],
+      "id": "001f4d57-b36c-4091-a7f4-56f4bf6204ff",
+      "name": "HTTP Request"
     }
   ],
   "connections": {
@@ -60,7 +78,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "80893b1c-59bd-4f5f-b756-e3a0b6355be5",
+  "versionId": "5d2b4f34-bd03-4deb-aaaf-5eb1b063b7ec",
   "triggerCount": 0,
   "shared": [
     {
