@@ -1,0 +1,1844 @@
+{
+  "updatedAt": "2025-11-24T11:08:28.000Z",
+  "createdAt": "2025-10-28T06:16:21.546Z",
+  "id": "bnBLKsgrbUDoYxAJ",
+  "name": "Knowshare - car service - old",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
+              "leftValue": "={{ $json.body.index }}",
+              "rightValue": "notices",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        208
+      ],
+      "id": "0912693f-0e89-47bc-a74f-72b0dbea09c3",
+      "name": "Check if it's notice"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook').item.json;\nconst index = $('Set index').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        208
+      ],
+      "id": "e4beb5eb-170e-45eb-a8e7-9d8e221203c7",
+      "name": "Attachment - chat"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1824,
+        208
+      ],
+      "id": "76a0dc0c-74f1-4d63-9333-3ded33e18dc5",
+      "name": "Set index"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "62ec8387-d979-403a-a2cf-455d56bff842",
+              "leftValue": "={{ $json.index }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1952,
+        208
+      ],
+      "id": "77d9be39-dc39-4835-a78d-60d4d505cfb5",
+      "name": "Check index"
+    },
+    {
+      "parameters": {
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "image"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        208
+      ],
+      "id": "0cd51623-5fa3-4e57-8993-90f4cf29a80b",
+      "name": "Fetch image - chat",
+      "credentials": {
+        "s3": {
+          "id": "smwCdXvghDY8DlJz",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        208
+      ],
+      "id": "b76d6045-d5bb-4c51-ada1-5494b4456abe",
+      "name": "Change mime type - chat"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Scal wszystkie dane pojazdu jeden json:\n{\n  \"name\",\"carId\",\"worker\",\"datetime\",\"mileage\",\"subject\"\n}\n",
+              "role": "system"
+            },
+            {
+              "content": "=Dane samochodu:  {{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2912,
+        224
+      ],
+      "id": "597a0b67-2a8d-47f0-bdcc-496d7c9b01e4",
+      "name": "Car summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "workbook": {
+          "__rl": true,
+          "value": "={{ $('Get workbooks').item.json.workbookId }}",
+          "mode": "id"
+        },
+        "worksheet": {
+          "__rl": true,
+          "value": "={{ $('Get workbooks').item.json.sheetId }}",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Get workbooks').item.json.tableId }}",
+          "mode": "id"
+        },
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Data",
+              "fieldValue": "={{ $('Final json').item.json.datetime }}"
+            },
+            {
+              "column": "Nr rejestracyjny",
+              "fieldValue": "={{ $('Final json').item.json.name }}"
+            },
+            {
+              "column": "Id",
+              "fieldValue": "={{ $('Final json').item.json.carId }}"
+            },
+            {
+              "column": "Imię i nazwisko",
+              "fieldValue": "={{ $('Final json').item.json.worker }}"
+            },
+            {
+              "column": "Przebieg",
+              "fieldValue": "={{ $('Final json').item.json.mileage }}"
+            },
+            {
+              "column": "Cel/Temat",
+              "fieldValue": "={{ $('Final json').item.json.subject }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftExcel",
+      "typeVersion": 2.1,
+      "position": [
+        4928,
+        224
+      ],
+      "id": "0830fdcd-66d7-4344-80bf-b794355aaddf",
+      "name": "Append car summary",
+      "credentials": {
+        "microsoftExcelOAuth2Api": {
+          "id": "zmnl13fnkUUm8OMB",
+          "name": "Microsoft Excel account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e9bf7821-d969-41b2-a0a4-aa647bb37199",
+              "leftValue": "={{ $json.carId }}",
+              "rightValue": "={{ $('Webhook').item.json.body.assetId }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        192
+      ],
+      "id": "86c11ff4-4e54-469e-9e83-6cce99ddcfc7",
+      "name": "Check if it's a car"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Przeszukaj poniższe dane w poszukiwaniu numeru rejestracyjnego pojazdu. \nNumery rejestracyjne mogą mieć różne formaty (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\"), \nale zawsze zawierają litery i cyfry, często z lub bez spacji/podkreślników.\n\nTytuł: {{ $('Webhook').item.json.body.subject }}\nOpis:  {{ $('Webhook').item.json.body.message }}\n\nTwoje zadanie:\n1. Znajdź w tekście numer rejestracyjny, jeśli występuje.\n2. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"<znaleziony numer rejestracyjny lub null>\",\n  \"carId\": \"{{ $json.carId }}\",\n  \"worker\": \"{{ $json.worker }}\",\n  \"datetime\": \"{{ $json.datetime }}\",\n  \"mileage\": \"{{ $json.mileage }}\"\n  \"subject\": \"{{ $json.subject }}\"\n}\n\nWymagania:\n- Nie dodawaj żadnych opisów, komentarzy ani tekstów poza czystym JSON-em.\n- Jeśli numer nie występuje, zwróć \"name\": null\n- Nie poprawiaj formatu numeru — zwróć go dokładnie tak, jak występuje w tekście.\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "maxTokens": 100
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3712,
+        224
+      ],
+      "id": "1a0f5d7a-b82f-4b37-b6dc-efa7fe4463d3",
+      "name": "Find plates",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "zVavLntkta84oKO7",
+          "mode": "list",
+          "cachedResultName": "Vehicles",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/zVavLntkta84oKO7"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "assetId",
+              "keyValue": "={{ $json.body.assetId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        768,
+        192
+      ],
+      "id": "5d3b8ca1-5a25-4f1c-b32e-df4ba69b7827",
+      "name": "Get vehicle"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        192
+      ],
+      "id": "4c101c3c-3eaa-4d01-9c0f-16f9bd69f8c3",
+      "name": "Get attachments"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        192
+      ],
+      "id": "5fae1657-40df-4343-af50-8fa01d660d62",
+      "name": "Split attachments"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1648,
+        144
+      ],
+      "id": "901fd7d0-0f21-40ec-aa8c-75643ee31d6d",
+      "name": "Loop over attachments",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=Otrzymujesz zdjęcie, które może przedstawiać:\n- licznik przebiegu pojazdu (wartość w kilometrach),\n- kod QR zawierający identyfikator pojazdu (ID),\n- numer rejestracyjny pojazdu.\n\nTwoje zadanie:\n1. Odczytaj z obrazu wszystkie możliwe informacje:\n   - przebieg w kilometrach (z dokładnie jedną spacją przed \"km\"),\n   - ID z kodu QR (surowy, bez prefixów, suffixów ani opisów),\n   - numer rejestracyjny pojazdu (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\" – format alfanumeryczny, czasem z odstępem lub podkreśleniem).\n2. Jeśli na zdjęciu znajduje się tylko część z tych informacji, brakujące pola ustaw jako null.\n3. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"{{ $('Get vehicle').item.json.name }}\",\n  \"carId\": \"<odczytane ID z kodu QR lub null>\",\n  \"worker\": \"{{ $('Webhook').item.json.body.createdBy }}\",\n  \"datetime\": \"{{ $now.format('yyyy-MM-dd HH:mm') }}\",\n  \"mileage\": \"<wartość przebiegu w formacie 'XXXXXX km' lub null>\",\n  \"subject\": \"{{ $('Webhook').item.json.body.subject }}\"\n}\n\n4. Zasady dotyczące pola \"name\":\n   - Jeśli {{ $('Get vehicle').item.json.name }} ma wartość null lub pustą, a na zdjęciu znajduje się numer rejestracyjny, **nadpisz pole \"name\" odczytanym numerem rejestracyjnym**.\n   - Jeśli {{ $('Get vehicle').item.json.name }} ma już wartość tekstową, pozostaw ją bez zmian.\n   - Nie dodawaj żadnych opisów ani komunikatów o tej decyzji.\n\n5. Zasady dotyczące pola \"id\":\n   - ID w kodzie QR to zwykle numer rejestracyjny zapisany z podkreśleniem zamiast spacji (np. \"SM_5669C\") lub prosty identyfikator typu \"car1\", \"car2\", itp.\n   - **Zwróć wartość z QR tylko wtedy, gdy jesteś niemal w 100% pewny poprawnego odczytu.**\n   - Jeśli QR jest nieczytelny, niepewny lub częściowy — ustaw `\"id\": null`.\n   - Nie próbuj zgadywać ani uzupełniać brakujących znaków.\n\nWymagania:\n- JSON musi być poprawny składniowo.\n- Wartość przebiegu zapisz z dokładnie jedną spacją między liczbą a jednostką (np. \"249415 km\").\n- Wartość ID z QR zwróć dokładnie tak, jak jest zakodowana (bez zmian).\n- Nie dodawaj żadnych opisów, komentarzy, tłumaczeń ani tekstów poza JSON-em.\n- Jeśli nie uda się odczytać któregokolwiek pola, ustaw je na null.\n",
+        "inputType": "base64",
+        "binaryPropertyName": "image",
+        "options": {
+          "detail": "auto",
+          "maxTokens": 300
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2480,
+        208
+      ],
+      "id": "404b4ae5-4b23-44fe-948c-0a41a665a3bd",
+      "name": "Fetch car info",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        224
+      ],
+      "id": "9f72cf07-52ea-45ce-ad17-2b31cc2ae4d4",
+      "name": "Aggregate car info"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('Car summary').first().json.message.content;\nconst match = text.match(/```json\\s*([\\s\\S]*?)\\s*```/);\nlet data = {};\n\nif (match) {\n\ttry {\n\t\tdata = JSON.parse(match[1]);\n\t} catch (error) {\n\t\tdata = { error: 'Invalid JSON', details: error.message };\n\t}\n}\n\nreturn [{ json: data }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        224
+      ],
+      "id": "846451be-92d1-4c89-980f-1b06052702fa",
+      "name": "Car summary to json"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1729d11e-d498-4dc7-9c02-66c780becbdc",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "Undefined",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3456,
+        224
+      ],
+      "id": "bbed84d8-86f4-4774-8424-fe74277d2281",
+      "name": "If name is empty"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "zVavLntkta84oKO7",
+          "mode": "list",
+          "cachedResultName": "Vehicles",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/zVavLntkta84oKO7"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Get vehicle').first().json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $('Final json').first().json.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "carId",
+              "displayName": "carId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "orgId",
+              "displayName": "orgId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "workbookId",
+              "displayName": "workbookId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "assetId",
+              "displayName": "assetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        7840,
+        224
+      ],
+      "id": "fcda8633-0983-4be1-bb17-d77775626886",
+      "name": "Update vehicle"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "KSDKobOAgUL7XS3u",
+          "mode": "list",
+          "cachedResultName": "Services_excel",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/KSDKobOAgUL7XS3u"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Get vehicle').item.json.workbookName }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        4448,
+        224
+      ],
+      "id": "61dd429b-1d47-4f0a-b109-031b6bc110f7",
+      "name": "Get workbooks"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3968,
+        224
+      ],
+      "id": "0a5a7a28-88c5-4deb-8822-7bb06ef13acc",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{$input.item.json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4208,
+        224
+      ],
+      "id": "37b686e9-5cc8-417f-9903-6fd924dd1c5d",
+      "name": "Final json"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z poprzedniego węzła (pierwszy element)\nconst item = $('Final json').first().json;\n\n// Przygotuj tablicę komunikatów o brakach\nconst issues = [];\n\nif (item.name === null || item.name === undefined || item.name === \"\" || (typeof item.name === \"string\" && item.name.trim() === \"\")) {\n  issues.push(\"- Brak informacji o numerze rejestracyjnym pojazdu\");\n}\n\n// if (!item.carId || item.carId === null || item.carId.trim() === \"\") {\n//   issues.push(\"- Brak informacji o Id pojazdu (zła jakość qr na zdjęciu lub jego brak)\");\n// }\n\n// Złóż treść maila\nlet message = \"\";\n\nif (issues.length > 0) {\n  message += \"Wykryto następujące braki w przesłanych danych:\\n\\n\";\n  message += issues.join(\"\\n\");\n  message += \"\\n\\nUprzejmie prosimy o wprowadzenie korekty w arkuszu.\";\n} else {\n  message = \"Brak problemów do korekty.\";\n}\n\n// Zwróć wynik\nreturn [\n  {\n    json: {\n      subject: \"Prośba o korektę danych pojazdu\",\n      body: message\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4688,
+        224
+      ],
+      "id": "53e1d18f-6df4-4da8-9dda-8fa8bef4709a",
+      "name": "Create feedback"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "x5jrioWSG6eIovFc",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/x5jrioWSG6eIovFc"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('User data').first().json.name }}"
+            },
+            {
+              "keyName": "surname",
+              "keyValue": "={{ $('User data').first().json.surname }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        6208,
+        224
+      ],
+      "id": "c150807a-28af-46dc-b209-8dd99fd002df",
+      "name": "Get users",
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "={{ $('Get organisation').first().json.name }} - Nowy wpis do rejestru floty pojazdów ",
+        "bodyContent": "=Dodano nowy wpis do rejestru floty pojazdów.\nRejestr znajduje się pod linkiem: {{ $('Get workbooks').first().json.url }}\n\n{{ $('Create feedback').first().json.body }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        7120,
+        224
+      ],
+      "id": "2f4e84d8-a6a0-421a-becd-55e5a662f5b2",
+      "name": "Send email",
+      "webhookId": "c54de9a7-0df7-4981-bb55-8e27364838a8",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "I8vnEihffZSIdc4c",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d4d2e53-c8a8-4a0b-a302-1a78a9386201",
+              "name": "name",
+              "value": "={{ $('Webhook').first().json.body.createdBy.split(' ')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "5df2bee1-b951-4cdc-9fbf-cf80a55fcb64",
+              "name": "surname",
+              "value": "={{ $('Webhook').first().json.body.createdBy.split(' ')[1] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5728,
+        224
+      ],
+      "id": "8396b635-0afb-4a34-b128-03a53a6eb3f8",
+      "name": "User data"
+    },
+    {
+      "parameters": {
+        "content": "## Główne flow testujące\nOdpowiada za publikację wpisu excel odnośnie samochodu i wysyłą powiadomienie użytkownikowi. ",
+        "height": 608,
+        "width": 7904
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -80
+      ],
+      "id": "9639afd0-1d53-4275-b578-d14b46495d42",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Sprawdzenie czy ramka dotyczy zgłoszenia knowshare",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        32
+      ],
+      "id": "968f2338-3ff4-453d-ac27-5380ef46f063",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Sprawdzenie czy asset dotyczy samochodu",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        928,
+        32
+      ],
+      "id": "42c47cd6-43a8-429f-8248-be17e14bf2f2",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Wylistowanie załączników\n",
+        "height": 432,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        32
+      ],
+      "id": "37c8b1e4-825c-4c52-a27a-e6d20c201b21",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Pętla analizy obrazu\nW pętli analizowane są obrazy ze zgłoszenia i zwracane są jsony z danymi dotyczącymi samochodu",
+        "height": 432,
+        "width": 1040,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        32
+      ],
+      "id": "e39a83c4-a0d0-4a18-b576-bc26e0a69ae0",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie  jednego jsona wyjściowego\n",
+        "height": 432,
+        "width": 512,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        32
+      ],
+      "id": "b54edd36-db3c-41f9-a8cd-61fcb5afac3f",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Sprawdzanie czy jest dodany nr rejesracyjny pojazdu\n",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        32
+      ],
+      "id": "a37549e0-2ded-4a42-8ca5-90efadf45857",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie finalnej struktury danych\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4144,
+        32
+      ],
+      "id": "13991152-dc8a-4193-9fe8-9fbced141a89",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Dodatkowe szukanie numeru rejestracyjnego w treści\n\n",
+        "height": 432,
+        "width": 496,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3632,
+        32
+      ],
+      "id": "22bb372e-328c-4435-99c7-f7f8ac468e2b",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł webhooka - przekazanie wiadomości z knowshare",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        32
+      ],
+      "id": "807b4c2f-b8e3-45b1-a0db-06e744ead7ff",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie z bazy info o samochodzie\n\n\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        32
+      ],
+      "id": "c3b19912-6c20-467a-8f80-09c4ce96074b",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Agregacja jsonów\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        32
+      ],
+      "id": "d54b467b-a264-43c4-8aeb-0ef7d0f7f5ea",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie listy wrokbooków\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4384,
+        32
+      ],
+      "id": "011c6080-344f-41d2-b95b-23bcccd13722",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie feedbacku dla zgłaszającego\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4624,
+        32
+      ],
+      "id": "ecd62264-e835-4ce9-91fe-9625e433c340",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Publikacja wpisu w tabeli excel\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4864,
+        32
+      ],
+      "id": "66adb7ca-bef0-444f-875a-6fc0ff3971fe",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Publikacja wpisu w tabeli excel\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5664,
+        32
+      ],
+      "id": "23522027-e27e-4d09-b315-f91121518cc9",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie listy użytkowników",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6144,
+        32
+      ],
+      "id": "3df1198e-364f-46e9-bc14-b789a858ca51",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "## Wysłanie maila z powiadomieniem\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7056,
+        32
+      ],
+      "id": "0e0cf8c5-b4ca-46de-8654-f06dff145ed3",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "## Wysłanie maila z powiadomieniem\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7776,
+        32
+      ],
+      "id": "e5ca0441-9e10-489b-bc87-a0955e78c84a",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "x5jrioWSG6eIovFc",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/x5jrioWSG6eIovFc"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "=2"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        7360,
+        224
+      ],
+      "id": "3282592e-1efc-4544-9cd3-196597817bbf",
+      "name": "Get users1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "={{ $('Get organisation').first().json.name }} - Nowy wpis do rejestru floty pojazdów ",
+        "bodyContent": "=Dodano nowy wpis do rejestru floty pojazdów.\nRejestr znajduje się pod linkiem: {{ $('Get workbooks').first().json.url }}\n\n{{ $('Create feedback').first().json.body }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        7600,
+        224
+      ],
+      "id": "f5066528-74e4-467e-a02e-345e325bae36",
+      "name": "Send email1",
+      "webhookId": "c54de9a7-0df7-4981-bb55-8e27364838a8",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "I8vnEihffZSIdc4c",
+          "name": "Microsoft Outlook account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie listy użytkowników",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7296,
+        32
+      ],
+      "id": "94c07d55-3d4c-44b4-b314-00bc8dad3abf",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "content": "## Publikacja wpisu w tabeli excel\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7536,
+        32
+      ],
+      "id": "1d7cf68f-7e40-4086-84dd-66c3c894ae2f",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "abb5f0eb-4706-454e-add2-470ab73c7b6c",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6480,
+        224
+      ],
+      "id": "4bfe896f-1b4f-4ac5-ab8e-08a7143cd208",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie danych obecnej organizacji",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5904,
+        32
+      ],
+      "id": "992a9bf0-fb83-4c2e-a807-3b1565799d20",
+      "name": "Sticky Note24"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "bFSwhN4UXLQK9Ri2",
+          "mode": "list",
+          "cachedResultName": "Organisations",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/bFSwhN4UXLQK9Ri2"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "orgId",
+              "keyValue": "={{ $('Get vehicle').first().json.orgId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        5968,
+        224
+      ],
+      "id": "93c6012d-0ad5-4b5c-8c1c-bb3104ee67fe",
+      "name": "Get organisation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z node'a \"Get organisation\"\nconst emailTemplate = $('Get organisation').first().json.emailTemplate || '';\n\n// Pobierz imię i nazwisko z node'a \"User data\" (odwrócone nazewnictwo)\nconst { surname = '', name = '' } = $('User data').first().json;\n\n// Funkcja do normalizacji tekstu (małe litery, bez znaków specjalnych)\nfunction normalize(str) {\n  return str\n    .normalize('NFD') // dekompozycja unicode\n    .replace(/[\\u0300-\\u036f]/g, '') // usuwa akcenty\n    .replace(/[^a-zA-Z0-9]/g, '') // usuwa znaki spoza A-Z i 0-9\n    .toLowerCase(); // na małe litery\n}\n\n// Normalizuj imię i nazwisko\nconst normName = normalize(name);\nconst normSurname = normalize(surname);\n\n// Podstaw placeholdery, jeśli występują\nlet email = emailTemplate;\nif (email.includes('<name>')) {\n  email = email.replace('<name>', normName);\n}\nif (email.includes('<surname>')) {\n  email = email.replace('<surname>', normSurname);\n}\n\n// Zwróć wynik\nreturn [\n  {\n    json: {\n      email,\n      originalTemplate: emailTemplate,\n      name,\n      surname\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6656,
+        224
+      ],
+      "id": "8872d7a8-d0a0-42b8-83ff-5a47bb4a3be5",
+      "name": "Create user email"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "x5jrioWSG6eIovFc",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/x5jrioWSG6eIovFc"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "surname": "={{ $json.surname }}",
+            "email": "={{ $json.email }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "surname",
+              "displayName": "surname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        6848,
+        224
+      ],
+      "id": "1c85d42c-afd2-440d-be88-0f501ec1cd51",
+      "name": "Create user",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "## Dodanie usera jeśli nie istnieje\n\n\n",
+        "height": 432,
+        "width": 656,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6384,
+        32
+      ],
+      "id": "6e669652-f058-46c6-814b-c1856461e103",
+      "name": "Sticky Note25"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie listy wrokbooków\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5136,
+        32
+      ],
+      "id": "d2b668da-9be7-46dd-8398-a9abacfcb50b",
+      "name": "Sticky Note26"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "fsbvzcGRKQ8pIkzF",
+          "mode": "list",
+          "cachedResultName": "Services_nocodb",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/fsbvzcGRKQ8pIkzF"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Get vehicle').first().json.workbookName }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        5200,
+        224
+      ],
+      "id": "cc9afc1a-8210-4da4-8605-27ebdadfbeaa",
+      "name": "Get nocodb"
+    },
+    {
+      "parameters": {
+        "content": "## Publikacja wpisu w tabeli nocodb\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5392,
+        32
+      ],
+      "id": "4f5e79dc-b731-4c9e-a95d-14a78b9066e7",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "create",
+        "projectId": "={{ $json.baseId }}",
+        "table": "={{ $json.tableId }}",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "Data",
+              "fieldValue": "={{ $('Final json').first().json.datetime }}"
+            },
+            {
+              "fieldName": "=Nr rejestracyjny",
+              "fieldValue": "={{ $('Final json').first().json.name }}"
+            },
+            {
+              "fieldName": "Id pojazdu",
+              "fieldValue": "={{ $('Final json').first().json.carId }}"
+            },
+            {
+              "fieldName": "Imię i nazwisko",
+              "fieldValue": "={{ $('Final json').first().json.worker }}"
+            },
+            {
+              "fieldName": "Przebieg",
+              "fieldValue": "={{ $('Final json').first().json.mileage }}"
+            },
+            {
+              "fieldName": "Cel/Temat",
+              "fieldValue": "={{ $('Final json').first().json.subject }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        5456,
+        224
+      ],
+      "id": "c291c8f8-d6c7-4ca9-b9ca-87156f2fb86a",
+      "name": "Create a row1",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Check if it's notice": {
+      "main": [
+        [
+          {
+            "node": "Get vehicle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - chat": {
+      "main": [
+        [
+          {
+            "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set index": {
+      "main": [
+        [
+          {
+            "node": "Check index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check index": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Attachment - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch image - chat": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - chat": {
+      "main": [
+        [
+          {
+            "node": "Fetch car info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Car summary": {
+      "main": [
+        [
+          {
+            "node": "Car summary to json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if it's a car": {
+      "main": [
+        [
+          {
+            "node": "Get attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find plates": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get vehicle": {
+      "main": [
+        [
+          {
+            "node": "Check if it's a car",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get attachments": {
+      "main": [
+        [
+          {
+            "node": "Split attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split attachments": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over attachments": {
+      "main": [
+        [
+          {
+            "node": "Aggregate car info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch car info": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate car info": {
+      "main": [
+        [
+          {
+            "node": "Car summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Car summary to json": {
+      "main": [
+        [
+          {
+            "node": "If name is empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If name is empty": {
+      "main": [
+        [
+          {
+            "node": "Find plates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update vehicle": {
+      "main": [
+        []
+      ]
+    },
+    "Get workbooks": {
+      "main": [
+        [
+          {
+            "node": "Create feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append car summary": {
+      "main": [
+        [
+          {
+            "node": "Get nocodb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Final json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final json": {
+      "main": [
+        [
+          {
+            "node": "Get workbooks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create feedback": {
+      "main": [
+        [
+          {
+            "node": "Append car summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get users": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Get users1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User data": {
+      "main": [
+        [
+          {
+            "node": "Get organisation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get users1": {
+      "main": [
+        [
+          {
+            "node": "Send email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email1": {
+      "main": [
+        [
+          {
+            "node": "Update vehicle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get organisation": {
+      "main": [
+        [
+          {
+            "node": "Get users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create user email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create user email": {
+      "main": [
+        [
+          {
+            "node": "Create user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create user": {
+      "main": [
+        [
+          {
+            "node": "Get users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get nocodb": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row1": {
+      "main": [
+        [
+          {
+            "node": "User data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7381e1ce-8d75-4b99-8bcd-5306bdd24df1",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-10-28T06:16:21.548Z",
+      "createdAt": "2025-10-28T06:16:21.548Z",
+      "role": "workflow:owner",
+      "workflowId": "bnBLKsgrbUDoYxAJ",
+      "projectId": "98BhLNTRDdyyDRlO"
+    },
+    {
+      "updatedAt": "2025-11-07T07:10:19.200Z",
+      "createdAt": "2025-11-07T07:10:19.200Z",
+      "role": "workflow:editor",
+      "workflowId": "bnBLKsgrbUDoYxAJ",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
