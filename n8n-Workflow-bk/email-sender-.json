@@ -1,0 +1,307 @@
+{
+  "updatedAt": "2025-06-03T06:36:22.000Z",
+  "createdAt": "2025-06-03T06:00:03.825Z",
+  "id": "5SYhkGHnlHe71Gp0",
+  "name": "Email sender",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "Knowshare - nowy wpis ",
+        "bodyContent": "=Temat: {{ $('assets params - jira').item.json.task_title }}\nTreść: {{ $('assets params - jira').item.json.task_description }}\nAutor: {{ $('Webhook').item.json.body.reporter }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ],
+      "id": "aa2a0200-4bd9-4d3f-bae3-be9e50e3c8c0",
+      "name": "Microsoft Outlook",
+      "webhookId": "0f1fd2a8-18c5-4ea0-926b-d354790b3ac0",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "Etv69Nz1BksTtxiI",
+          "name": "Microsoft Outlook account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        720,
+        380
+      ],
+      "id": "2d118e0a-abf0-477d-8443-7917da9aa455",
+      "name": "Loop Over Items3",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        520,
+        160
+      ],
+      "id": "f8c7f355-055b-43ba-bebc-110cfb5e0ac9",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "recipients",
+              "value": "={{ $('Config').item.json.services.email.recipients }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        160
+      ],
+      "id": "5b31b458-5c0b-4d0a-bc27-eeddf4a40f16",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0f1808d1-e65f-4890-be2e-fc57fcd2bb0d",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ca24728b-5d4c-4624-a162-00d33e1b4504",
+              "leftValue": "={{ $('Config').item.json.services.email.recipients }}",
+              "rightValue": "={{ $('Loop Over Items3').item.json.recipients }}",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        400
+      ],
+      "id": "258144fb-5006-4670-961a-ebd7f44a9012",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        100,
+        160
+      ],
+      "id": "26e4ca2b-6bbf-4c26-81ff-418c542cd21d",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "recipient = _input.first().json.recipients\nrecipients = _('Config').first().json.setup.recipients\nemail = recipients[recipient][\"email\"]\nreturn [{\"email\": email}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        400
+      ],
+      "id": "26c57cd3-1b58-4006-8cb2-5478de38c61c",
+      "name": "recipients - email"
+    },
+    {
+      "parameters": {
+        "content": "## Powiadomienie email\n\nW ramach tego kroku wysyłąne są powiadomienia e-mail o zgłoszeniu w knowshare. Wysyłane są do wyłącznie do tych użytkowników znajdujących się w liście ('Config').email.recipients.",
+        "height": 620,
+        "width": 1060,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        0
+      ],
+      "id": "e51a5454-f7a7-48d7-b50f-59d907d741e5",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        160
+      ],
+      "id": "e097dcd6-b427-48c5-9102-bee6d3ebf2a9",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "Microsoft Outlook": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "recipients - email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Microsoft Outlook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recipients - email": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ff9da2e2-87f3-49d5-846c-76fda71ef13b",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-06-03T06:00:03.827Z",
+      "createdAt": "2025-06-03T06:00:03.827Z",
+      "role": "workflow:owner",
+      "workflowId": "5SYhkGHnlHe71Gp0",
+      "projectId": "v3iOlUQZPnWy0OLx"
+    }
+  ],
+  "tags": []
+}
