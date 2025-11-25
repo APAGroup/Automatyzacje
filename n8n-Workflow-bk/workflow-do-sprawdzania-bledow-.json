@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T12:14:01.000Z",
+  "updatedAt": "2025-11-25T12:34:59.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -8,185 +8,171 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "// Pobierz status wiadomości\nconst received_status = $input.item.json.body?.MessageStatus;\n\n// Sprawdź, czy status to \"undelivered\" lub \"failed\"\nconst value = (received_status === 'undelivered' || received_status === 'failed') ? false : true;\n\n// Zwróć wynik\nreturn [\n  {\n    json: {\n      caseId: 'sms_notice',\n      source: 'A',\n      value\n    }\n  }\n];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        160,
-        -80
-      ],
-      "id": "f47ffe72-2bd7-4ca2-bc62-10f0a276bb9f",
-      "name": "Code2"
-    },
-    {
-      "parameters": {
-        "operation": "get",
-        "dataTableId": {
-          "__rl": true,
-          "value": "snuaVRUZhmMyCDx2",
-          "mode": "list",
-          "cachedResultName": "Temp_knowshare_flow_trello",
-          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/snuaVRUZhmMyCDx2"
-        },
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "updatedAt",
-              "condition": "gte",
-              "keyValue": "={{ new Date(new Date().setHours(0,0,0,0)).toISOString().trim() }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        2336,
-        464
-      ],
-      "id": "b2d5094e-d463-4e6e-86ee-e0fe7b952f73",
-      "name": "Get row(s)"
-    },
-    {
-      "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "destinationFieldName": "services",
+        "httpMethod": "POST",
+        "path": "9fa3910c-8207-4351-b79b-b74b65ec4a3c",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
         "options": {}
       },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        2576,
-        464
-      ],
-      "id": "9085487e-ad65-4471-bc16-4669b84e1f5f",
-      "name": "Aggregate"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Pobierz dane z wejścia (lista wyników z poprzednich node'ów)\nconst services = $input.item.json.services || [];\n\n// --- Definicja kanałów powiadomień ---\nconst expectedChannels = [\n  { caseId: \"email\", label: \"Email - powiadomienie o zadaniu Trello\" },\n  { caseId: \"kanban_card\", label: \"Kanban - dodanie zadania\" },\n  { caseId: \"sms_notice\", label: \"SMS - powiadomienie Trello\" },\n];\n\n// Tworzymy mapę istniejących kanałów\nconst serviceMap = {};\nfor (const s of services) {\n\tserviceMap[s.caseId] = s;\n}\n\n// --- Nagłówek raportu ---\nlet report = `*Raport statusu kanałów powiadomień - Trello* (${new Date().toLocaleString('pl-PL')})\\n\\n`;\n\n// --- Sekcja: sprawdzanie wszystkich kanałów ---\nfor (const channel of expectedChannels) {\n\tconst data = serviceMap[channel.caseId];\n\tconst status = data && data.value ? \"✅ Działa poprawnie\" : \"❌ Niedostępny\";\n\treport += `${channel.label}\\n${status}\\n\\n`;\n}\n\n// --- Sprawdzenie, czy wszystkie kanały działają ---\nconst allOk = expectedChannels.every(c => serviceMap[c.caseId]?.value === true);\n\n// --- Podsumowanie ---\nreport += allOk\n\t? \"🟢 *Wszystkie kanały działają poprawnie!*\"\n\t: \"⚠️ *Niektóre kanały są niedostępne!*\";\n\n// --- Zwracamy JSON-safe string (gotowy dla Teams webhooka) ---\nreturn [{ json: { message: JSON.stringify(report) } }];\n"
-      },
-      "type": "n8n-nodes-base.code",
+      "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        2816,
-        464
+        -5072,
+        816
       ],
-      "id": "438af6af-0084-46b3-951a-defbd00a11f1",
-      "name": "Creating report"
+      "id": "29b6d955-b621-410f-b204-7ecff9b3144f",
+      "name": "Webhook",
+      "webhookId": "9fa3910c-8207-4351-b79b-b74b65ec4a3c"
     },
     {
       "parameters": {
-        "operation": "upsert",
-        "dataTableId": {
+        "modelId": {
           "__rl": true,
-          "value": "snuaVRUZhmMyCDx2",
+          "value": "gpt-4o",
           "mode": "list",
-          "cachedResultName": "Temp_knowshare_flow_trello",
-          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/snuaVRUZhmMyCDx2"
+          "cachedResultName": "GPT-4O"
         },
-        "filters": {
-          "conditions": [
+        "messages": {
+          "values": [
             {
-              "keyName": "sourceId",
-              "keyValue": "={{ $json.source }}"
+              "content": "=Jesteś systemem do generowania OPISÓW zgłoszeń Trello. Twoje zadanie to sumaryzacja i skrócenie dostarczonego tekstu do postaci zwięzłego opisu problemu.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy. Nigdy, pod żadnym pozorem, nie zmieniaj języka odpowiedzi na polski, chyba że język wejściowy był polski.\n2. **LIMIT:** Opis musi mieć **maksymalnie 500 znaków** i zawierać same konkrety, bez tytułów.\n3. **FORMAT WYJŚCIA (JSON Safe):** Zwróć **wyłącznie** czysty tekst opisu w jednej linii. Nie dodawaj nowych linii, list, nagłówków, formatowania Markdown ani innych elementów, które mogłyby sprawiać problem w JSON. Wszystkie znaki cudzysłowa (\") zamieniaj na apostrofy (').",
+              "role": "system"
+            },
+            {
+              "content": "=Treść do przetworzenia na opis:\n{{ $('Create Picture Summary1').item.json.message.content }}"
             }
           ]
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "caseId": "={{ $json.caseId }}",
-            "sourceId": "={{ $json.source }}",
-            "value": "={{ $json.value }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "caseId",
-              "displayName": "caseId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "sourceId",
-              "displayName": "sourceId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "value",
-              "displayName": "value",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "boolean",
-              "readOnly": false,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
         },
         "options": {
-          "dryRun": false
+          "n": 1,
+          "temperature": 0.2,
+          "topP": 1
         }
       },
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
       "position": [
-        368,
-        -80
+        -1920,
+        272
       ],
-      "id": "4d172536-b8f2-4610-93ad-d4f79480aa74",
-      "name": "Save cases"
+      "id": "c33c9464-10b9-468f-b0e1-4d7659f50bbe",
+      "name": "Create Task Content by Picture",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
     },
     {
       "parameters": {
-        "rule": {
-          "interval": [
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
             {
-              "field": "cronExpression",
-              "expression": "0 3 * * 1-5"
+              "content": "=Jesteś systemem do generowania TYTUŁÓW zgłoszeń Trello. Twoje zadanie to skrócenie dostarczonego tekstu do postaci zwięzłego tytułu.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy. Nigdy, pod żadnym pozorem, nie zmieniaj języka odpowiedzi na polski, chyba że język wejściowy był polski.\n2. **LIMIT:** Tytuł musi być jednym zdaniem i **NIE MOŻE** przekroczyć 100 znaków.\n3. **FORMAT:** Zwróć **wyłącznie** finalny tekst tytułu. Wszystkie cudzysłowy (\") zamieniaj na apostrofy ('). Bez wstępów, wyjaśnień, nowych linii, czy formatowania Markdown.",
+              "role": "system"
+            },
+            {
+              "content": "=Treść do przetworzenia na tytuł:\n{{ $('Create Picture Summary1').item.json.message.content }}"
             }
           ]
+        },
+        "options": {
+          "maxTokens": 200,
+          "n": 1,
+          "temperature": 0.4,
+          "topP": 1
         }
       },
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
       "position": [
-        -48,
-        448
+        -2256,
+        272
       ],
-      "id": "5f0ba173-a2b2-4926-84a5-41f8fae6ea81",
-      "name": "Schedule Trigger"
+      "id": "e5ab0345-bab8-41c7-b08d-ae679c73f765",
+      "name": "Create Task Title",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://apaspzoo.webhook.office.com/webhookb2/556a2bd6-5100-4422-8f36-1814da029aa2@cb49c4c6-5d1c-46aa-b78b-73ae7f6dbdf1/IncomingWebhook/2d9ef11a5cba4a82b31bb98563a3a384/57fb8d26-6143-4604-949d-29a1b74c50c2/V2bhoymPhJFvtcYzF6C0ivVbd8K2A5c1ts6pgjczDrMQw1",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"text\": {{ $json.message }}\n}",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Jesteś systemem do generowania opisu zgłoszeń Trello. Twoje zadanie to analiza obrazu i tekstu oraz wygenerowanie krótkiego opisu problemu technicznego.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Musisz wykryć i ZACHOWAĆ oryginalny język z pola 'Opis'. Nigdy, pod żadnym pozorem, nie zmieniaj języka odpowiedzi na polski, chyba że język wejściowy był polski. Odpowiedź musi być w IDNETYCZNYM języku źródłowym.\n2. **ANALIZA WIZUALNA:** Połącz analizę załączonego obrazu z kontekstem z pola 'Opis'.\n3. **TREŚĆ:** Wygeneruj krótki i treściwy opis problemu technicznego, który ma trafić do zgłoszenia Trello.\n4. **FORMAT WYJŚCIA:** Zwróć tylko finalny tekst opisu. Bez tytułów, wyjaśnień, nowych linii, formatowania Markdown, cudzysłowów ani żadnych znaków utrudniających bezpośredni zapis do pola JSON/Trello.",
+              "role": "system"
+            },
+            {
+              "content": "=Poniżej znajdują się dane do analizy:\nOpis:  {{ $json.content }}"
+            }
+          ]
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
       "position": [
-        3056,
-        464
+        -3280,
+        240
       ],
-      "id": "c55f9988-edca-441b-bbc6-13124cd10d3d",
-      "name": "HTTP Request"
+      "id": "c906081d-e217-48b2-8b95-95989b972c68",
+      "name": "Create Picture Summary1",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=Jesteś ekspertem technicznym i specjalistą od analizy obrazów.\nAnalizuj załączony obraz oraz poniższy opis problemu technicznego.\n\n1. **Identyfikacja Języka:** Najpierw zidentyfikuj język użyty w polu \"OPIS PROBLEMÓW\".\n2. **Generowanie Odpowiedzi:** Wygeneruj **krótki i treściwy opis** zawartości zdjęcia w kontekście zgłoszonego problemu technicznego.\n3. **Wymagany Język Odpowiedzi:** **MUSISZ** odpowiedzieć w **IDNETYCZNYM** języku, który został zidentyfikowany w punkcie 1.\n\nOPIS PROBLEMÓW:\n{{ $('Webhook').item.json.body.message }}\n\nFORMAT ODPOWIEDZI:\nWygeneruj tylko sam tekst opisu. Nie dodawaj żadnych wstępów (np. \"Opis:\", \"Analiza:\"), wyjaśnień, nowych linii, formatowania Markdown (np. *, **), ani żadnych znaków, które utrudnią zapis w pojedynczym polu JSON.",
+        "inputType": "base64",
+        "binaryPropertyName": "image",
+        "options": {
+          "detail": "auto",
+          "maxTokens": 1000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -3680,
+        320
+      ],
+      "id": "456a9019-41c0-4b0c-aa03-5e9356110a6d",
+      "name": "Create Picture Summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
     },
     {
       "parameters": {
@@ -195,186 +181,127 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1376,
-        352
+        1744,
+        336
       ],
-      "id": "2a13fd89-378f-4881-a97c-863fa957f939",
-      "name": "Loop Over Items"
+      "id": "bac51891-817c-4fde-95d7-c82365d1019f",
+      "name": "Loop Over Items",
+      "alwaysOutputData": false
     },
     {
       "parameters": {
-        "operation": "upsert",
-        "dataTableId": {
-          "__rl": true,
-          "value": "snuaVRUZhmMyCDx2",
-          "mode": "list",
-          "cachedResultName": "Temp_knowshare_flow_trello",
-          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/snuaVRUZhmMyCDx2"
-        },
-        "filters": {
-          "conditions": [
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
             {
-              "keyName": "sourceId",
-              "keyValue": "={{ $json.source }}"
+              "fieldToAggregate": "content"
             }
           ]
         },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "caseId": "={{ $json.caseId }}",
-            "sourceId": "={{ $json.source }}",
-            "value": "={{ $json.value }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "caseId",
-              "displayName": "caseId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "sourceId",
-              "displayName": "sourceId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "value",
-              "displayName": "value",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "boolean",
-              "readOnly": false,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {
-          "dryRun": false
-        }
-      },
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        1520,
-        480
-      ],
-      "id": "6ba32556-b8c0-4df3-a5ca-097002e64048",
-      "name": "Save cases1"
-    },
-    {
-      "parameters": {
-        "amount": 10
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        2096,
-        464
-      ],
-      "id": "66f631b2-936e-4494-8982-ac1c01b3ddbb",
-      "name": "Wait",
-      "webhookId": "f3aea78d-9900-4c68-9e48-81a1414ff5e3"
-    },
-    {
-      "parameters": {
-        "amount": 60
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        416,
-        448
-      ],
-      "id": "db3998d6-288b-46cd-aa28-43f8c0c68d4a",
-      "name": "Wait1",
-      "webhookId": "336cc6f5-9f85-4088-808e-ac09596c79c1"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBasicAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n\"index\": \"notices\",\n\"createdAt\": \"2025-10-27T06:58:47.5677181Z\",\n\"assetId\": \"08dd6221-813c-437b-8d19-6678e11a55f5\",\n\"subject\": \"Uszczerbiony kubek!\",\n\"message\": \"Znaleziono uszczerbiony kubek w szawce z naczyniami dla gości. Prośba o wymianę na nowy\",\n\"type\": 0,\n\"createdBy\": \"test test\",\n\"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": [\n\"ff57b48d-0c93-4e9d-8d19-32519adae5f98684434820700654792.jpg\",\n\"52ee9c9e-54e8-4328-950f-13bab0bd3ff74756521684993759038.jpg\",\n\"babf1377-bdfa-4e2a-9c8f-2fa87af3cfc6254830784995343420.jpg\"\n]\n}",
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        192,
-        448
-      ],
-      "id": "93cad18b-8965-4484-9e57-7ee27492e057",
-      "name": "Knowshare flow Trello trigger",
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "resource": "folderMessage",
-        "folderId": {
-          "__rl": true,
-          "value": "AAMkADI5YzEwODkzLTUxM2YtNDU4MC04Yjg4LTJjZTZmZTRiOWE2YgAuAAAAAACIIErcp4onS70BA2kb2McNAQDsgIO2TTtOSIfv9pUwaN2NAAQC_18YAAA=",
-          "mode": "list",
-          "cachedResultName": "Knowshare Trello",
-          "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADI5YzEwODkzLTUxM2YtNDU4MC04Yjg4LTJjZTZmZTRiOWE2YgAuAAAAAACIIErcp4onS70BA2kb2McNAQDsgIO2TTtOSIfv9pUwaN2NAAQC_18YAAA%3D"
-        },
-        "limit": 1,
-        "output": "raw",
         "options": {}
       },
-      "type": "n8n-nodes-base.microsoftOutlook",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
       "position": [
-        640,
-        448
+        -3440,
+        240
       ],
-      "id": "3d77556c-49e3-4110-a935-a4ddfb872c6f",
-      "name": "Get newest knowshare notice",
-      "webhookId": "e2507218-fee5-431c-94b5-a294a8027dfd"
+      "id": "2ecc8b1b-c49b-4e72-a1d8-ba7d2453abbd",
+      "name": "Aggregate"
     },
     {
       "parameters": {
-        "jsCode": "// === 1️⃣ Pobierz dane z wejścia (tablica kart kanban z API / HTTP Request) ===\nconst cards = $input.all().flatMap(item => item.json);\n\n// Jeśli nie ma kart — zwróć pusty wynik\nif (!Array.isArray(cards) || cards.length === 0) {\n  return [{\n    json: {\n      message: 'Brak kart kanban',\n      results: [\n        { caseId: 'email', source: 'C', value: false },\n        { caseId: 'kanban_card', source: 'D', value: false }\n      ]\n    }\n  }];\n}\n\n// === 2️⃣ Znajdź kartę o najnowszej dacie ===\nconst newestCard = cards.reduce((latest, card) => {\n  const currentDate = new Date(card.dateLastActivity);\n  const latestDate = new Date(latest.dateLastActivity);\n  return currentDate > latestDate ? card : latest;\n});\n\n// === 3️⃣ Pobierz dane z node'a e-mail ===\nconst emailNode = $('Get newest knowshare notice').item.json;\n\n// === 4️⃣ Ustal dzisiejszą datę w formacie YYYY-MM-DD ===\nconst today = new Date().toISOString().split('T')[0];\n\n// === 5️⃣ Sprawdź, czy daty pasują do dzisiejszej ===\n\n// Email (source C)\nconst emailDate = emailNode.receivedDateTime || '';\nconst emailToday = emailDate.includes(today);\n\n// kanban (source D)\nconst kanbanCreated = newestCard.dateLastActivity || '';\nconst kanbanToday = kanbanCreated.includes(today);\n\n// === 6️⃣ Zwróć końcowy wynik (lista sekcji) ===\nreturn [\n  {\n    json: {\n      caseId: 'email',\n      source: 'C',\n      value: emailToday,\n      created: emailDate || null\n    }\n  },\n  {\n    json: {\n      caseId: 'kanban_card',\n      source: 'D',\n      value: kanbanToday,\n      created: kanbanCreated || null,\n      cardId: newestCard.id || null \n    }\n  }\n];\n"
+        "fieldToSplitOut": "fileNames",
+        "options": {}
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
       "position": [
         1120,
-        448
+        112
       ],
-      "id": "a4ca3940-49f3-4152-b923-46b92d25cf31",
-      "name": "Code5"
+      "id": "6e6a4d8b-0303-41ec-b03f-c6069b791d00",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "fileNames",
+              "value": "={{ $('Webhook').item.json.body.attachments }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        112
+      ],
+      "id": "dbca09e1-fc8f-4bea-affe-ce0f93d4327b",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5120,
+        240
+      ],
+      "id": "e71e832c-3ec1-4979-99c6-54cf813af3d3",
+      "name": "Loop parameter - chat"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -4960,
+        240
+      ],
+      "id": "faa91c1e-f85f-44e0-ba93-d32020862e88",
+      "name": "Split Out - chat"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -4768,
+        240
+      ],
+      "id": "94c6834f-0902-47a5-9e75-3560e7fb9e14",
+      "name": "Loop Over Items - chat",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n    \"services\":{\n\n        \"trello\":{\n            \"assets\":[\n                \"test\",\n                \"2mundos\",\n                \"2mundos_prod\",\n                \"2mundos_maintenance\",\n                \"2mundos_facility\",\n                \"demo\",\n                \"sn99999999\"\n            ]\n        },\n        \"whatsapp\":{\n            \"recipients\":[\n                \"test\",\n                \"zloty\"\n            ]\n        },\n        \"sms\":{\n            \"recipients\":[\n                \"zloty\",\n                \"mkobielski\",\n                \"gbojdo\",\n                \"mrachel\"\n            ]\n        },\n        \"email\":{\n            \"recipients\":[\n                \"test\",\n                \"zloty\",\n                \"gbojdo\"\n            ]\n        }\n    },\n    \"setup\":{\n        \"recipients\":{\n            \"test\":{\n                \"name\": \"Test\",\n                \"phone\":\"+48604874003\",\n                \"email\":\"nazca4@apagroup.pl\",\n                \"assets\": [\n                  \"test\"\n                ]\n            },\n            \"zloty\":{\n                \"name\": \"Złoty\",\n                \"phone\":\"+48604874003\",\n                \"email\":\"michal.kobielski@apagroup.pl\",\n                \"assets\": [\n                  \"test\",\n                  \"2mundos\",\n                  \"2mundos_prod\",\n                  \"2mundos_maintenance\",\n                  \"2mundos_facility\"\n                ]\n            },\n            \"mkobielski\":{\n                \"name\": \"Michał Kobielski\",\n                \"phone\":\"+48604874003\",\n                \"email\":\"michalkobielski@o2.pl\",\n                \"assets\": [\n                ]\n            },\n            \"ppabianczyk\":{\n                \"name\": \"Przemysław Pabiańczyk\",\n                \"phone\":\"+48506731006\",\n                \"email\":\"przemyslaw.pabianczyk@apagroup.pl\",\n                \"assets\": [\n                  \"demo\"\n                ]\n            },\n            \"wbieg\":{\n                \"name\": \"Wojciech Bieg\",\n                \"phone\":\"+48533245056\",\n                \"email\":\"wojciech.bieg@apagroup.pl\",\n                \"assets\": [\n                  \"demo\"\n                ]\n            },\n            \"mrachel\":{\n                \"name\": \"Marek Rachel\",\n                \"phone\":\"+48570304306\",\n                \"email\":\"marek.rachel@apagroup.pl\",\n                \"assets\": [\n\t              \"test\",\n                  \"demo\"\n                ]\n            },\n            \"gbojdo\":{\n                \"name\": \"Grzegorz Bojdo\",\n                \"phone\":\"+48730090031\",\n                \"email\":\"grzegorz.bojdo@apagroup.pl\",\n                \"assets\": [\n                  \"2mundos\",\n                  \"2mundos_prod\",\n                  \"2mundos_maintenance\",\n                  \"2mundos_facility\",\n                  \"demo\",\n                  \"sn99999999\",\n                  \"APADEMOSTOL\"\n                ]\n            }\n        },\n        \"assets\":{\n            \"test\":{\n                \"name\":\"Test\",\n                \"id\": \"08dd6221-813c-437b-8d19-6678e11a55f5\",\n                \"trello_list_id\": \"6900c94db545e17dd8dc83e4\"\n            },\n            \"2mundos\":{\n                \"name\":\"2MUNDOS\",\n                \"id\": \"08de16f1-f9c4-4cbe-8a85-611bc3ce2bc9\",\n                \"trello_list_id\": \"6900c94db545e17dd8dc83e4\"\n            },\n            \"2mundos_prod\":{\n                \"name\":\"Produkcja\",\n                \"id\": \"08de1aa3-eb6a-4458-8458-ec8dfdff5204\",\n                \"trello_list_id\": \"6900c94db545e17dd8dc83e4\"\n            },\n            \"2mundos_maintenance\":{\n                \"name\":\"Utrzymanie ruchu\",\n                \"id\": \"08de1aa4-389b-460b-8777-2b103817daaf\",\n                \"trello_list_id\": \"6900c94db545e17dd8dc83e4\"\n            },\n            \"2mundos_facility\":{\n                \"name\":\"Facility managment\",\n                \"id\": \"08de1aa4-5b7a-4c4d-8603-29f0df9f18f3\",\n                \"trello_list_id\": \"6900c94db545e17dd8dc83e4\"\n            },\n            \"demo\":{\n                \"name\":\"Demo\",\n                \"id\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n                \"trello_list_id\": \"690c3c4b57ebf2f8fe9cc865\"\n            },\n            \"sn99999999\":{\n                \"name\":\"SN99999999\",\n                \"id\": \"08de1d32-c81f-403c-8888-082145f7ea4b\",\n                \"trello_list_id\": \"690c3c4b57ebf2f8fe9cc865\"\n            },\n            \"APADEMOSTOL\":{\n                \"name\":\"APA DEMO Stół\",\n                \"id\": \"08de274e-d980-4059-871a-1a1931df6e3f\",\n                \"trello_list_id\": \"690c3c4b57ebf2f8fe9cc865\"\n            }\n        }\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4128,
+        816
+      ],
+      "id": "1513ba46-609e-4e21-a05f-546459bd5ba3",
+      "name": "Config"
     },
     {
       "parameters": {
@@ -387,21 +314,477 @@
           },
           "conditions": [
             {
-              "id": "c280e059-8402-4e90-b07b-c0e37a873a8d",
-              "leftValue": "={{ $json.caseId }}",
-              "rightValue": "trello_card",
+              "id": "ab019542-36c9-47de-848e-c9eaa988208e",
+              "leftValue": "={{ $('Config').item.json.services.trello.assets }}",
+              "rightValue": "={{ $('assets params').item.json.asset_key }}",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        912
+      ],
+      "id": "296c1ee3-9b8c-4218-9af2-487848e706e9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        5008,
+        880
+      ],
+      "id": "2938c07a-6dcf-4574-9082-d1ecae318652",
+      "name": "Loop Over Items3",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        4800,
+        592
+      ],
+      "id": "98240dff-977a-4677-8c73-59a7d2465521",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "recipients",
+              "value": "={{ $('Config').item.json.services.email.recipients }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4496,
+        656
+      ],
+      "id": "1fc975df-8707-45cc-a43f-f47c755653ad",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook').item.json;\nconst index = $('Set index').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4288,
+        320
+      ],
+      "id": "4ad775fb-0e8c-471f-88b7-63a63a0db573",
+      "name": "Attachment - chat"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0f1808d1-e65f-4890-be2e-fc57fcd2bb0d",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "contains"
+                "operation": "notEmpty",
+                "singleValue": true
               }
             },
             {
-              "id": "65949a81-210d-4ef4-a718-156eee9b6d0b",
-              "leftValue": "={{ $json.value }}",
-              "rightValue": "true",
+              "id": "ca24728b-5d4c-4624-a162-00d33e1b4504",
+              "leftValue": "={{ $json.assets_list }}",
+              "rightValue": "={{ $('assets params').item.json.asset_key }}",
               "operator": {
-                "type": "boolean",
-                "operation": "true",
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4496,
+        864
+      ],
+      "id": "1583d441-049f-4967-891b-ba95fa3fa459",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "self"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        576
+      ],
+      "id": "af0b17dc-1fd1-46a4-84d1-e3383239ef49",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        4320,
+        656
+      ],
+      "id": "6b212b54-9fad-4b95-b364-4727ed526d86",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "from": "MG57b1eeb171ed820e74d29ebc017e22cc",
+        "to": "={{ $json.phone }}",
+        "message": "={{ $('SMS Final').first().json.finalSmsText }}",
+        "options": {
+          "statusCallback": "https://apagroup.app.n8n.cloud/webhook/4732399e-f34f-47dd-9467-2063f222d057"
+        }
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        688
+      ],
+      "id": "d86151ec-4fd8-41e2-8f3c-935d8778bcd7",
+      "name": "Twilio",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4000,
+        848
+      ],
+      "id": "6cbdec85-2970-4a9f-bb1c-d98e4b3194a8",
+      "name": "Loop Over Items4",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0f1808d1-e65f-4890-be2e-fc57fcd2bb0d",
+              "leftValue": "={{ $json.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5e9ac14f-4018-4dc0-9e68-9ffc456668af",
+              "leftValue": "={{ $json.assets_list }}",
+              "rightValue": "={{ $('assets params').item.json.asset_key }}",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2992,
+        800
+      ],
+      "id": "da6f0ad1-6126-4982-b081-caa43ec3ccad",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3792,
+        592
+      ],
+      "id": "cd3abbad-160b-4bbd-acc7-cc9b3a6bd5bc",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "recipients",
+              "value": "={{ $('Config').item.json.services.sms.recipients }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3488,
+        544
+      ],
+      "id": "0d1430da-4799-4e4f-a959-fa3eb9bd27f5",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dane z loopa\nconst currentRecipientKey = $input.first().json.recipients\n\n// Dane z node 'Config'\nconst setup = $('Config').item.json.setup;\n\n// Pobranie listy odbiorców\nconst recipients = setup.recipients || {};\n\n// Sprawdzenie, czy wskazany odbiorca istnieje\nconst recipientData = recipients[currentRecipientKey];\n\nif (!recipientData) {\n  throw new Error(`Brak danych dla odbiorcy: ${currentRecipientKey}`);\n}\n\nconst phone = recipientData.phone;\nconst assets_list = recipientData.assets;\n\nreturn [\n  {\n    json: {\n      phone,\n      assets_list\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2832,
+        800
+      ],
+      "id": "d088b575-2504-4853-b32f-819dcb37f0ac",
+      "name": "recipients - sms"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dane z loopa\nconst currentRecipientKey = $input.first().json.recipients\n\n// Dane z node 'Config'\nconst setup = $('Config').item.json.setup;\n\n// Pobranie listy odbiorców\nconst recipients = setup.recipients || {};\n\n// Sprawdzenie, czy wskazany odbiorca istnieje\nconst recipientData = recipients[currentRecipientKey];\n\nif (!recipientData) {\n  throw new Error(`Brak danych dla odbiorcy: ${currentRecipientKey}`);\n}\n\nconst email = recipientData.email;\nconst assets_list = recipientData.assets;\n\nreturn [\n  {\n    json: {\n      email,\n      assets_list\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4320,
+        864
+      ],
+      "id": "c4db2081-f777-49c9-8b60-0de67f278db5",
+      "name": "recipients - email"
+    },
+    {
+      "parameters": {
+        "content": "## Konfiguracja \nKonfiguracja flow odbywa się za pomocą pliku json.\n\nW celu dodania nowego użytkownika do adresatów powiadomień należy go dopisać do listy 'recipients', zawierającej dane adresowe użytkowników. Następnie w celu przypisania użytkownika do powiadomień danej usługi należy jego klucz zawrzeć w liście odbiorców tej usługi. ",
+        "height": 520,
+        "width": 980,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4528,
+        576
+      ],
+      "id": "d476fca6-511a-45a7-b0d0-7196b5bfc357",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
+        "height": 480,
+        "width": 1600,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -5152,
+        64
+      ],
+      "id": "47d3d513-c385-4a22-acad-fcbb0d21b24c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 2 - Tworzenie opisu zbiorczego\n\nW ramach tego kroku uruchamiana jest agregacja powstałych opisów do jednego opisu podsumowującego.",
+        "height": 480,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3520,
+        64
+      ],
+      "id": "4318e5b5-cef1-4492-9dd4-d663b7f18cca",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3 - zgłoszenie Jira (opcjonalne)  \n",
+        "height": 1236,
+        "width": 2424
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -144
+      ],
+      "id": "b4518621-2339-425d-b326-c8fc2a07d923",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3.2 - Tworzenie zgłoszenia\n\nW ramach tego kroku na podstawie opisu tworzone są temat zgłoszenia, jego treść, oraz realizowane jest samo zgłoszenie na Jira. ",
+        "height": 680,
+        "width": 436,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        192
+      ],
+      "id": "a0859f0f-152b-47c7-9663-541b65fb2cc0",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3.4 - Przekazywanie załączników\n\nW ramach tego kroku załączane pliki są przekazywane do utworzonego zgłoszenia Jira. ",
+        "height": 680,
+        "width": 1000,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -64
+      ],
+      "id": "7ca91c9e-1d00-455e-9019-f363d62e4ef9",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 5 - Powiadomienie email (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia e-mail o zgłoszeniu w knowshare. Wysyłane są do wyłącznie do tych użytkowników znajdujących się w liście ('Config').email.recipients.",
+        "height": 620,
+        "width": 940,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4240,
+        480
+      ],
+      "id": "b97c2713-25fe-4838-8a49-33f283944766",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 6 - Powiadomienie sms (obecnie nieaktywne)\n\nW ramach tego kroku wysyłąne są powiadomienia sms o zgłoszeniu w knowshare. Wysyłane są do wyłącznie do tych użytkowników znajdujących się w liście ('Config').sms.recipients.",
+        "height": 716,
+        "width": 2204,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        368
+      ],
+      "id": "89dbea90-988a-4dcf-bb65-6cc476aa28cf",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Podział na analizę tekstu i obrazu",
+        "height": 520,
+        "width": 500,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3520,
+        576
+      ],
+      "id": "0c483e3c-cabd-45e8-8434-61091c8ccffc",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "92dbdc9c-4a93-4514-bf6d-a71f53e43803",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
                 "singleValue": true
               }
             }
@@ -413,29 +796,241 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1680,
-        480
+        -2496,
+        528
       ],
-      "id": "90e43e9e-899e-4667-86ef-1aa46bee1427",
-      "name": "If"
+      "id": "4891bec5-3d41-4793-997c-a76a96db3582",
+      "name": "If7"
     },
     {
       "parameters": {
-        "operation": "delete",
-        "id": {
-          "__rl": true,
-          "value": "={{ $('Code5').item.json.cardId }}",
-          "mode": "id"
-        }
+        "content": "## Webhook",
+        "height": 520,
+        "width": 580,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -5152,
+        576
+      ],
+      "id": "6ce3b37a-fb7d-464b-8610-747ce4e69f36",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3.1 - Tworzenie contentu\n\nW ramach tego kroku na podstawie opisu tworzone są temat zgłoszenia, jego treść, oraz realizowane jest samo zgłoszenie n. ",
+        "height": 1032,
+        "width": 2420,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2976,
+        64
+      ],
+      "id": "03afe4d6-5027-42bb-bc4e-1e29fb27b5f4",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "Knowshare - nowe zadanie Trello",
+        "bodyContent": "=Temat: {{ $('assets params - trello').item.json.task_title }}\nTreść: {{ $('assets params - trello').item.json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').item.json.body.message }}\nAsset: {{$('assets params - trello').item.json.asset_name }}\nAutor: {{ $('Webhook').item.json.body.createdBy }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        4800,
+        752
+      ],
+      "id": "7ab07a8f-6ee9-4c88-9850-b162de3fe99d",
+      "name": "Send a message",
+      "webhookId": "c54de9a7-0df7-4981-bb55-8e27364838a8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3312,
+        800
+      ],
+      "id": "ff01d641-a2f3-468b-9494-9f3e14c4f5ef",
+      "name": "If there are attachments"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4608,
+        320
+      ],
+      "id": "98232502-25eb-4814-a59b-4adba06cec84",
+      "name": "Set index"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "62ec8387-d979-403a-a2cf-455d56bff842",
+              "leftValue": "={{ $json.index }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4464,
+        320
+      ],
+      "id": "ff7df947-6875-4a29-a6bc-26dfd0af8f34",
+      "name": "Check index"
+    },
+    {
+      "parameters": {
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "image"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        -4096,
+        320
+      ],
+      "id": "54d61a3f-fb54-465e-bf3d-4046248a0d3c",
+      "name": "Fetch image - chat"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3872,
+        320
+      ],
+      "id": "aa376cda-9794-4d75-bb95-524002eef082",
+      "name": "Change mime type - chat"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
+              "leftValue": "={{ $json.body.index }}",
+              "rightValue": "notices",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4848,
+        816
+      ],
+      "id": "e0db8731-ed20-4394-8fd1-e4902d458042",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z node'ów (pierwszy element)\nconst fromWebhook = $('Webhook').first().json;\nconst fromSet = $('Config').first().json;\n\n// Pobierz assetId z webhooka\nconst assetId = fromWebhook?.body?.assetId;\n\n// Pobierz assets_dict z konfiguracji\nconst assetsDict = fromSet?.setup?.assets || {};\n\n// Znajdź klucz zasobu na podstawie id\nlet asset_key = null;\nlet asset_name = null;\n\nfor (const key of Object.keys(assetsDict)) {\n\tconst asset = assetsDict[key];\n\tif (asset?.id === assetId) {\n\t\tasset_key = key;\n\t\tasset_name = asset?.name || null;\n\t\tbreak;\n\t}\n}\n\n// Zwróć wynik\nreturn [\n\t{\n\t\tjson: {\n\t\t\tasset_key,\n\t\t\tasset_name\n\t\t}\n\t}\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2656,
+        528
+      ],
+      "id": "39fee539-33d6-4017-9184-449900961583",
+      "name": "assets params"
+    },
+    {
+      "parameters": {
+        "listId": "={{ $('assets params - trello').item.json.trello_list_id }}",
+        "name": "={{ $('assets params').item.json.asset_name }} - {{ $('assets params - trello').item.json.task_title }}",
+        "description": "={{ $('Translation Option - Parse').item.json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').item.json.body.message }}\nAsset: {{$('assets params - trello').item.json.asset_name }}\nZgłaszający: {{ $('Webhook').item.json.body.createdBy }}",
+        "additionalFields": {}
       },
       "type": "n8n-nodes-base.trello",
       "typeVersion": 1,
       "position": [
-        1840,
-        480
+        -64,
+        512
       ],
-      "id": "d868e292-a1cc-4495-a698-f85958f4ff15",
-      "name": "Delete a card",
+      "id": "be35f4fc-4c2c-43d3-9525-f827239ee63a",
+      "name": "Create a card",
       "credentials": {
         "trelloApi": {
           "id": "nhF8Bjyt8UxnkYnE",
@@ -445,305 +1040,466 @@
     },
     {
       "parameters": {
-        "content": "## Główne flow testujące\nUruchamia cyklicznie flow knowshare publikujące zgłoszenia w trello - a następnie je testuje",
-        "height": 592,
-        "width": 3488
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
       },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        -192,
-        160
+        992,
+        336
       ],
-      "id": "c7a8dae2-9314-4c05-93ac-b0fda02615eb",
-      "name": "Sticky Note"
+      "id": "ba440815-156c-4856-a52c-a43167db6353",
+      "name": "Set index - trello"
     },
     {
       "parameters": {
-        "content": "## Flow pomocnicze twilio\nOdbierany jest tutaj callback status od twilio. Sprawdzany jest tutaj status wiadomości i zwracana jest wartość logiczna. ",
-        "height": 336,
-        "width": 800,
-        "color": 5
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook').item.json;\nconst index = $('Set index - trello').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
       },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        -192,
-        -208
+        1136,
+        336
       ],
-      "id": "95551b26-41a1-4ad0-8a2d-7f22594856e1",
-      "name": "Sticky Note1"
+      "id": "695ed5eb-20d9-48a5-9c1e-a66a9e1b8528",
+      "name": "Attachment - trello"
     },
     {
       "parameters": {
-        "content": "## Węzeł uruchamiający flow knowshare",
-        "height": 432,
-        "width": 224,
-        "color": 4
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "image"
       },
-      "type": "n8n-nodes-base.stickyNote",
+      "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        128,
-        256
+        1280,
+        336
       ],
-      "id": "bc516149-420d-444f-a115-36ec6d03a028",
-      "name": "Sticky Note2"
+      "id": "783bfe00-0289-492d-879c-ee10feb7fcd1",
+      "name": "Fetch image - trello"
     },
     {
       "parameters": {
-        "content": "## Węzeł mailowy\nZwraca ostatni mail powiadamiający o nowym zgłoszeniu w trello ",
-        "height": 432,
-        "width": 224,
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        336
+      ],
+      "id": "cd43d918-011a-4d56-8b7e-1ba70487a30d",
+      "name": "Change mime type - trello"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5ktV0yMGjtUOrjLf",
+          "mode": "list",
+          "cachedResultName": "Temp_sms_limit",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/5ktV0yMGjtUOrjLf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "messagesSent": "={{ $json.messagesSent + 1 }}"
+          },
+          "matchingColumns": [
+            "messagesSent"
+          ],
+          "schema": [
+            {
+              "id": "messagesSent",
+              "displayName": "messagesSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        3792,
+        720
+      ],
+      "id": "ff2545c7-e758-46dc-b573-226e7774b654",
+      "name": "Update row(s)"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5ktV0yMGjtUOrjLf",
+          "mode": "list",
+          "cachedResultName": "Temp_sms_limit",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/5ktV0yMGjtUOrjLf"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        3632,
+        720
+      ],
+      "id": "1a32611d-de69-4287-ac95-c5ccb60c491c",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5ktV0yMGjtUOrjLf",
+          "mode": "list",
+          "cachedResultName": "Temp_sms_limit",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/5ktV0yMGjtUOrjLf"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        576
+      ],
+      "id": "2b889aec-09ff-4db5-89fb-771b326ee68d",
+      "name": "Get sms number"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "da03406e-ed5e-4309-8c61-a4006d7a5a48",
+              "leftValue": "={{ $json.messagesSent }}",
+              "rightValue": 1000,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2384,
+        576
+      ],
+      "id": "6c7c3a09-5c10-4919-9d3c-ea8891d16415",
+      "name": "Check sms limit"
+    },
+    {
+      "parameters": {
+        "jsCode": "let title;\nlet description;\n\n// --- Pobranie tytułu z OpenAI (fallback)\ntry {\n\ttitle = $('Create Task Title').item.json.message.content;\n} catch {\n\t//title = $('Create Task Title from Text').item.json.message.content;\n\ttitle =   $('Webhook').first().json.body.subject;\n}\n\n// --- Pobranie opisu z OpenAI (fallback)\ntry {\n\tdescription = $('Create Task Content by Picture').item.json.message.content;\n} catch {\n\t//description = $('Create Task Content').item.json.message.content;\n\tdescription =   $('Webhook').first().json.body.message;\n}\n\n// --- Webhook i Config\nconst webhook = $('Webhook').item.json;\nconst config = $('Config').item.json;\n\n// --- Id zasobu z webhooka\nconst assetId = webhook?.body?.assetId;\nconst assetsDict = config?.setup?.assets || {};\n\nlet asset_name = '';\nlet trello_list_id = '';\n\n// --- Szukaj po assetId\nfor (const key of Object.keys(assetsDict)) {\n\tconst asset = assetsDict[key];\n\tif (asset?.id === assetId) {\n\t\tasset_name = asset?.name || '';\n\t\ttrello_list_id = asset?.trello_list_id || '';\n\t\tbreak;\n\t}\n}\n\n// --- Zwróć wynik\nreturn [\n\t{\n\t\tjson: {\n\t\t\ttask_title: title,\n\t\t\ttask_description: description,\n\t\t\tasset_name,\n            trello_list_id\n\t\t}\n\t}\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        496
+      ],
+      "id": "1674e0a3-cd50-4e8e-ad51-cd4c3cbaaa69",
+      "name": "assets params - trello"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Twoim zadaniem jest tłumaczyć pola `task_title` i `task_description` **TYLKO wtedy**, gdy w polu \"message\" znajduje się wyraźne polecenie tłumaczenia.\n\nPolecenia tłumaczenia mogą zawierać słowa/zwroty:\n\"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\",\n\"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\nJeżeli wykryjesz polecenie tłumaczenia:\n1. Ustal język docelowy wskazany w poleceniu.\n2. Przetłumacz `task_title` i `task_description` **wyłącznie na ten język**.\n3. Tłumaczenie wykonuj TYLKO jeśli:\n   • tekst źródłowy jest napisany alfabetem łacińskim\n   • i język docelowy również korzysta z alfabetu łacińskiego.\n4. Nie tłumacz, jeśli język docelowy używa innego alfabetu.\n5. Jeśli język docelowy jest niejednoznaczny lub nieznany → zwróć tekst bez zmian.\n\nJeżeli w polu \"message\" **NIE ma polecenia tłumaczenia**:\n- **Wykryj język tekstu z pola \"message\".**\n- **Zwróć task_title i task_description w dokładnie tym samym języku.**\n- **Nie tłumacz, nie poprawiaj, nie parafrazuj, nie anglicyzuj, nie normalizuj.**\n- **Zachowaj dokładnie ten sam język, nawet jeśli jest to niderlandzki, niemiecki, francuski, polski itp.**\n\nModel NIGDY nie może tłumaczyć automatycznie bez wyraźnego polecenia.\n\nZawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n{\n  \"task_title\": \"...\",\n  \"task_description\": \"...\"\n}\n"
+            },
+            {
+              "content": "=message: {{ $('Webhook').item.json.body.message }}\ntask_title: {{$json[\"task_title\"]}}\ntask_description: {{$json[\"task_description\"]}}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        496
+      ],
+      "id": "398674d9-e84e-4853-9732-c1edd0c55d64",
+      "name": "Translation Option",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "ZMIANY MR",
+        "height": 560,
+        "width": 832,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        576,
+        -1424,
         256
       ],
-      "id": "d018d3ac-a131-4024-a48e-99fea39d3416",
-      "name": "Sticky Note3"
-    },
-    {
-      "parameters": {
-        "content": "## Węzeł nocodb",
-        "height": 432,
-        "width": 224,
-        "color": 6
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        816,
-        256
-      ],
-      "id": "eeff70f2-610f-43f4-aebb-b9ccae50bc9b",
+      "id": "f53f1e83-3f52-4f8a-bad8-95666eb025e5",
       "name": "Sticky Note4"
     },
     {
       "parameters": {
-        "content": "## Węzeł sumujący\nSprawdza warunek dla obu wysyłek i zwraca wartość logiczną wraz z parametrami usługi\n",
-        "height": 432,
-        "width": 224,
+        "jsCode": "// Pobierz surowy tekst z pola \"text\"\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Sprawdź, czy tekst zawiera ```json i usuń jeśli tak\nif (raw.includes(\"```json\")) {\n    raw = raw.replace(/```json\\\\n|```/g, '').replace(/\\\\n/g, '\\n').trim();\n} else {\n    // usuń ewentualne nowe linie i białe znaki z końca\n    raw = raw.trim();\n}\n\n// Spróbuj sparsować JSON\nlet parsed;\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // jeśli JSON jest niepoprawny, zwróć puste pola\n    parsed = {\n        task_title: \"\",\n        task_description: \"\"\n    };\n}\n\n// Zwróć jako JSON dla kolejnych węzłów\nreturn [{ json: parsed }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        496
+      ],
+      "id": "af9bccb3-a194-4eda-a144-6ffb6b1b0557",
+      "name": "Translation Option - Parse"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        752
+      ],
+      "id": "c468a1c7-ea4d-4039-ab8b-9c673c29d19e",
+      "name": "If there are attachments1"
+    },
+    {
+      "parameters": {
+        "content": "ZMIANY MR",
+        "height": 560,
+        "width": 560,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1056,
-        256
+        288,
+        480
       ],
-      "id": "246c6116-8876-4f10-92f1-03284920ae00",
-      "name": "Sticky Note5"
-    },
-    {
-      "parameters": {
-        "content": "## Węzeł kasujący\nUsuwa zgłoszenie trello utworzone w ramach testów ",
-        "height": 432,
-        "width": 720,
-        "color": 6
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        1296,
-        256
-      ],
-      "id": "f2e728f5-1bde-4082-bffa-035053bbf65a",
-      "name": "Sticky Note6"
-    },
-    {
-      "parameters": {
-        "content": "## Pobranie z bazy danych stanów usług\n",
-        "height": 432,
-        "width": 224,
-        "color": 5
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        2272,
-        256
-      ],
-      "id": "2fca3e57-4cbd-46fa-a702-0868baad54e0",
-      "name": "Sticky Note7"
-    },
-    {
-      "parameters": {
-        "content": "## Agregacja wszystkich usług\n\n",
-        "height": 432,
-        "width": 224,
-        "color": 5
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        2512,
-        256
-      ],
-      "id": "f888626b-3c36-4c07-9493-e0233e84f264",
+      "id": "9ae41137-6c13-4d9c-b248-915f06a3e5b1",
       "name": "Sticky Note8"
     },
     {
       "parameters": {
-        "content": "## Tworzenie zgłoszenia \n\n",
-        "height": 432,
-        "width": 224,
-        "color": 5
+        "jsCode": "// Funkcja konwertująca tekst do GSM-7\nfunction toGSM7(text) {\n    if (!text) return '';\n\n    // 1. Usuń znaki diakrytyczne z liter łacińskich\n    let normalized = text.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n\n    // 2. Mapa zamiany znaków spoza GSM-7 na zbliżone\n    const charMap = {\n        '’': \"'\", '‘': \"'\", '“': '\"', '”': '\"', '–': '-', '—': '-',\n        'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'ã': 'a', 'å': 'a',\n        'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',\n        'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',\n        'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'ö': 'o', 'õ': 'o',\n        'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',\n        'ý': 'y', 'ÿ': 'y',\n        'ß': 'ss', 'Œ': 'OE', 'œ': 'oe', 'Æ': 'AE', 'æ': 'ae',\n        'ł': 'l', 'Ł': 'L', 'Ø': 'O', 'ø': 'o', 'Đ': 'D', 'đ': 'd'\n    };\n\n    normalized = normalized.split('').map(c => charMap[c] || c).join('');\n\n    // 3. Definicja znaków dopuszczalnych w GSM-7\n    const gsm7Chars =\n        '@£$¥èéùìòÇ\\nØø\\rÅåΔ_ΦΓΛΩΠΨΣΘΞ ' +\n        \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\" +\n        \"0123456789\" +\n        \"!\\\"#¤%&'()*+,-./:;<=>?¡ÄÖÑÜ§¿äöñü\";\n\n    // 4. Usuń znaki niezgodne z GSM-7\n    return normalized.split('').filter(c => gsm7Chars.includes(c)).join('');\n}\n\n// Limit SMS\nconst SMS_LIMIT = 160;\nconst ELLIPSIS = '...';\nconst ELLIPSIS_LENGTH = ELLIPSIS.length;\n\n// Przetwarzanie każdego elementu w danych\nfor (const item of items) {\n    const input = item.json;\n\n    // Bezpieczne pobranie wszystkich pól tekstowych\n    const smsPartText = $('SMS part 1').first().json.sms_firstPart || '';\n    const itemText = input.output?.[0]?.content?.[0]?.text || '';\n\n    // Połączenie tekstów i trim\n    const rawMessage = (smsPartText + itemText).trim();\n\n    // Konwersja do GSM-7\n    const cleanMessage = toGSM7(rawMessage);\n\n    // Obcinanie do limitu 160 znaków z \"...\"\n    let finalSmsText = cleanMessage;\n    if (cleanMessage.length > SMS_LIMIT) {\n        finalSmsText = cleanMessage.substring(0, SMS_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n    }\n\n    // Dodanie wyników do JSON\n    input.finalSmsText = finalSmsText;\n    input.finalSmsLength = finalSmsText.length;\n}\n\nreturn items;"
       },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        2752,
-        256
+        3264,
+        560
       ],
-      "id": "23bdc7ae-1111-4226-b232-d2fb14dd4762",
-      "name": "Sticky Note9"
+      "id": "267d5dab-dcf5-4e35-ae11-a8ce7c759203",
+      "name": "SMS Final"
     },
     {
       "parameters": {
-        "content": "## Wysłanie zgłoszenia do MS Teams\n\n",
-        "height": 432,
-        "width": 224,
-        "color": 5
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Jesteś systemem do generowania krótkich, zwięzłych komunikatów SMS.\nTwoje JEDYNE zadanie to sumaryzacja, skracanie i łączenie tekstu.\n\nZASADA KLUCZOWA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Nigdy, pod żadnym pozorem, nie tłumacz treści. Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy (nawet jeśli jest to język mieszany, niepoprawny lub zawiera błędy).\n2. **KONTRA POLSKI:** Nie zmieniaj języka na polski, chyba że język wejściowy był polski.\n3. **SKRACANIE:** Połącz oba teksty, skróć je do podanego limitu znaków, zachowując sens.\n4. **FORMAT:** Zwróć tylko finalny tekst SMS. Bez cudzysłowów, wyjaśnień, ani formatowania Markdown."
+            },
+            {
+              "content": "=Tytuł: \"{{ $('Translation Option - Parse').item.json.task_title }}\"\nWiadomość: \"{{ $('Translation Option - Parse').item.json.task_description }}\"\n\nLimit znaków: {{ $json.sms_contentLimit }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
       },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
       "position": [
-        2992,
-        256
+        2880,
+        560
       ],
-      "id": "b210d19f-7290-4333-8ec4-6cd75feb0eb0",
-      "name": "Sticky Note10"
-    },
-    {
-      "parameters": {
-        "content": "## Węzeł harmonogramu",
-        "height": 432,
-        "width": 224,
-        "color": 4
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -112,
-        256
-      ],
-      "id": "cbbcf209-d4f0-4142-a43a-4df5470ba604",
-      "name": "Sticky Note11"
-    },
-    {
-      "parameters": {
-        "content": "## Czekanie na publikację zgłoszeń\n\n\n",
-        "height": 432,
-        "width": 198,
-        "color": 3
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        368,
-        256
-      ],
-      "id": "aad74e87-3f42-4b9f-ab4e-3728504ed3f4",
-      "name": "Sticky Note12"
-    },
-    {
-      "parameters": {
-        "content": "## Czekanie na publikację zgłoszeń\n\n\n",
-        "height": 432,
-        "width": 214,
-        "color": 3
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        2032,
-        256
-      ],
-      "id": "a5cec15f-a863-4f5f-940c-96280411c639",
-      "name": "Sticky Note13"
-    },
-    {
-      "parameters": {
-        "authentication": "nocoDbApiToken",
-        "operation": "getAll",
-        "projectId": "p8ctmuqgmd41gsy",
-        "table": "m9uil5p3apd33zt",
-        "limit": 1,
-        "options": {
-          "sort": {
-            "property": [
-              {
-                "field": "CreatedAt",
-                "direction": "desc"
-              }
-            ]
-          }
+      "id": "0bc1dc67-d725-43ab-b71f-ed84087f3983",
+      "name": "Text shortening",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
         }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const SMS_LIMIT = 155; //160\n\n// Przetwarzanie każdego elementu w danych\nfor (const item of items) {\n  const input = item.json;\n  \n  // 1. Definiowanie pól\n  const name = $('Webhook').first().json.body.createdBy || '';\n\n\n  // 2. Łączenie pól w format: \"Imię Nazwisko; Tytuł; \" (Z POLSKIMI ZNAKAMI)\n  // Używamy separatorów \"; \" (dwa znaki)\n  const firstPartRaw = `${name}; `;\n  \n  // 3. Obliczenie DŁUGOŚCI tej części (na podstawie RAW stringu)\n  const firstPartLength = firstPartRaw.length;\n  \n  // 4. Wyznaczenie różnicy (maksymalnego limitu dla Treści)\n  const maxContentLength = SMS_LIMIT - firstPartLength;\n  \n  // Zapewnienie, że limit nie jest ujemny\n  const finalContentLimit = Math.max(0, maxContentLength);\n  \n  // Dodanie nowych zmiennych do obiektu JSON:\n  // - sms_firstPart: sformatowana część z polskimi znakami\n  // - sms_contentLimit: obliczony limit znaków dla treści (dla Chat GPT)\n  input.sms_firstPart = firstPartRaw;\n  input.sms_contentLimit = finalContentLimit;\n}\n\nreturn items;"
       },
-      "type": "n8n-nodes-base.nocoDb",
-      "typeVersion": 3,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        880,
-        448
+        2656,
+        560
       ],
-      "id": "190637d9-acda-45c1-bf3d-d10b0ac7a372",
-      "name": "Create latest record"
+      "id": "6e55ace8-0765-4010-a2f8-92a7dda6cb55",
+      "name": "SMS part 1"
+    },
+    {
+      "parameters": {
+        "content": "ZMIANY MR",
+        "height": 240,
+        "width": 784,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        512
+      ],
+      "id": "60ce38ef-fbdf-4aea-ae22-360dc522eb6d",
+      "name": "Sticky Note6"
     }
   ],
   "connections": {
-    "Code2": {
+    "Webhook": {
       "main": [
         [
           {
-            "node": "Save cases",
+            "node": "If4",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get row(s)": {
+    "Create Task Content by Picture": {
       "main": [
         [
           {
-            "node": "Aggregate",
+            "node": "assets params - trello",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Aggregate": {
+    "Create Task Title": {
       "main": [
         [
           {
-            "node": "Creating report",
+            "node": "Create Task Content by Picture",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Creating report": {
+    "Create Picture Summary1": {
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "assets params",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Schedule Trigger": {
+    "Create Picture Summary": {
       "main": [
         [
           {
-            "node": "Knowshare flow Trello trigger",
+            "node": "Loop Over Items - chat",
             "type": "main",
             "index": 0
           }
@@ -754,80 +1510,98 @@
       "main": [
         [
           {
-            "node": "Wait",
+            "node": "Aggregate2",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Save cases1",
+            "node": "Set index - trello",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Save cases1": {
+    "Aggregate": {
       "main": [
         [
           {
-            "node": "If",
+            "node": "Create Picture Summary1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Get row(s)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait1": {
-      "main": [
-        [
-          {
-            "node": "Get newest knowshare notice",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Knowshare flow Trello trigger": {
-      "main": [
-        [
-          {
-            "node": "Wait1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get newest knowshare notice": {
-      "main": [
-        [
-          {
-            "node": "Create latest record",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code5": {
+    "Split Out1": {
       "main": [
         [
           {
             "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop parameter - chat": {
+      "main": [
+        [
+          {
+            "node": "Split Out - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out - chat": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items - chat": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "If there are attachments",
             "type": "main",
             "index": 0
           }
@@ -838,21 +1612,361 @@
       "main": [
         [
           {
-            "node": "Delete a card",
+            "node": "Create a card",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Loop Over Items",
+            "node": "Aggregate2",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Delete a card": {
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "recipients - email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - chat": {
+      "main": [
+        [
+          {
+            "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Get sms number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "recipients - sms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recipients - sms": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recipients - email": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Create Task Title",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "assets params - trello",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there are attachments": {
+      "main": [
+        [
+          {
+            "node": "assets params",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop parameter - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set index": {
+      "main": [
+        [
+          {
+            "node": "Check index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check index": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Attachment - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch image - chat": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - chat": {
+      "main": [
+        [
+          {
+            "node": "Create Picture Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assets params": {
+      "main": [
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a card": {
+      "main": [
+        [
+          {
+            "node": "If there are attachments1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set index - trello": {
+      "main": [
+        [
+          {
+            "node": "Attachment - trello",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - trello": {
+      "main": [
+        [
+          {
+            "node": "Fetch image - trello",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch image - trello": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - trello",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - trello": {
       "main": [
         [
           {
@@ -863,11 +1977,128 @@
         ]
       ]
     },
-    "Create latest record": {
+    "Update row(s)": {
       "main": [
         [
           {
-            "node": "Code5",
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get sms number": {
+      "main": [
+        [
+          {
+            "node": "Check sms limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check sms limit": {
+      "main": [
+        [
+          {
+            "node": "SMS part 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "assets params - trello": {
+      "main": [
+        [
+          {
+            "node": "Translation Option",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translation Option": {
+      "main": [
+        [
+          {
+            "node": "Translation Option - Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translation Option - Parse": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there are attachments1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Final": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text shortening": {
+      "main": [
+        [
+          {
+            "node": "SMS Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS part 1": {
+      "main": [
+        [
+          {
+            "node": "Text shortening",
             "type": "main",
             "index": 0
           }
@@ -883,25 +2114,56 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {
-    "Schedule Trigger": [
+    "Webhook": [
       {
         "json": {
-          "timestamp": "2025-10-31T03:00:31.007+01:00",
-          "Readable date": "October 31st 2025, 3:00:31 am",
-          "Readable time": "3:00:31 am",
-          "Day of week": "Friday",
-          "Year": "2025",
-          "Month": "October",
-          "Day of month": "31",
-          "Hour": "03",
-          "Minute": "00",
-          "Second": "31",
-          "Timezone": "Europe/Warsaw (UTC+01:00)"
+          "headers": {
+            "host": "apagroup.app.n8n.cloud",
+            "user-agent": "axios/1.12.0",
+            "content-length": "530",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "20.218.238.116",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9a03df29e5a06d26-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "20.218.238.116, 104.23.239.53",
+            "x-forwarded-host": "apagroup.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-865tl",
+            "x-is-trusted": "yes",
+            "x-real-ip": "20.218.238.116"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "index": "notices",
+            "createdAt": "2025-10-27T06:58:47.5677181Z",
+            "assetId": "08dd6221-813c-437b-8d19-6678e11a55f5",
+            "subject": "Uszczerbiony kubek!",
+            "message": "Znaleziono uszczerbiony kubek w szawce z naczyniami dla gości. Prośba o wymianę na nowy",
+            "type": 0,
+            "createdBy": "test test",
+            "tenantId": "08dd5714-941b-4e58-817b-934c403cebb5",
+            "attachments": [
+              "ff57b48d-0c93-4e9d-8d19-32519adae5f98684434820700654792.jpg",
+              "52ee9c9e-54e8-4328-950f-13bab0bd3ff74756521684993759038.jpg",
+              "babf1377-bdfa-4e2a-9c8f-2fa87af3cfc6254830784995343420.jpg"
+            ]
+          },
+          "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c",
+          "executionMode": "production"
         }
       }
     ]
   },
-  "versionId": "96ad35f2-e0ad-4a6d-ba0f-e21d9d83b0b3",
+  "versionId": "804f99a0-4117-4095-bd18-3bd7ee075c1e",
   "triggerCount": 0,
   "shared": [
     {
