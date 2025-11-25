@@ -1,0 +1,190 @@
+{
+  "updatedAt": "2025-11-21T14:13:24.000Z",
+  "createdAt": "2025-11-12T10:06:59.742Z",
+  "id": "LfcH6LBB3RYc9ruF",
+  "name": "SMS testy",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Funkcja wykrywająca czy tekst zawiera znaki spoza alfabetu łacińskiego\nfunction isNonLatin(text) {\n    // Znaki spoza zakresu łacińskiego\n    const nonLatinRegex = /[^\\u0000-\\u007F\\u00A0-\\u024F]/;\n    return nonLatinRegex.test(text);\n}\n\n// Funkcja konwertująca tekst do GSM-7\nfunction toGSM7(text) {\n    if (!text) return '';\n\n    // 1. Usuń diakrytyki\n    let normalized = text.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n\n    // 2. Mapa zamian\n    const charMap = {\n        '’': \"'\", '‘': \"'\", '“': '\"', '”': '\"', '–': '-', '—': '-',\n        'ß': 'ss', 'Œ': 'OE', 'œ': 'oe', 'Æ': 'AE', 'ae': 'ae',\n        'ł': 'l', 'Ł': 'L', 'Ø': 'O', 'ø': 'o', 'Đ': 'D', 'đ': 'd'\n    };\n\n    normalized = normalized.split('').map(c => charMap[c] || c).join('');\n\n    // 3. Dozwolone znaki GSM-7\n    const gsm7Chars =\n        '@£$¥èéùìòÇ\\nØø\\rÅåΔ_ΦΓΛΩΠΨΣΘΞ ' +\n        \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\" +\n        \"0123456789\" +\n        \"!\\\"#¤%&'()*+,-./:;<=>?¡ÄÖÑÜ§¿äöñü\";\n\n    // 4. Usuń niedozwolone\n    return normalized.split('').filter(c => gsm7Chars.includes(c)).join('');\n}\n\n// Limity SMS\nconst GSM_LIMIT = 160;\nconst UCS2_LIMIT = 70;\nconst ELLIPSIS = \"...\";\nconst ELLIPSIS_LENGTH = ELLIPSIS.length;\n\n\n// Przetwarzanie itemów\nfor (const item of items) {\n    const input = item.json;\n\n    const smsPartText = $('SMS part 1').first().json.sms_firstPart || '';\n    const itemText = input.output?.[0]?.content?.[0]?.text || '';\n\n    const rawMessage = (smsPartText + itemText).trim();\n\n    // WYKRYWANIE ALFABETU\n    const nonLatin = isNonLatin(rawMessage);\n\n    let finalSmsText;\n\n    if (!nonLatin) {\n        // ============================\n        //   TRYB ŁACIŃSKI (GSM-7)\n        // ============================\n        const cleanMessage = toGSM7(rawMessage);\n\n        if (cleanMessage.length > GSM_LIMIT) {\n            finalSmsText =\n                cleanMessage.substring(0, GSM_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n        } else {\n            finalSmsText = cleanMessage;\n        }\n\n    } else {\n        // ============================\n        //  TRYB NIEŁACIŃSKI (UCS-2)\n        // ============================\n\n        if (rawMessage.length > UCS2_LIMIT) {\n            finalSmsText =\n                rawMessage.substring(0, UCS2_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n        } else {\n            finalSmsText = rawMessage;\n        }\n    }\n\n    // Zapis do item.json\n    input.finalSmsText = finalSmsText;\n    input.finalSmsLength = finalSmsText.length;\n}\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -944,
+        128
+      ],
+      "id": "39bd85f9-7e13-40a1-89b0-34fd1ca21abd",
+      "name": "SMS Final"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2016,
+        128
+      ],
+      "id": "d4dbfec2-1f50-455d-85a2-18387bfc0896",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Połącz i skróć poniższe teksty w jeden zwięzły komunikat SMS:\nTytuł: \"{{ $json.Tytul }}\"\nWiadomość: \"{{ $json['Treść'] }}\"\n\nWymagania:\n1. Zachowaj sens i najważniejsze informacje z obu tekstów.\n2. Użyj dokładnie tego samego języka, w jakim napisane są teksty źródłowe — nie tłumacz ani nie zmieniaj języka. \n   Jeśli np. tekst jest po angielsku, odpowiedź również ma być po angielsku; jeśli po polsku — po polsku.\n3. Po scaleniu skróć treść tak, aby cały wynik miał maksymalnie {{ $json.sms_contentLimit }} znaków (licząc wszystkie znaki, w tym spacje i interpunkcję).\n4. Jeśli trzeba, uprość zdania lub usuń mniej istotne informacje, ale nigdy nie przekraczaj limitu znaków.\n5. Zwróć wyłącznie gotowy tekst SMS — bez komentarzy, cudzysłowów, formatowania ani wyjaśnień."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        -144
+      ],
+      "id": "8dd29e3e-d9d4-45a2-a971-9b6818b225bf",
+      "name": "Text shortening",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const SMS_LIMIT = 155; //160\n\n// Przetwarzanie każdego elementu w danych\nfor (const item of items) {\n  const input = item.json;\n  \n  // 1. Definiowanie pól\n  const name = $('Webhook').first().json.body.createdBy || '';\n\n\n  // 2. Łączenie pól w format: \"Imię Nazwisko; Tytuł; \" (Z POLSKIMI ZNAKAMI)\n  // Używamy separatorów \"; \" (dwa znaki)\n  const firstPartRaw = `Knowshare: ${name}; `;\n  \n  // 3. Obliczenie DŁUGOŚCI tej części (na podstawie RAW stringu)\n  const firstPartLength = firstPartRaw.length;\n  \n  // 4. Wyznaczenie różnicy (maksymalnego limitu dla Treści)\n  const maxContentLength = SMS_LIMIT - firstPartLength;\n  \n  // Zapewnienie, że limit nie jest ujemny\n  const finalContentLimit = Math.max(0, maxContentLength);\n  \n  // Dodanie nowych zmiennych do obiektu JSON:\n  // - sms_firstPart: sformatowana część z polskimi znakami\n  // - sms_contentLimit: obliczony limit znaków dla treści (dla Chat GPT)\n  input.sms_firstPart = firstPartRaw;\n  input.sms_contentLimit = finalContentLimit;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1488,
+        128
+      ],
+      "id": "9577b834-522e-4212-9fa9-efd3547960c6",
+      "name": "SMS part 1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Funkcja konwertująca tekst do GSM-7\nfunction toGSM7(text) {\n    if (!text) return '';\n\n    // 1. Usuń znaki diakrytyczne z liter łacińskich\n    let normalized = text.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n\n    // 2. Mapa zamiany znaków spoza GSM-7 na zbliżone\n    const charMap = {\n        '’': \"'\", '‘': \"'\", '“': '\"', '”': '\"', '–': '-', '—': '-',\n        'à': 'a', 'á': 'a', 'â': 'a', 'ä': 'a', 'ã': 'a', 'å': 'a',\n        'ç': 'c', 'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',\n        'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',\n        'ñ': 'n', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'ö': 'o', 'õ': 'o',\n        'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',\n        'ý': 'y', 'ÿ': 'y',\n        'ß': 'ss', 'Œ': 'OE', 'œ': 'oe', 'Æ': 'AE', 'æ': 'ae',\n        'ł': 'l', 'Ł': 'L', 'Ø': 'O', 'ø': 'o', 'Đ': 'D', 'đ': 'd'\n    };\n\n    normalized = normalized.split('').map(c => charMap[c] || c).join('');\n\n    // 3. Definicja znaków dopuszczalnych w GSM-7\n    const gsm7Chars =\n        '@£$¥èéùìòÇ\\nØø\\rÅåΔ_ΦΓΛΩΠΨΣΘΞ ' +\n        \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\" +\n        \"0123456789\" +\n        \"!\\\"#¤%&'()*+,-./:;<=>?¡ÄÖÑÜ§¿äöñü\";\n\n    // 4. Usuń znaki niezgodne z GSM-7\n    return normalized.split('').filter(c => gsm7Chars.includes(c)).join('');\n}\n\n// Limit SMS\nconst SMS_LIMIT = 160;\nconst ELLIPSIS = '...';\nconst ELLIPSIS_LENGTH = ELLIPSIS.length;\n\n// Przetwarzanie każdego elementu w danych\nfor (const item of items) {\n    const input = item.json;\n\n    // Bezpieczne pobranie wszystkich pól tekstowych\n    const smsPartText = $('SMS part 1').first().json.sms_firstPart || '';\n    const itemText = input.output?.[0]?.content?.[0]?.text || '';\n\n    // Połączenie tekstów i trim\n    const rawMessage = (smsPartText + itemText).trim();\n\n    // Konwersja do GSM-7\n    const cleanMessage = toGSM7(rawMessage);\n\n    // Obcinanie do limitu 160 znaków z \"...\"\n    let finalSmsText = cleanMessage;\n    if (cleanMessage.length > SMS_LIMIT) {\n        finalSmsText = cleanMessage.substring(0, SMS_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n    }\n\n    // Dodanie wyników do JSON\n    input.finalSmsText = finalSmsText;\n    input.finalSmsLength = finalSmsText.length;\n}\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        -144
+      ],
+      "id": "9c23f5b3-103d-4ba3-86d5-47df2f2c3548",
+      "name": "SMS Final OLD"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tworzymy tablicę items (każdy item to obiekt z polem json)\nreturn [\n    {\n        json: {\n          body:{\n            createdBy: \"Jan Kowalski\",\n          }\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1760,
+        128
+      ],
+      "id": "cbf812e6-7b7f-4e56-9479-da80a07f8762",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tworzymy tablicę items (każdy item to obiekt z polem json)\nreturn [\n    {\n      \"output\": [\n        {\n          \"content\": [\n            { \"text\": \"四楼405室卫生间，水槽上方天花板严重漏水。急需水管工干预处理。丰田卡罗拉行驶时，左前轮附近有响亮的金属敲击 abc def\" \n            }\n          ]\n        }\n      ]\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        128
+      ],
+      "id": "235801f6-9873-4005-bbe3-c2d4451a79d7",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text shortening": {
+      "main": [
+        []
+      ]
+    },
+    "SMS part 1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "SMS part 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "SMS Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5b366c1d-215e-4790-a748-c737846df6cc",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-12T10:06:59.749Z",
+      "createdAt": "2025-11-12T10:06:59.749Z",
+      "role": "workflow:owner",
+      "workflowId": "LfcH6LBB3RYc9ruF",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
