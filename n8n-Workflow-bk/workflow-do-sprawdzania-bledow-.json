@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T12:00:41.000Z",
+  "updatedAt": "2025-11-25T12:12:39.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "workflow do sprawdzania bledow",
@@ -7,21 +7,824 @@
   "isArchived": false,
   "nodes": [
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "jsCode": "// Pobierz status wiadomości\nconst received_status = $input.item.json.body?.MessageStatus;\n\n// Sprawdź, czy status to \"undelivered\" lub \"failed\"\nconst value = (received_status === 'undelivered' || received_status === 'failed') ? false : true;\n\n// Zwróć wynik\nreturn [\n  {\n    json: {\n      caseId: 'sms_notice',\n      source: 'A',\n      value\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        -96
+      ],
+      "id": "3ac71869-ddf5-4ceb-9d84-c7c37380cdce",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "snuaVRUZhmMyCDx2",
+          "mode": "list",
+          "cachedResultName": "Temp_knowshare_flow_trello",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/snuaVRUZhmMyCDx2"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "updatedAt",
+              "condition": "gte",
+              "keyValue": "={{ new Date(new Date().setHours(0,0,0,0)).toISOString().trim() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1,
       "position": [
-        0,
-        0
+        2112,
+        448
       ],
-      "id": "ce5d8468-4162-4d50-9201-6496e220b6c5",
-      "name": "When clicking ‘Execute workflow’"
+      "id": "bd75b93e-091b-4643-adb1-4d70ec878ef2",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "services",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        448
+      ],
+      "id": "36ce09f4-ab51-4889-b0d3-9da170954e2a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z wejścia (lista wyników z poprzednich node'ów)\nconst services = $input.item.json.services || [];\n\n// --- Definicja kanałów powiadomień ---\nconst expectedChannels = [\n  { caseId: \"email\", label: \"Email - powiadomienie o zadaniu Trello\" },\n  { caseId: \"kanban_card\", label: \"Kanban - dodanie zadania\" },\n  { caseId: \"sms_notice\", label: \"SMS - powiadomienie Trello\" },\n];\n\n// Tworzymy mapę istniejących kanałów\nconst serviceMap = {};\nfor (const s of services) {\n\tserviceMap[s.caseId] = s;\n}\n\n// --- Nagłówek raportu ---\nlet report = `*Raport statusu kanałów powiadomień - Trello* (${new Date().toLocaleString('pl-PL')})\\n\\n`;\n\n// --- Sekcja: sprawdzanie wszystkich kanałów ---\nfor (const channel of expectedChannels) {\n\tconst data = serviceMap[channel.caseId];\n\tconst status = data && data.value ? \"✅ Działa poprawnie\" : \"❌ Niedostępny\";\n\treport += `${channel.label}\\n${status}\\n\\n`;\n}\n\n// --- Sprawdzenie, czy wszystkie kanały działają ---\nconst allOk = expectedChannels.every(c => serviceMap[c.caseId]?.value === true);\n\n// --- Podsumowanie ---\nreport += allOk\n\t? \"🟢 *Wszystkie kanały działają poprawnie!*\"\n\t: \"⚠️ *Niektóre kanały są niedostępne!*\";\n\n// --- Zwracamy JSON-safe string (gotowy dla Teams webhooka) ---\nreturn [{ json: { message: JSON.stringify(report) } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        448
+      ],
+      "id": "15c80e1b-9163-4310-8ef9-5d881ee50dd2",
+      "name": "Creating report"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "snuaVRUZhmMyCDx2",
+          "mode": "list",
+          "cachedResultName": "Temp_knowshare_flow_trello",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/snuaVRUZhmMyCDx2"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "sourceId",
+              "keyValue": "={{ $json.source }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "caseId": "={{ $json.caseId }}",
+            "sourceId": "={{ $json.source }}",
+            "value": "={{ $json.value }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "caseId",
+              "displayName": "caseId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sourceId",
+              "displayName": "sourceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "dryRun": false
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -96
+      ],
+      "id": "493575ae-567e-4171-836d-72e121281855",
+      "name": "Save cases"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * 1-5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        432
+      ],
+      "id": "cadcbec6-7315-4681-be9b-8c3a0c599502",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apaspzoo.webhook.office.com/webhookb2/556a2bd6-5100-4422-8f36-1814da029aa2@cb49c4c6-5d1c-46aa-b78b-73ae7f6dbdf1/IncomingWebhook/2d9ef11a5cba4a82b31bb98563a3a384/57fb8d26-6143-4604-949d-29a1b74c50c2/V2bhoymPhJFvtcYzF6C0ivVbd8K2A5c1ts6pgjczDrMQw1",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": {{ $json.message }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2832,
+        448
+      ],
+      "id": "1e8eda29-e6ea-4bc3-a592-b5712a91c400",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1152,
+        336
+      ],
+      "id": "7a06d228-9042-4af0-b971-7fac13dfcc67",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "snuaVRUZhmMyCDx2",
+          "mode": "list",
+          "cachedResultName": "Temp_knowshare_flow_trello",
+          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/snuaVRUZhmMyCDx2"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "sourceId",
+              "keyValue": "={{ $json.source }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "caseId": "={{ $json.caseId }}",
+            "sourceId": "={{ $json.source }}",
+            "value": "={{ $json.value }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "caseId",
+              "displayName": "caseId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sourceId",
+              "displayName": "sourceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "dryRun": false
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        464
+      ],
+      "id": "88965ede-7608-43b6-846f-62510fc65e06",
+      "name": "Save cases1"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1872,
+        448
+      ],
+      "id": "ccac12f3-85aa-4a90-ad1d-3aa45adf7b25",
+      "name": "Wait",
+      "webhookId": "f3aea78d-9900-4c68-9e48-81a1414ff5e3"
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        432
+      ],
+      "id": "704c28d1-9789-42aa-a7a3-71765ec5d174",
+      "name": "Wait1",
+      "webhookId": "336cc6f5-9f85-4088-808e-ac09596c79c1"
+    },
+    {
+      "parameters": {
+        "resource": "folderMessage",
+        "folderId": {
+          "__rl": true,
+          "value": "AAMkADI5YzEwODkzLTUxM2YtNDU4MC04Yjg4LTJjZTZmZTRiOWE2YgAuAAAAAACIIErcp4onS70BA2kb2McNAQDsgIO2TTtOSIfv9pUwaN2NAAQC_18YAAA=",
+          "mode": "list",
+          "cachedResultName": "Knowshare Trello",
+          "cachedResultUrl": "https://outlook.office365.com/mail/AAMkADI5YzEwODkzLTUxM2YtNDU4MC04Yjg4LTJjZTZmZTRiOWE2YgAuAAAAAACIIErcp4onS70BA2kb2McNAQDsgIO2TTtOSIfv9pUwaN2NAAQC_18YAAA%3D"
+        },
+        "limit": 1,
+        "output": "raw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        416,
+        432
+      ],
+      "id": "7df64c15-0c2b-49cf-be8c-a343822b2877",
+      "name": "Get newest knowshare notice",
+      "webhookId": "e2507218-fee5-431c-94b5-a294a8027dfd"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === 1️⃣ Pobierz dane z wejścia (tablica kart kanban z API / HTTP Request) ===\nconst cards = $input.all().flatMap(item => item.json);\n\n// Jeśli nie ma kart — zwróć pusty wynik\nif (!Array.isArray(cards) || cards.length === 0) {\n  return [{\n    json: {\n      message: 'Brak kart kanban',\n      results: [\n        { caseId: 'email', source: 'C', value: false },\n        { caseId: 'kanban_card', source: 'D', value: false }\n      ]\n    }\n  }];\n}\n\n// === 2️⃣ Znajdź kartę o najnowszej dacie ===\nconst newestCard = cards.reduce((latest, card) => {\n  const currentDate = new Date(card.dateLastActivity);\n  const latestDate = new Date(latest.dateLastActivity);\n  return currentDate > latestDate ? card : latest;\n});\n\n// === 3️⃣ Pobierz dane z node'a e-mail ===\nconst emailNode = $('Get newest knowshare notice').item.json;\n\n// === 4️⃣ Ustal dzisiejszą datę w formacie YYYY-MM-DD ===\nconst today = new Date().toISOString().split('T')[0];\n\n// === 5️⃣ Sprawdź, czy daty pasują do dzisiejszej ===\n\n// Email (source C)\nconst emailDate = emailNode.receivedDateTime || '';\nconst emailToday = emailDate.includes(today);\n\n// kanban (source D)\nconst kanbanCreated = newestCard.dateLastActivity || '';\nconst kanbanToday = kanbanCreated.includes(today);\n\n// === 6️⃣ Zwróć końcowy wynik (lista sekcji) ===\nreturn [\n  {\n    json: {\n      caseId: 'email',\n      source: 'C',\n      value: emailToday,\n      created: emailDate || null\n    }\n  },\n  {\n    json: {\n      caseId: 'kanban_card',\n      source: 'D',\n      value: kanbanToday,\n      created: kanbanCreated || null,\n      cardId: newestCard.id || null \n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        432
+      ],
+      "id": "0fde370c-3aa7-407e-8e34-39cad42509c1",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c280e059-8402-4e90-b07b-c0e37a873a8d",
+              "leftValue": "={{ $json.caseId }}",
+              "rightValue": "trello_card",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "65949a81-210d-4ef4-a718-156eee9b6d0b",
+              "leftValue": "={{ $json.value }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        464
+      ],
+      "id": "fed3bbb6-7c97-432a-a9db-35f80767a624",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "id": {
+          "__rl": true,
+          "value": "={{ $('Code5').item.json.cardId }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        464
+      ],
+      "id": "dd41668e-81dd-41ba-8aef-79721273fc14",
+      "name": "Delete a card",
+      "credentials": {
+        "trelloApi": {
+          "id": "nhF8Bjyt8UxnkYnE",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Główne flow testujące\nUruchamia cyklicznie flow knowshare publikujące zgłoszenia w trello - a następnie je testuje",
+        "height": 592,
+        "width": 3488
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        144
+      ],
+      "id": "fc6dfca9-1b57-42db-8de3-de86b7becd1c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Flow pomocnicze twilio\nOdbierany jest tutaj callback status od twilio. Sprawdzany jest tutaj status wiadomości i zwracana jest wartość logiczna. ",
+        "height": 336,
+        "width": 800,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -224
+      ],
+      "id": "f044007e-f552-4603-a8c0-2b9932f5384d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł uruchamiający flow knowshare",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        240
+      ],
+      "id": "ca9bc64d-ae2d-4975-8f21-a59f4739ca62",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł mailowy\nZwraca ostatni mail powiadamiający o nowym zgłoszeniu w trello ",
+        "height": 432,
+        "width": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        352,
+        240
+      ],
+      "id": "de415025-9a2f-41cc-bbab-85b9a030cdb7",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł nocodb",
+        "height": 432,
+        "width": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        592,
+        240
+      ],
+      "id": "c542256c-15f8-4aef-9f22-04600efb53c1",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł sumujący\nSprawdza warunek dla obu wysyłek i zwraca wartość logiczną wraz z parametrami usługi\n",
+        "height": 432,
+        "width": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        240
+      ],
+      "id": "aa41bf35-a25a-480a-97e7-3e5854968dc4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł kasujący\nUsuwa zgłoszenie trello utworzone w ramach testów ",
+        "height": 432,
+        "width": 720,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        240
+      ],
+      "id": "a20c706d-976d-418b-b273-9b1af984a25d",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie z bazy danych stanów usług\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        240
+      ],
+      "id": "456587c0-58d5-40ee-ae9f-3e721386b7ad",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Agregacja wszystkich usług\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        240
+      ],
+      "id": "e2fcb029-8e0a-485e-92ef-256e0b3eeb65",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie zgłoszenia \n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        240
+      ],
+      "id": "1ec02c59-ea30-459b-979c-b1060e7f776c",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Wysłanie zgłoszenia do MS Teams\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        240
+      ],
+      "id": "d19dc41a-4d98-4b19-8e7f-1ae6fd073823",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł harmonogramu",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        240
+      ],
+      "id": "9f60966f-ec9c-4828-b4db-4e6596c6c44b",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Czekanie na publikację zgłoszeń\n\n\n",
+        "height": 432,
+        "width": 198,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        240
+      ],
+      "id": "aba8fd00-40a0-4b43-8a9d-b50522018339",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Czekanie na publikację zgłoszeń\n\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        240
+      ],
+      "id": "4a23eede-a4ed-4dc1-b0bb-da32be7f8f24",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "p8ctmuqgmd41gsy",
+        "table": "m9uil5p3apd33zt",
+        "limit": 1,
+        "options": {
+          "sort": {
+            "property": [
+              {
+                "field": "CreatedAt",
+                "direction": "desc"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        656,
+        432
+      ],
+      "id": "c188b965-13e4-4751-9c54-895ae36ad6a0",
+      "name": "Create latest record"
     }
   ],
   "connections": {
-    "When clicking ‘Execute workflow’": {
+    "Code2": {
       "main": [
-        []
+        [
+          {
+            "node": "Save cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Creating report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creating report": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save cases1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save cases1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get newest knowshare notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get newest knowshare notice": {
+      "main": [
+        [
+          {
+            "node": "Create latest record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Delete a card",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a card": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create latest record": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -32,8 +835,26 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "pinData": {},
-  "versionId": "1b743b8d-f287-4711-8a79-fbe58538d177",
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-10-31T03:00:31.007+01:00",
+          "Readable date": "October 31st 2025, 3:00:31 am",
+          "Readable time": "3:00:31 am",
+          "Day of week": "Friday",
+          "Year": "2025",
+          "Month": "October",
+          "Day of month": "31",
+          "Hour": "03",
+          "Minute": "00",
+          "Second": "31",
+          "Timezone": "Europe/Warsaw (UTC+01:00)"
+        }
+      }
+    ]
+  },
+  "versionId": "8edc9209-ede2-470b-9e63-9926aa24c999",
   "triggerCount": 0,
   "shared": [
     {
