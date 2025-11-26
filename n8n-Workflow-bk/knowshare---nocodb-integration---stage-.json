@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-26T10:07:34.000Z",
+  "updatedAt": "2025-11-26T12:51:43.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -17,7 +17,7 @@
         "messages": {
           "values": [
             {
-              "content": "=Jesteś systemem do generowania OPISÓW zgłoszeń Trello. Twoje zadanie to sumaryzacja i skrócenie dostarczonego tekstu do postaci zwięzłego opisu problemu.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy. Nigdy, pod żadnym pozorem, nie zmieniaj języka odpowiedzi na polski, chyba że język wejściowy był polski.\n2. **LIMIT:** Opis musi mieć **maksymalnie 500 znaków** i zawierać same konkrety, bez tytułów.\n3. **FORMAT WYJŚCIA (JSON Safe):** Zwróć **wyłącznie** czysty tekst opisu w jednej linii. Nie dodawaj nowych linii, list, nagłówków, formatowania Markdown ani innych elementów, które mogłyby sprawiać problem w JSON. Wszystkie znaki cudzysłowa (\") zamieniaj na apostrofy (').",
+              "content": "=esteś systemem do generowania ZWIĘZŁYCH OPISÓW zgłoszeń NocoDB. Twoje zadanie to analiza zgłoszenia i wygenerowanie dwóch kluczowych pól (interpretacji i rekomendacji) w czystym formacie JSON.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **JĘZYK:** ZACHOWAJ oryginalny język wejściowy.\n2. **LIMIT:** Zawartość pól 'interpretation' i 'recommendation' musi być opisana w **maksymalnie 2 prostych zdaniach** i nie może przekroczyć **50 słów** na pole.\n3. **FORMAT WYJŚCIA (JSON Safe):** Zwróć **WYŁĄCZNIE** czysty obiekt JSON, bez żadnych dodatkowych wyjaśnień, wstępów czy formatowania Markdown. Wszystkie znaki cudzysłowa (\") zamieniaj na apostrofy (').\n\n{\n  \"interpretation\": \"[Zwięzła interpretacja problemu na podstawie zgłoszenia i zdjęcia - max. 2 zdania]\",\n  \"recommendation\": \"[Zwięzłe rekomendacje, sugerowane kroki do podjęcia - max. 2 zdania]\"\n}",
               "role": "system"
             },
             {
@@ -34,8 +34,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        4128,
-        -192
+        4304,
+        -720
       ],
       "id": "acb14f6f-1188-47ff-8c06-831b5a12b37b",
       "name": "Create Task Content by Picture",
@@ -75,8 +75,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        3840,
-        -192
+        4016,
+        -704
       ],
       "id": "ecafbadc-8ac3-461a-94a6-2a9fb0a4e8fc",
       "name": "Create Task Title",
@@ -111,8 +111,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        3280,
-        -336
+        3632,
+        -720
       ],
       "id": "554ae54a-4d27-4d55-9f75-c93c2bdfc20f",
       "name": "Create Picture Summary1",
@@ -179,7 +179,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
+        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook-test').item.json.body.attachments }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -244,7 +244,7 @@
       "type": "n8n-nodes-base.twilio",
       "typeVersion": 1,
       "position": [
-        9648,
+        9776,
         208
       ],
       "id": "7a6986a0-08b4-4af8-9547-a21c2ce6ad8c",
@@ -314,7 +314,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5072,
+        5200,
         -560
       ],
       "id": "373bf113-8f3c-4e37-8af6-dfce2c0a11c1",
@@ -330,7 +330,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5632,
+        5760,
         -528
       ],
       "id": "60601591-3498-472d-a113-8f43bfe3386c",
@@ -346,7 +346,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        10064,
+        10192,
         -32
       ],
       "id": "7743b066-01ff-4c76-8d59-16b32c490f12",
@@ -396,8 +396,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3648,
-        -96
+        4112,
+        96
       ],
       "id": "151d59f7-c8c2-46a8-b03f-9793abf9a7a4",
       "name": "If7"
@@ -428,8 +428,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3600,
-        -560
+        3584,
+        -528
       ],
       "id": "2e7520d5-4e47-46ae-9d71-f5306fe288db",
       "name": "Sticky Note15"
@@ -446,7 +446,7 @@
           "conditions": [
             {
               "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
-              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "leftValue": "={{ $('Webhook-test').item.json.body.attachments }}",
               "rightValue": "",
               "operator": {
                 "type": "array",
@@ -456,7 +456,7 @@
             },
             {
               "id": "3139722a-659b-4e66-88f2-b2153ba0c7ac",
-              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "leftValue": "={{ $('Webhook-test').item.json.body.attachments }}",
               "rightValue": "",
               "operator": {
                 "type": "array",
@@ -612,7 +612,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8528,
+        8656,
         208
       ],
       "id": "b0e3eb29-c099-4932-92ae-131c1920d105",
@@ -643,7 +643,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        8192,
+        8320,
         208
       ],
       "id": "c34924e0-1b76-4e8f-9435-9986ebbe0fcc",
@@ -662,7 +662,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8016,
+        8144,
         208
       ],
       "id": "64f1a183-ba66-4f85-a44f-28e32002432d",
@@ -675,7 +675,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4864,
+        4896,
         -96
       ],
       "id": "7a9c40cd-bc40-44e6-893d-c8b734881167",
@@ -752,7 +752,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        5728,
+        5856,
         -224
       ],
       "id": "880dfdd6-125f-49a2-9612-044fd61469e5",
@@ -765,7 +765,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5904,
+        6032,
         -224
       ],
       "id": "459ba19a-745d-4573-b461-e59fece8a404",
@@ -780,7 +780,7 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        6096,
+        6224,
         -224
       ],
       "id": "0cad374d-98de-43e2-b1cb-4708070d15a7",
@@ -799,7 +799,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6288,
+        6416,
         -224
       ],
       "id": "05b4b7fe-7a82-49b7-9742-61d5508394ab",
@@ -834,7 +834,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6496,
+        6624,
         -224
       ],
       "id": "61556983-0872-4795-beaa-4349ecbad178",
@@ -857,7 +857,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        5904,
+        6032,
         -432
       ],
       "id": "b38bb220-9ae3-47f2-a1f9-9648ad7fa5d7",
@@ -871,7 +871,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        6096,
+        6224,
         -432
       ],
       "id": "a0d6b546-896f-4845-aa40-609013489de7",
@@ -884,7 +884,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        6704,
+        6832,
         -224
       ],
       "id": "ad6e32e3-d5e6-45ab-94df-f03275622de4",
@@ -899,7 +899,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        6896,
+        7024,
         -224
       ],
       "id": "b1c5a8f7-58dd-455b-98b7-dda19fbb5d35",
@@ -912,7 +912,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7056,
+        7184,
         -224
       ],
       "id": "47936b76-56de-43a7-82c9-b0a78a0bcb07",
@@ -946,7 +946,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        5184,
+        5312,
         32
       ],
       "id": "01d78efb-f6cb-4cf8-b845-e1357f8f5880",
@@ -962,7 +962,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5632,
+        5760,
         64
       ],
       "id": "dd26945a-8e38-4438-a1da-ceeebbe89386",
@@ -1010,7 +1010,7 @@
       "type": "n8n-nodes-base.nocoDb",
       "typeVersion": 3,
       "position": [
-        7216,
+        7344,
         -224
       ],
       "id": "52f59826-8632-47f7-b92a-257c0e8c5b5b",
@@ -1036,7 +1036,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        7824,
+        7952,
         208
       ],
       "id": "b8420f5f-9c52-429f-9c87-543edd031c95",
@@ -1052,7 +1052,7 @@
       "type": "n8n-nodes-base.microsoftOutlook",
       "typeVersion": 2,
       "position": [
-        10160,
+        10288,
         208
       ],
       "id": "7f77b84f-004d-47db-9a79-bc255271b750",
@@ -1072,7 +1072,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4432,
+        4416,
         -96
       ],
       "id": "a58812ee-44a0-4d10-98e6-05115a25a448",
@@ -1116,7 +1116,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        9312,
+        9440,
         208
       ],
       "id": "d7f52dff-bd16-4bfd-a049-f6f3be633165",
@@ -1145,7 +1145,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        8736,
+        8864,
         208
       ],
       "id": "9a0a5d26-58b6-445b-bdbb-089aea00d408",
@@ -1159,7 +1159,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        8944,
+        9072,
         208
       ],
       "id": "f9ee6279-18b7-4c9e-828b-8ef7f32821c7",
@@ -1172,7 +1172,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        9136,
+        9264,
         208
       ],
       "id": "71d407a5-4987-4b4d-b868-4505bd69e5b8",
@@ -1217,7 +1217,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        9904,
+        10032,
         208
       ],
       "id": "3ac03702-c730-4db9-9254-3e53103f3626",
@@ -1233,7 +1233,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        9536,
+        9664,
         -32
       ],
       "id": "413560f4-ff72-4b4c-bbd5-e38b97740204",
@@ -1249,7 +1249,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        7744,
+        7872,
         -64
       ],
       "id": "57c36fcd-f0df-496b-895a-9a9c89e74c4d",
@@ -1365,7 +1365,7 @@
       "type": "n8n-nodes-base.nocoDb",
       "typeVersion": 3,
       "position": [
-        6400,
+        6528,
         160
       ],
       "id": "d7891473-ff2a-41e9-89ed-744963dc59c7",
@@ -1390,19 +1390,74 @@
         176
       ],
       "id": "42d98bcf-8cca-48e4-821d-e2e30009b060",
-      "name": "Webhook"
+      "name": "Webhook-test"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        176
+      ],
+      "id": "c6a79c03-750f-4708-8908-3688c4463f39",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia\n- shortened_text: skrót wygenerowany przez wcześniejszy węzeł\n- image_description: opis obrazu wygenerowany przez Create Picture Summary (opcjonalny)\n\nZasady:\n1. Odpowiadaj w tym samym języku, w jakim napisano message.\n2. Wygeneruj:\n   - task_title: jedno zdanie, maksymalnie 100 znaków\n   - task_description.interpretation: opis sytuacji na podstawie message + shortened_text + image_description, maksymalnie 300 znaków\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków\n   - task_description.\"original-message\": dokładna treść pola message\n3. Zawsze zwracaj wynik w formacie:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\",\n      \"original-message\": \"…\"\n    }\n  }\n]\n\n4. Nie dodawaj nowych linii ani dodatkowego tekstu. \n5. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy.\n"
+            },
+            {
+              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nimage_description: {{ $json.content[0] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        3664,
+        -336
+      ],
+      "id": "d978a1ee-eed8-496a-b491-df565de467d1",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz surowy tekst z pola \"text\"\nlet raw = $input.first().json.text || \"\";\n\n// Usuń formatowanie ```json ... ```\nif (raw.includes(\"```json\") || raw.includes(\"```\")) {\n\traw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// Usuń niepotrzebne nowe linie\nraw = raw.replace(/\\\\n/g, \"\\n\").trim();\n\n// Zamień apostrofy na cudzysłowy — AI czasem miesza format\n// ale tylko gdy nie popsuje to JSON struktury\nif (raw.includes(\"'\") && !raw.includes(\"\\\"\")) {\n\traw = raw.replace(/'/g, \"\\\"\");\n}\n\n// Przygotowanie zmiennej na wynik\nlet parsed;\n\n// Spróbuj sparsować JSON\ntry {\n\tparsed = JSON.parse(raw);\n} catch (error) {\n\t// Jeśli JSON niepoprawny → ustaw pustą strukturę\n\treturn [{\n\t\tjson: {\n\t\t\ttask_title: \"\",\n\t\t\tinterpretation: \"\",\n\t\t\trecommendation: \"\",\n\t\t\t\"original-message\": \"\",\n\t\t\t_error: \"Nie udało się sparsować JSON\"\n\t\t}\n\t}];\n}\n\n// Oczekujemy tablicy z jednym obiektem\nif (!Array.isArray(parsed) || parsed.length === 0) {\n\treturn [{\n\t\tjson: {\n\t\t\ttask_title: \"\",\n\t\t\tinterpretation: \"\",\n\t\t\trecommendation: \"\",\n\t\t\t\"original-message\": \"\",\n\t\t\t_error: \"Struktura JSON nie jest tablicą z obiektem\"\n\t\t}\n\t}];\n}\n\nconst obj = parsed[0];\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n\tjson: {\n\t\ttask_title: obj.task_title || \"\",\n\t\tinterpretation: obj.task_description?.interpretation || \"\",\n\t\trecommendation: obj.task_description?.recommendation || \"\",\n\t\t\"original-message\": obj.task_description?.[\"original-message\"] || \"\"\n\t}\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4224,
+        -352
+      ],
+      "id": "251d7130-dbcb-4260-b6b9-81eb976b32bb",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
     "Create Task Content by Picture": {
       "main": [
-        [
-          {
-            "node": "Task content",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Create Task Title": {
@@ -1420,7 +1475,7 @@
       "main": [
         [
           {
-            "node": "If7",
+            "node": "Create Task Title",
             "type": "main",
             "index": 0
           }
@@ -1442,7 +1497,7 @@
       "main": [
         [
           {
-            "node": "Create Picture Summary1",
+            "node": "Message a model",
             "type": "main",
             "index": 0
           }
@@ -1513,27 +1568,15 @@
     },
     "If7": {
       "main": [
-        [
-          {
-            "node": "Create Task Title",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Task content",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [],
+        []
       ]
     },
     "If there are attachments": {
       "main": [
         [
           {
-            "node": "If7",
+            "node": "Task content",
             "type": "main",
             "index": 0
           }
@@ -1962,11 +2005,33 @@
         ]
       ]
     },
-    "Webhook": {
+    "Webhook-test": {
       "main": [
         [
           {
             "node": "If it's notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Webhook-test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -1982,7 +2047,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "a7d2975c-6767-41fc-858c-cee12b0f1e34",
+  "versionId": "5c02d644-3c37-424f-bd5e-e51566d4c34a",
   "triggerCount": 1,
   "shared": [
     {
