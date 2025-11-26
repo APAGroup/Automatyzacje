@@ -1,0 +1,1462 @@
+{
+  "updatedAt": "2025-11-24T11:13:21.000Z",
+  "createdAt": "2025-11-24T11:06:30.826Z",
+  "id": "GBFX9PHHchJIF7sp",
+  "name": "Knowshare - car service",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
+              "leftValue": "={{ $json.body.index }}",
+              "rightValue": "notices",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        208
+      ],
+      "id": "5fb7e4fd-7c83-4e50-895e-250a7f40318d",
+      "name": "Check if it's notice"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook').item.json;\nconst index = $('Set index').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        208
+      ],
+      "id": "510427fe-5ce2-4419-80c9-ba03ca8b2027",
+      "name": "Attachment - chat"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1824,
+        208
+      ],
+      "id": "0e32155a-5e16-406d-8d83-435ba9cec9bc",
+      "name": "Set index"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "62ec8387-d979-403a-a2cf-455d56bff842",
+              "leftValue": "={{ $json.index }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1952,
+        208
+      ],
+      "id": "54db94c7-93a0-4e34-bac2-f236037449de",
+      "name": "Check index"
+    },
+    {
+      "parameters": {
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "image"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        208
+      ],
+      "id": "c2ca5bab-76a1-4605-b784-af81409c1122",
+      "name": "Fetch image - chat",
+      "credentials": {
+        "s3": {
+          "id": "smwCdXvghDY8DlJz",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        208
+      ],
+      "id": "c4dabc45-5f66-449e-bac8-b0508ea1ba56",
+      "name": "Change mime type - chat"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Scal wszystkie dane pojazdu jeden json:\n{\n  \"name\",\"carId\",\"worker\",\"datetime\",\"mileage\",\"subject\"\n}\n",
+              "role": "system"
+            },
+            {
+              "content": "=Dane samochodu:  {{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2912,
+        224
+      ],
+      "id": "5a033420-7c4c-4cfc-b804-e10be6c4de57",
+      "name": "Car summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e9bf7821-d969-41b2-a0a4-aa647bb37199",
+              "leftValue": "={{ $json.asset.isCar }}",
+              "rightValue": "={{ $('Webhook').item.json.body.assetId }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        208
+      ],
+      "id": "466856f9-bc2c-4181-a956-902ae3da7945",
+      "name": "Check if it's a car"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Przeszukaj poniższe dane w poszukiwaniu numeru rejestracyjnego pojazdu. \nNumery rejestracyjne mogą mieć różne formaty (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\"), \nale zawsze zawierają litery i cyfry, często z lub bez spacji/podkreślników.\n\nTytuł: {{ $('Webhook').item.json.body.subject }}\nOpis:  {{ $('Webhook').item.json.body.message }}\n\nTwoje zadanie:\n1. Znajdź w tekście numer rejestracyjny, jeśli występuje.\n2. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"<znaleziony numer rejestracyjny lub null>\",\n  \"carId\": \"{{ $json.carId }}\",\n  \"worker\": \"{{ $json.worker }}\",\n  \"datetime\": \"{{ $json.datetime }}\",\n  \"mileage\": \"{{ $json.mileage }}\"\n  \"subject\": \"{{ $json.subject }}\"\n}\n\nWymagania:\n- Nie dodawaj żadnych opisów, komentarzy ani tekstów poza czystym JSON-em.\n- Jeśli numer nie występuje, zwróć \"name\": null\n- Nie poprawiaj formatu numeru — zwróć go dokładnie tak, jak występuje w tekście.\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "maxTokens": 100
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3712,
+        224
+      ],
+      "id": "feeff40a-1ea3-42f2-bac2-9794cf0fb75d",
+      "name": "Find plates",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        208
+      ],
+      "id": "12442d43-e736-410c-9fe5-9a26cfb5be20",
+      "name": "Get attachments"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        208
+      ],
+      "id": "a5f51719-d369-42d1-8530-fb6e44305e64",
+      "name": "Split attachments"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1648,
+        144
+      ],
+      "id": "e327ad31-767a-43db-8df8-3e76cb8830ca",
+      "name": "Loop over attachments",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=Otrzymujesz zdjęcie, które może przedstawiać:\n- licznik przebiegu pojazdu (wartość w kilometrach),\n- kod QR zawierający identyfikator pojazdu (ID),\n- numer rejestracyjny pojazdu.\n\nTwoje zadanie:\n1. Odczytaj z obrazu wszystkie możliwe informacje:\n   - przebieg w kilometrach (z dokładnie jedną spacją przed \"km\"),\n   - ID z kodu QR (surowy, bez prefixów, suffixów ani opisów),\n   - numer rejestracyjny pojazdu (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\" – format alfanumeryczny, czasem z odstępem lub podkreśleniem).\n2. Jeśli na zdjęciu znajduje się tylko część z tych informacji, brakujące pola ustaw jako null.\n3. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"{{ $('Get car data').item.json['Plate number'] }}\",\n  \"carId\": \"<odczytane ID z kodu QR lub null>\",\n  \"worker\": \"{{ $('Webhook').item.json.body.createdBy }}\",\n  \"datetime\": \"{{ $now.format('yyyy-MM-dd HH:mmZZ') }}\",\n  \"mileage\": \"<wartość przebiegu w formacie 'XXXXXX km' lub null>\",\n  \"subject\": \"{{ $('Webhook').item.json.body.subject }}\"\n}\n\n4. Zasady dotyczące pola \"name\":\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma wartość null lub pustą, a na zdjęciu znajduje się numer rejestracyjny, **nadpisz pole \"name\" odczytanym numerem rejestracyjnym**.\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma już wartość tekstową, pozostaw ją bez zmian.\n   - Nie dodawaj żadnych opisów ani komunikatów o tej decyzji.\n\n5. Zasady dotyczące pola \"id\":\n   - ID w kodzie QR to zwykle numer rejestracyjny zapisany z podkreśleniem zamiast spacji (np. \"SM_5669C\") lub prosty identyfikator typu \"car1\", \"car2\", itp.\n   - **Zwróć wartość z QR tylko wtedy, gdy jesteś niemal w 100% pewny poprawnego odczytu.**\n   - Jeśli QR jest nieczytelny, niepewny lub częściowy — ustaw `\"id\": null`.\n   - Nie próbuj zgadywać ani uzupełniać brakujących znaków.\n\nWymagania:\n- JSON musi być poprawny składniowo.\n- Wartość przebiegu zapisz z dokładnie jedną spacją między liczbą a jednostką (np. \"249415 km\").\n- Wartość ID z QR zwróć dokładnie tak, jak jest zakodowana (bez zmian).\n- Nie dodawaj żadnych opisów, komentarzy, tłumaczeń ani tekstów poza JSON-em.\n- Jeśli nie uda się odczytać któregokolwiek pola, ustaw je na null.\n",
+        "inputType": "base64",
+        "binaryPropertyName": "image",
+        "options": {
+          "detail": "auto",
+          "maxTokens": 300
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2480,
+        208
+      ],
+      "id": "afce199c-d986-435e-93ae-8c614678fdb3",
+      "name": "Fetch car info",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        224
+      ],
+      "id": "8f4e5abe-37cd-4500-9dca-6593751219cd",
+      "name": "Aggregate car info"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.message.content;\nconst match = text.match(/```json\\s*([\\s\\S]*?)\\s*```/);\nlet data = {};\n\nif (match) {\n\ttry {\n\t\tdata = JSON.parse(match[1]);\n\t} catch (error) {\n\t\tdata = { error: 'Invalid JSON', details: error.message };\n\t}\n}\n\nreturn [{ json: data }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        224
+      ],
+      "id": "a05446e5-d77b-4595-9a49-aad271d6a412",
+      "name": "Car summary to json"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1729d11e-d498-4dc7-9c02-66c780becbdc",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "Undefined",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3456,
+        224
+      ],
+      "id": "8fbb3265-9269-48e2-bb69-6a17d46403bc",
+      "name": "If name is empty"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3968,
+        224
+      ],
+      "id": "7da2569f-6370-442f-8c1d-3dc4603eb7e3",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{$input.item.json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4208,
+        224
+      ],
+      "id": "2017675c-89f2-43ca-a973-4a41b84c14cb",
+      "name": "Final json"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z poprzedniego węzła (pierwszy element)\nconst item = $('Final json').first().json;\n\n// Przygotuj tablicę komunikatów o brakach\nconst issues = [];\n\nif (item.name === null || item.name === undefined || item.name === \"\" || (typeof item.name === \"string\" && item.name.trim() === \"\")) {\n  issues.push(\"- Brak informacji o numerze rejestracyjnym pojazdu\");\n}\n\n// if (!item.carId || item.carId === null || item.carId.trim() === \"\") {\n//   issues.push(\"- Brak informacji o Id pojazdu (zła jakość qr na zdjęciu lub jego brak)\");\n// }\n\n// Złóż treść maila\nlet message = \"\";\n\nif (issues.length > 0) {\n  message += \"Wykryto następujące braki w przesłanych danych:\\n\\n\";\n  message += issues.join(\"\\n\");\n  message += \"\\n\\nUprzejmie prosimy o wprowadzenie korekty w arkuszu.\";\n} else {\n  message = \"Brak problemów do korekty.\";\n}\n\n// Zwróć wynik\nreturn [\n  {\n    json: {\n      subject: \"Prośba o korektę danych pojazdu\",\n      body: message\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4448,
+        224
+      ],
+      "id": "909d1d49-8d18-4773-9bfa-fcabffc7a486",
+      "name": "Create feedback"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.EmailAdress }}",
+        "subject": "={{ $('Get asset summary - journal').item.json.organization }} - Nowy wpis do rejestru floty pojazdów ",
+        "bodyContent": "=Dodano nowy wpis do rejestru floty pojazdów.\n\n{{ $('Create feedback').first().json.body }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        5456,
+        224
+      ],
+      "id": "bd33c4e5-22ff-43d8-8466-fb819c2e00ae",
+      "name": "Send email",
+      "webhookId": "cf7f5d98-7f66-41ec-a19d-444ebbe427d2",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "I8vnEihffZSIdc4c",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d4d2e53-c8a8-4a0b-a302-1a78a9386201",
+              "name": "name",
+              "value": "={{ $('Webhook').first().json.body.createdBy.split(' ')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "5df2bee1-b951-4cdc-9fbf-cf80a55fcb64",
+              "name": "surname",
+              "value": "={{ $('Webhook').first().json.body.createdBy.split(' ')[1] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4944,
+        224
+      ],
+      "id": "959b02f4-ddcb-4e0c-9f0e-e1b36a8bc56d",
+      "name": "User data"
+    },
+    {
+      "parameters": {
+        "content": "## Główne flow testujące\nOdpowiada za publikację wpisu excel odnośnie samochodu i wysyłą powiadomienie użytkownikowi. ",
+        "height": 608,
+        "width": 6768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -80
+      ],
+      "id": "16e39b61-48dd-45dc-b24b-ff88f6a555f9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Sprawdzenie czy ramka dotyczy zgłoszenia knowshare",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        32
+      ],
+      "id": "d5560ceb-adff-495c-ae27-4789a9c8a90c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Sprawdzenie czy asset dotyczy samochodu",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        672,
+        32
+      ],
+      "id": "28791d46-0154-4620-a0d4-fccf5714572b",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Wylistowanie załączników\n",
+        "height": 432,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        32
+      ],
+      "id": "54516c66-4dc0-44b8-a6db-df3155d6e3ab",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Pętla analizy obrazu\nW pętli analizowane są obrazy ze zgłoszenia i zwracane są jsony z danymi dotyczącymi samochodu",
+        "height": 432,
+        "width": 1040,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        32
+      ],
+      "id": "e0fcc8cc-7007-4da6-aea2-98eb483f4a66",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie  jednego jsona wyjściowego\n",
+        "height": 432,
+        "width": 512,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        32
+      ],
+      "id": "afe05704-dcb7-4a56-81d3-dbdf9bee6291",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Sprawdzanie czy jest dodany nr rejesracyjny pojazdu\n",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        32
+      ],
+      "id": "0b13f002-39df-4232-9b45-09647b8be06a",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie finalnej struktury danych\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4144,
+        32
+      ],
+      "id": "853d451c-61e7-47f0-9870-449b6dffc076",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Dodatkowe szukanie numeru rejestracyjnego w treści\n\n",
+        "height": 432,
+        "width": 496,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3632,
+        32
+      ],
+      "id": "f72a00da-7896-4215-9d7e-691edaec3245",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Węzeł webhooka - przekazanie wiadomości z knowshare",
+        "height": 432,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        32
+      ],
+      "id": "89f11d94-af65-4f7f-b30e-4cf4a972a4b0",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie z bazy info o assecie\n\n\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        208,
+        32
+      ],
+      "id": "9b8a955a-f3d8-4db5-87d0-eef189699e7e",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Agregacja jsonów\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        32
+      ],
+      "id": "8aaa07bf-cd03-45e6-a66c-31b54cd67572",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Tworzenie feedbacku dla zgłaszającego\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4384,
+        32
+      ],
+      "id": "5bbc9921-7fa3-467e-bbb1-718a6bad5a32",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Publikacja wpisu w tabeli excel\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4880,
+        32
+      ],
+      "id": "2d7f5bbe-3117-4c4d-939a-54c1ba43c8db",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie listy użytkowników",
+        "height": 432,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5136,
+        32
+      ],
+      "id": "c3565b40-48ae-4c80-905f-43d2bf3af437",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "## Wysłanie maila z powiadomieniem\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5392,
+        32
+      ],
+      "id": "6e9dba73-c8a9-48c8-9a1c-a41a0fbe8e7f",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "toRecipients": "grzegorz.bojdo@apagroup.pl",
+        "subject": "={{ $('Get asset summary - journal').item.json.organization }} - Nowy wpis do rejestru floty pojazdów ",
+        "bodyContent": "=Dodano nowy wpis do rejestru floty pojazdów.\n\n{{ $('Create feedback').first().json.body }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        5712,
+        224
+      ],
+      "id": "62355342-73a8-42ad-b5b0-6e288e308d94",
+      "name": "Send email1",
+      "webhookId": "4f32fe48-6a83-40b2-ba04-42ca581416db",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "I8vnEihffZSIdc4c",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Publikacja wpisu w tabeli nocodb\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4640,
+        32
+      ],
+      "id": "36e4747d-5550-4180-a4ff-a4464edf2659",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "create",
+        "projectId": "={{ $('Get asset summary - journal').item.json.table.BaseId }}",
+        "table": "={{ $('Get asset summary - journal').item.json.table.TableId }}",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "Datetime",
+              "fieldValue": "={{ $('Final json').item.json.datetime }}"
+            },
+            {
+              "fieldName": "Plate number",
+              "fieldValue": "={{ $('Final json').item.json.name }}"
+            },
+            {
+              "fieldName": "Vahicle id",
+              "fieldValue": "={{ $('Final json').item.json.carId }}"
+            },
+            {
+              "fieldName": "Worker",
+              "fieldValue": "={{ $('Final json').item.json.worker }}"
+            },
+            {
+              "fieldName": "Mileage",
+              "fieldValue": "={{ $('Final json').item.json.mileage }}"
+            },
+            {
+              "fieldName": "Subject",
+              "fieldValue": "={{ $('Final json').item.json.subject }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        4704,
+        224
+      ],
+      "id": "4d263e8b-505a-47e5-b45a-2a5703983d4d",
+      "name": "Create a row",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie z bazy info o samochodzie\n\n\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        928,
+        32
+      ],
+      "id": "65f91be1-1aa3-4c3b-851e-59add3219dd7",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "content": "## Pobranie z bazy info o assecie\n\n\n\n",
+        "height": 432,
+        "width": 214,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        432,
+        32
+      ],
+      "id": "df829684-d078-4563-a928-f0f0d2009ceb",
+      "name": "Sticky Note28"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c6gReJDAxZwjoiwY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c6gReJDAxZwjoiwY",
+          "cachedResultName": "Nocodb function - get asset summary"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "assetId": "={{ $('Webhook').item.json.body.assetId }}",
+            "case": "Fleet-vehicles"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "assetId",
+              "displayName": "assetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "case",
+              "displayName": "case",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        208
+      ],
+      "id": "cd868c8c-2971-4a7f-9ce0-0b23c0888e96",
+      "name": "Get asset summary - vehicles"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c6gReJDAxZwjoiwY",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c6gReJDAxZwjoiwY",
+          "cachedResultName": "Nocodb function - get asset summary"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "assetId": "={{ $json.body.assetId }}",
+            "case": "Fleet-journal"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "assetId",
+              "displayName": "assetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "case",
+              "displayName": "case",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        208
+      ],
+      "id": "fb3a3b41-066a-49ef-8738-07e1ce707107",
+      "name": "Get asset summary - journal"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "={{ $json.table.BaseId }}",
+        "table": "={{ $json.table.TableId }}",
+        "limit": 1,
+        "options": {
+          "where": "=(AssetId,like,{{ $('Webhook').item.json.body.assetId }}) "
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        992,
+        208
+      ],
+      "id": "08f3e7bd-e5d5-4d49-91f8-52a0ae788494",
+      "name": "Get car data",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "pqt495lyos0y4do",
+        "table": "mq8n0dce8y7al2g",
+        "limit": 1,
+        "options": {
+          "where": "=(FirstName,like,{{ $json.name }})~and(LastName,like,{{ $json.surname }})"
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        5200,
+        224
+      ],
+      "id": "e1352933-e354-4e12-aa81-f4bf2a22eaf0",
+      "name": "Get user",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4eacc5bb-82cc-47db-8589-a1c1ba8a2f72",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        208
+      ],
+      "id": "a49b4db9-1b1c-4a8f-a26b-abd7e7923f24",
+      "name": "Webhook",
+      "webhookId": "4eacc5bb-82cc-47db-8589-a1c1ba8a2f72",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "QmXylULo8NVgMnZB",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Wysłanie maila z powiadomieniem do GB\n\n",
+        "height": 432,
+        "width": 224,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5648,
+        32
+      ],
+      "id": "2bfe5e3f-26b7-4a28-af8e-42958c8bbe64",
+      "name": "Sticky Note20"
+    }
+  ],
+  "connections": {
+    "Check if it's notice": {
+      "main": [
+        [
+          {
+            "node": "Get asset summary - journal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - chat": {
+      "main": [
+        [
+          {
+            "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set index": {
+      "main": [
+        [
+          {
+            "node": "Check index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check index": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Attachment - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch image - chat": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - chat": {
+      "main": [
+        [
+          {
+            "node": "Fetch car info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Car summary": {
+      "main": [
+        [
+          {
+            "node": "Car summary to json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if it's a car": {
+      "main": [
+        [
+          {
+            "node": "Get car data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find plates": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get attachments": {
+      "main": [
+        [
+          {
+            "node": "Split attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split attachments": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over attachments": {
+      "main": [
+        [
+          {
+            "node": "Aggregate car info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch car info": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate car info": {
+      "main": [
+        [
+          {
+            "node": "Car summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Car summary to json": {
+      "main": [
+        [
+          {
+            "node": "If name is empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If name is empty": {
+      "main": [
+        [
+          {
+            "node": "Find plates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Final json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final json": {
+      "main": [
+        [
+          {
+            "node": "Create feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create feedback": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Send email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User data": {
+      "main": [
+        [
+          {
+            "node": "Get user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email1": {
+      "main": [
+        []
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "User data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get asset summary - journal": {
+      "main": [
+        [
+          {
+            "node": "Get asset summary - vehicles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get asset summary - vehicles": {
+      "main": [
+        [
+          {
+            "node": "Check if it's a car",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get car data": {
+      "main": [
+        [
+          {
+            "node": "Get attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get user": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if it's notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "apagroup.app.n8n.cloud",
+            "content-length": "324",
+            "accept-encoding": "gzip, br",
+            "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "51.83.252.104",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PL",
+            "cf-ray": "99febbb0d61df17e-WAW",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "date": "Mon, 17 Nov 2025 11:01:58 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.198.34",
+            "x-forwarded-host": "apagroup.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-jgqnt",
+            "x-is-trusted": "yes",
+            "x-real-ip": "51.83.252.104"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "index": "notices",
+            "createdAt": "2025-11-17T11:01:58.1726829Z",
+            "assetId": "08de15f6-f947-4790-8b92-1031b2692ae1",
+            "subject": "Stan pojazdu - test2",
+            "message": "Na zdjęciu załączono obecny stan pojazdu",
+            "type": 0,
+            "createdBy": "Michał Kobielski",
+            "tenantId": "08dd5714-941b-4e58-817b-934c403cebb5",
+            "attachments": [
+              "1000026327.jpg"
+            ]
+          },
+          "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/4eacc5bb-82cc-47db-8589-a1c1ba8a2f72",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "b8e44f7a-f620-425a-bc44-13f980d66fc5",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-24T11:06:30.831Z",
+      "createdAt": "2025-11-24T11:06:30.831Z",
+      "role": "workflow:owner",
+      "workflowId": "GBFX9PHHchJIF7sp",
+      "projectId": "98BhLNTRDdyyDRlO"
+    },
+    {
+      "updatedAt": "2025-11-26T06:20:00.786Z",
+      "createdAt": "2025-11-26T06:20:00.786Z",
+      "role": "workflow:editor",
+      "workflowId": "GBFX9PHHchJIF7sp",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
