@@ -1,0 +1,176 @@
+{
+  "updatedAt": "2025-11-24T08:48:06.000Z",
+  "createdAt": "2025-11-20T06:19:18.590Z",
+  "id": "c6gReJDAxZwjoiwY",
+  "name": "Nocodb function - get asset summary",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "pqt495lyos0y4do",
+        "table": "mzeiewh8c1639ie",
+        "limit": 100,
+        "options": {
+          "where": "=(AssetId,like,{{ $json.assetId }})"
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8d54902d-ebdc-415b-98b2-71bc69795c65",
+      "name": "Get asset",
+      "alwaysOutputData": true,
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "assetId"
+            },
+            {
+              "name": "case"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c34bada9-f36f-41be-8dfa-c29e60606870",
+      "name": "Start node"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "pqt495lyos0y4do",
+        "table": "m1py8u482er2o93",
+        "limit": 100,
+        "options": {
+          "fields": [
+            "_nc_m2m_nocodb_Organiza_nocodb_Tables"
+          ],
+          "where": "=(Name,like,{{ $json._nc_m2m_nocodb_Assets_nocodb_Organizas[0].nocodb_Organizations.Name }})"
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "fdd7710b-bc78-4d13-8b36-ad04d52604f3",
+      "name": "Get tables",
+      "alwaysOutputData": true,
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====== INPUTY ======\n\n// Wejście z Get tables (pierwszy input)\nconst tablesBlock = items[0].json._nc_m2m_nocodb_Organiza_nocodb_Tables;\n\n// Wejście z Start node (drugi input)\nconst startNode = $item(0).$node[\"Start node\"].json;\nconst searchCase = startNode.case;\n\n// Wejście z Get asset (trzeci input)\nconst asset = $item(0).$node[\"Get asset\"].json;\n\n// ====== 1. SZUKANIE TABELI ======\n\nconst foundTable = tablesBlock.find(t =>\n    t.nocodb_Tables?.Name?.toLowerCase().includes(searchCase.toLowerCase())\n);\n\nlet tableInfo = null;\n\nif (foundTable) {\n    const { BaseId, TableId, Name } = foundTable.nocodb_Tables;\n    tableInfo = { BaseId, TableId, Name };\n} else {\n    tableInfo = { error: \"Table not found\", searchCase };\n}\n\n// ====== 2. LISTA UŻYTKOWNIKÓW ======\n\nconst users = (asset._nc_m2m_nocodb_Assets_nocodb_Users || []).map(entry => {\n    const u = entry.nocodb_Users;\n    return {\n        firstName: u.FirstName,\n        lastName: u.LastName,\n        email: u.EmailAdress,\n        phone: u.PhoneNumber,\n        username: u.Username,\n        smsNotification: u.SmsNotification,\n        emailNotification: u.EmailNotification\n    };\n});\n\n// ====== 3. PARAMETRY ASSETU ======\n\nconst assetInfo = {\n    assetName: asset.Name,\n    kanbanTask: asset.KanbanTask,\n    isCar: asset.IsCar\n};\n\n// ====== 4. ORGANIZACJA ======\n\nconst orgEntry = asset._nc_m2m_nocodb_Assets_nocodb_Organizas?.[0];\nconst organizationName = orgEntry?.nocodb_Organizations?.Name || null;\n\n// ====== OUTPUT ======\n\nreturn [\n    {\n        json: {\n            table: tableInfo,\n            users,\n            asset: assetInfo,\n            organization: organizationName\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "38a11643-5423-42d0-95a6-fb92d2e9039e",
+      "name": "Return summary"
+    }
+  ],
+  "connections": {
+    "Get asset": {
+      "main": [
+        [
+          {
+            "node": "Get tables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start node": {
+      "main": [
+        [
+          {
+            "node": "Get asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get tables": {
+      "main": [
+        [
+          {
+            "node": "Return summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return summary": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Start node": [
+      {
+        "json": {
+          "assetId": "08dd5bca-a817-490e-8810-6c6689ec2e1f",
+          "case": "Knowshare"
+        }
+      }
+    ]
+  },
+  "versionId": "11377860-cf07-45aa-856f-878fdceee2db",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-20T06:19:18.594Z",
+      "createdAt": "2025-11-20T06:19:18.594Z",
+      "role": "workflow:owner",
+      "workflowId": "c6gReJDAxZwjoiwY",
+      "projectId": "98BhLNTRDdyyDRlO"
+    },
+    {
+      "updatedAt": "2025-11-26T06:21:31.619Z",
+      "createdAt": "2025-11-26T06:21:31.619Z",
+      "role": "workflow:editor",
+      "workflowId": "c6gReJDAxZwjoiwY",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
