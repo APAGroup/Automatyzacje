@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-20T12:51:47.000Z",
+  "updatedAt": "2025-11-26T10:07:34.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -179,7 +179,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook-test').item.json.body.attachments }}\n}",
+        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -446,7 +446,7 @@
           "conditions": [
             {
               "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
-              "leftValue": "={{ $('Webhook-test').item.json.body.attachments }}",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
               "rightValue": "",
               "operator": {
                 "type": "array",
@@ -456,7 +456,7 @@
             },
             {
               "id": "3139722a-659b-4e66-88f2-b2153ba0c7ac",
-              "leftValue": "={{ $('Webhook-test').item.json.body.attachments }}",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
               "rightValue": "",
               "operator": {
                 "type": "array",
@@ -688,7 +688,7 @@
           "value": "c6gReJDAxZwjoiwY",
           "mode": "list",
           "cachedResultUrl": "/workflow/c6gReJDAxZwjoiwY",
-          "cachedResultName": "Nocodb - get asset summary"
+          "cachedResultName": "Nocodb function - get asset summary"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -1376,6 +1376,21 @@
           "name": "NocoDB Token account"
         }
       }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "  {\n    \"params\": {},\n    \"query\": {},\n    \"body\": {\n      \"index\": \"notices\",\n      \"createdAt\": \"2025-11-26T10:00:19.3259736Z\",\n      \"assetId\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n      \"subject\": \"APA\",\n      \"message\": \" Skończyłem montować szafę na parterze na budynku na Tarnogórskiej 260 \",\n      \"type\": 0,\n      \"createdBy\": \"APA Group\",\n      \"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n      \"attachments\": [\n        \"image_picker_B6C1D93A-9AD2-423E-A7D4-D6776322EDD5-326-0000000360707B25.jpg\"\n      ]\n    },\n    \"webhookUrl\": \"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n    \"executionMode\": \"production\"\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        176
+      ],
+      "id": "42d98bcf-8cca-48e4-821d-e2e30009b060",
+      "name": "Webhook"
     }
   ],
   "connections": {
@@ -1651,13 +1666,7 @@
     },
     "Translation Option - Parse": {
       "main": [
-        [
-          {
-            "node": "If there are attachments - kanban",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Get asset summary": {
@@ -1952,6 +1961,17 @@
           }
         ]
       ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If it's notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1962,7 +1982,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "8e10209e-0faa-4a46-ad7a-8995700ad242",
+  "versionId": "a7d2975c-6767-41fc-858c-cee12b0f1e34",
   "triggerCount": 1,
   "shared": [
     {
