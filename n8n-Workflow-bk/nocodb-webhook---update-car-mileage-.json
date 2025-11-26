@@ -1,0 +1,210 @@
+{
+  "updatedAt": "2025-11-24T11:03:22.000Z",
+  "createdAt": "2025-11-24T07:38:07.248Z",
+  "id": "4fu0GT8npgWAQGYt",
+  "name": "Nocodb webhook - update car mileage",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e8a19e3a-7d10-4d69-bda9-fa448b13aeb0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "622e520e-44fa-4ead-8e67-332d5d515f7e",
+      "name": "Webhook",
+      "webhookId": "e8a19e3a-7d10-4d69-bda9-fa448b13aeb0"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "={{ $json.BaseId }}",
+        "table": "={{ $json.TableId }}",
+        "limit": 1,
+        "options": {
+          "where": "=(Plate number,like,)"
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        560,
+        0
+      ],
+      "id": "c017ecba-320b-4b5e-bd2a-ac796a154251",
+      "name": "Get a car",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "pqt495lyos0y4do",
+        "table": "m5ep4zl5jvt5j5l",
+        "limit": 100,
+        "options": {
+          "fields": [],
+          "where": "=(BaseId,like,{{ $json.body.base_id }})~and(Name,like,Fleet-vehicles)"
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        352,
+        0
+      ],
+      "id": "dcfde176-329c-46a1-9d51-7edbcb3b19fc",
+      "name": "Get cars table",
+      "alwaysOutputData": true,
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "update",
+        "projectId": "={{ $('Get cars table').item.json.BaseId }}",
+        "table": "={{ $('Get cars table').item.json.TableId }}",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "Id",
+              "fieldValue": "={{ $('Get a car').item.json.Id }}"
+            },
+            {
+              "fieldName": "Current mileage",
+              "fieldValue": "={{ $('Webhook').item.json.body.data.rows[0].Mileage }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        752,
+        0
+      ],
+      "id": "770b5d75-73b6-41c9-8c20-6515a282afb8",
+      "name": "Update mileage",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get cars table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a car": {
+      "main": [
+        [
+          {
+            "node": "Update mileage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get cars table": {
+      "main": [
+        [
+          {
+            "node": "Get a car",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "apagroup.app.n8n.cloud",
+            "user-agent": "axios/1.12.2",
+            "content-length": "18",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "51.83.252.104",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PL",
+            "cf-ray": "9a385cc6b25e7242-WAW",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "51.83.252.104, 172.64.200.118",
+            "x-forwarded-host": "apagroup.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-865tl",
+            "x-is-trusted": "yes",
+            "x-real-ip": "51.83.252.104"
+          },
+          "params": {},
+          "query": {},
+          "body": "{{ json event }}",
+          "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/e8a19e3a-7d10-4d69-bda9-fa448b13aeb0",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "79736167-f6e6-4609-9463-ff83da664d12",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-24T07:38:07.254Z",
+      "createdAt": "2025-11-24T07:38:07.254Z",
+      "role": "workflow:owner",
+      "workflowId": "4fu0GT8npgWAQGYt",
+      "projectId": "98BhLNTRDdyyDRlO"
+    },
+    {
+      "updatedAt": "2025-11-26T06:21:11.658Z",
+      "createdAt": "2025-11-26T06:21:11.658Z",
+      "role": "workflow:editor",
+      "workflowId": "4fu0GT8npgWAQGYt",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
