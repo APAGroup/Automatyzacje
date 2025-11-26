@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-25T14:08:23.000Z",
+  "updatedAt": "2025-11-26T10:10:59.000Z",
   "createdAt": "2025-11-25T10:04:21.491Z",
   "id": "54OzgWSzjWohfCn4",
   "name": "test 3",
@@ -11,10 +11,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -288,
-        -48
+        -11040,
+        -64
       ],
-      "id": "7a168917-2e09-4bc2-9d05-4172deaa3e47",
+      "id": "bff5cf27-a269-407e-a6cb-86372e40d971",
       "name": "When clicking ‘Execute workflow’"
     }
   ],
@@ -27,7 +27,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "8a177080-e87d-4ef9-91d2-31c0cd80d248",
+  "versionId": "4c0e331f-689d-4a79-9bf5-1796761737de",
   "triggerCount": 0,
   "shared": [
     {
