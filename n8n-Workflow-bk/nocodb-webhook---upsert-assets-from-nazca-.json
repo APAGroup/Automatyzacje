@@ -1,0 +1,413 @@
+{
+  "updatedAt": "2025-11-24T08:48:31.000Z",
+  "createdAt": "2025-11-19T06:19:15.310Z",
+  "id": "WKeN4Tuq9AzkozFQ",
+  "name": "Nocodb webhook - upsert assets from nazca",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -112
+      ],
+      "id": "a5471813-683b-45e9-a251-23fc6359b9d9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "b72315e4-297d-441c-8c99-384bf2ec2bac",
+      "name": "Loop over assets"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "pqt495lyos0y4do",
+        "table": "mzeiewh8c1639ie",
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        352,
+        0
+      ],
+      "id": "46707de4-a8c2-4273-ae31-f71b307b184d",
+      "name": "Get all assets - nocodb",
+      "alwaysOutputData": true,
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "getAll",
+        "projectId": "pqt495lyos0y4do",
+        "table": "msthjl66ilhnkc7",
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "fe61e8ee-06a8-4b97-bca0-599420f3ec9a",
+      "name": "Get all assets - nazca",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4d4de2a7-a357-4b40-aaf6-4aea016a3e64",
+              "leftValue": "={{ $('Assets convertion').item.json.assetList }}",
+              "rightValue": "={{ $('Loop over assets').item.json.Id }}",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        96
+      ],
+      "id": "b4fdeb20-3a2d-4df9-af9d-f02f72070706",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "create",
+        "projectId": "pqt495lyos0y4do",
+        "table": "mzeiewh8c1639ie",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "SystemName",
+              "fieldValue": "={{ $json.SystemName }}"
+            },
+            {
+              "fieldName": "Name",
+              "fieldValue": "={{ $json.Name }}"
+            },
+            {
+              "fieldName": "QrBadge",
+              "fieldValue": "={{ $json.QrBadge }}"
+            },
+            {
+              "fieldName": "Localization",
+              "fieldValue": "={{ $json.nfCfg_Localizations.Id }}"
+            },
+            {
+              "fieldName": "Tenant",
+              "fieldValue": "={{ $json.nfCfg_Tenants.Id }}"
+            },
+            {
+              "fieldName": "AssetId",
+              "fieldValue": "={{ $json.Id }}"
+            },
+            {
+              "fieldName": "LinkedOrganization",
+              "fieldValue": "[ { Id: 1 } ]"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        1856,
+        128
+      ],
+      "id": "3bb163cc-fb31-4ce7-9f84-2a3578dae25f",
+      "name": "Add asset",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "nocoDbApiToken",
+        "operation": "update",
+        "projectId": "pqt495lyos0y4do",
+        "table": "mzeiewh8c1639ie",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "SystemName",
+              "fieldValue": "={{ $('Loop over assets').first().json.SystemName }}"
+            },
+            {
+              "fieldName": "Name",
+              "fieldValue": "={{ $('Loop over assets').first().json.Name }}"
+            },
+            {
+              "fieldName": "QrBadge",
+              "fieldValue": "={{ $('Loop over assets').first().json.QrBadge }}"
+            },
+            {
+              "fieldName": "Localzation",
+              "fieldValue": "={{ $('Loop over assets').first().json.nfCfg_Localizations.Id }}"
+            },
+            {
+              "fieldName": "Tenant",
+              "fieldValue": "={{ $('Loop over assets').first().json.nfCfg_Tenants.Id }}"
+            },
+            {
+              "fieldName": "Id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldName": "LinkedOrganization",
+              "fieldValue": "[{\"Id\":1}]"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.nocoDb",
+      "typeVersion": 3,
+      "position": [
+        1856,
+        352
+      ],
+      "id": "f6ef2e9d-3b10-4eb8-a146-ee69f012065c",
+      "name": "Update asset",
+      "credentials": {
+        "nocoDbApiToken": {
+          "id": "qeCZEzG9ppXPu7Mh",
+          "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobranie wejściowych danych:\nconst assetId = $input.first().json.Id;     // szukany AssetId\nconst assetDict = $('Assets convertion').first().json.assetDict; // słownik { assetId: Id }\n\n// Pobranie wartości:\nconst id = assetDict[assetId] ?? null;\n\nreturn [\n  {\n    json: { id }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        192
+      ],
+      "id": "713f2eac-0da4-4173-8c2d-f7ac51c768ec",
+      "name": "Get id"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Wejście: wiele itemów od poprzedniego noda (np. NoCoDB)\n// Każdy item w formie: { Id, AssetId, ... }\n\nconst items = $input.all();\n\nconst assetList = items.map(i => i.json.AssetId);\n\nconst assetDict = {};\nfor (const i of items) {\n  assetDict[i.json.AssetId] = i.json.Id;\n}\n\nreturn [\n  {\n    json: {\n      assetList,\n      assetDict\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "09a3e6de-a5b7-4ef5-bf45-eac21004d15c",
+      "name": "Assets convertion"
+    },
+    {
+      "parameters": {
+        "path": "9c53f1aa-c9c3-4543-b93b-3583f92222ba",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        112,
+        96
+      ],
+      "id": "812df990-f109-4702-8f36-6cb23dc97b21",
+      "name": "Webhook",
+      "webhookId": "9c53f1aa-c9c3-4543-b93b-3583f92222ba"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get all assets - nocodb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over assets": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all assets - nocodb": {
+      "main": [
+        [
+          {
+            "node": "Assets convertion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all assets - nazca": {
+      "main": [
+        [
+          {
+            "node": "Loop over assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Add asset",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add asset": {
+      "main": [
+        [
+          {
+            "node": "Loop over assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update asset": {
+      "main": [
+        [
+          {
+            "node": "Loop over assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get id": {
+      "main": [
+        [
+          {
+            "node": "Update asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assets convertion": {
+      "main": [
+        [
+          {
+            "node": "Get all assets - nazca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get all assets - nocodb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7647146f-d995-4bc6-b042-c0ffc862b7f3",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-11-19T06:19:15.312Z",
+      "createdAt": "2025-11-19T06:19:15.312Z",
+      "role": "workflow:owner",
+      "workflowId": "WKeN4Tuq9AzkozFQ",
+      "projectId": "98BhLNTRDdyyDRlO"
+    },
+    {
+      "updatedAt": "2025-11-26T06:21:55.823Z",
+      "createdAt": "2025-11-26T06:21:55.823Z",
+      "role": "workflow:editor",
+      "workflowId": "WKeN4Tuq9AzkozFQ",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "tags": []
+}
