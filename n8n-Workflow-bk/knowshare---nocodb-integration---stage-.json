@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-26T12:51:43.000Z",
+  "updatedAt": "2025-11-27T10:45:05.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -34,8 +34,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        4304,
-        -720
+        4112,
+        -1008
       ],
       "id": "acb14f6f-1188-47ff-8c06-831b5a12b37b",
       "name": "Create Task Content by Picture",
@@ -75,8 +75,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        4016,
-        -704
+        3824,
+        -992
       ],
       "id": "ecafbadc-8ac3-461a-94a6-2a9fb0a4e8fc",
       "name": "Create Task Title",
@@ -111,8 +111,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        3632,
-        -720
+        3440,
+        -1008
       ],
       "id": "554ae54a-4d27-4d55-9f75-c93c2bdfc20f",
       "name": "Create Picture Summary1",
@@ -133,7 +133,7 @@
           "mode": "list",
           "cachedResultName": "CHATGPT-4O-LATEST"
         },
-        "text": "=Jesteś ekspertem technicznym i specjalistą od analizy obrazów.\nAnalizuj załączony obraz oraz poniższy opis problemu technicznego.\n\n1. **Identyfikacja Języka:** Najpierw zidentyfikuj język użyty w polu \"OPIS PROBLEMÓW\".\n2. **Generowanie Odpowiedzi:** Wygeneruj **krótki i treściwy opis** zawartości zdjęcia w kontekście zgłoszonego problemu technicznego.\n3. **Wymagany Język Odpowiedzi:** **MUSISZ** odpowiedzieć w **IDNETYCZNYM** języku, który został zidentyfikowany w punkcie 1.\n\nOPIS PROBLEMÓW:\n{{ $('Webhook-test').item.json.body.message }}\n\nFORMAT ODPOWIEDZI:\nWygeneruj tylko sam tekst opisu. Nie dodawaj żadnych wstępów (np. \"Opis:\", \"Analiza:\"), wyjaśnień, nowych linii, formatowania Markdown (np. *, **), ani żadnych znaków, które utrudnią zapis w pojedynczym polu JSON.",
+        "text": "=Jesteś ekspertem technicznym i specjalistą od analizy obrazów.\n\nTwoim JEDYNYM ZADANIEM jest wygenerowanie opisu załączonego obrazu.\n\n1. Opis Treści: Wygeneruj **krótki, treściwy i techniczny opis** zawartości zdjęcia w kontekście problemu.\n2. FORMAT: Zwróć **WYŁĄCZNIE SAM TEKST OPISU**. ZABRONIONE jest dodawanie wstępów, tytułów, wyjaśnień, nowych linii, formatowania (Markdown), **podwójnych cudzysłowów (\")**, ani żadnych innych znaków, które mogłyby utrudnić zapis w polu JSON. Tekst musi być pojedynczym ciągiem znaków.",
         "inputType": "base64",
         "binaryPropertyName": "image",
         "options": {
@@ -396,8 +396,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        4112,
-        96
+        3872,
+        -720
       ],
       "id": "151d59f7-c8c2-46a8-b03f-9793abf9a7a4",
       "name": "If7"
@@ -593,8 +593,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        4576,
-        -96
+        4752,
+        -1008
       ],
       "id": "bb6a5330-429e-45de-9f1f-bcf41e1b27ac",
       "name": "Translation Option",
@@ -675,8 +675,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4896,
-        -96
+        5072,
+        -1008
       ],
       "id": "7a9c40cd-bc40-44e6-893d-c8b734881167",
       "name": "Translation Option - Parse"
@@ -1072,8 +1072,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4416,
-        -96
+        4592,
+        -1008
       ],
       "id": "a58812ee-44a0-4d10-98e6-05115a25a448",
       "name": "Task content"
@@ -1380,7 +1380,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "  {\n    \"params\": {},\n    \"query\": {},\n    \"body\": {\n      \"index\": \"notices\",\n      \"createdAt\": \"2025-11-26T10:00:19.3259736Z\",\n      \"assetId\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n      \"subject\": \"APA\",\n      \"message\": \" Skończyłem montować szafę na parterze na budynku na Tarnogórskiej 260 \",\n      \"type\": 0,\n      \"createdBy\": \"APA Group\",\n      \"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n      \"attachments\": [\n        \"image_picker_B6C1D93A-9AD2-423E-A7D4-D6776322EDD5-326-0000000360707B25.jpg\"\n      ]\n    },\n    \"webhookUrl\": \"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n    \"executionMode\": \"production\"\n  }",
+        "jsonOutput": "{\n\n\t\"params\": \n\t{\n\t},\n\t\"query\": \n\t{\n\t},\n\t\"body\": \n\t{\n\t\"index\": \n\t\"notices\",\n\t\"createdAt\": \n\t\"2025-11-26T12:16:31.9999287Z\",\n\t\"assetId\": \n\t\"08de2c14-d512-4bb5-8dea-afd4c4dbd8b8\",\n\t\"subject\": \n\t\"Kontrola kondensator RGS\",\n\t\"message\": \n\t\"OK. Przetłumacz na angielski\",\n\t\"type\": \n\t0,\n\t\"createdBy\": \n\t\"Bartosz Kondracki\",\n\t\"tenantId\": \n\t\"08de2c0e-aab6-469d-8951-6fa19e7a9eeb\",\n\t\"attachments\": \n\t[\n\t\"image_picker_8E15C987-6F5F-4900-8251-FC0E40A07D8C-2797-0000006F1682A01B.jpg\"\n\t]\n\t},\n\t\"webhookUrl\": \n\t\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\t\"executionMode\": \n\t\"production\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -1415,10 +1415,10 @@
           "values": [
             {
               "role": "system",
-              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia\n- shortened_text: skrót wygenerowany przez wcześniejszy węzeł\n- image_description: opis obrazu wygenerowany przez Create Picture Summary (opcjonalny)\n\nZasady:\n1. Odpowiadaj w tym samym języku, w jakim napisano message.\n2. Wygeneruj:\n   - task_title: jedno zdanie, maksymalnie 100 znaków\n   - task_description.interpretation: opis sytuacji na podstawie message + shortened_text + image_description, maksymalnie 300 znaków\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków\n   - task_description.\"original-message\": dokładna treść pola message\n3. Zawsze zwracaj wynik w formacie:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\",\n      \"original-message\": \"…\"\n    }\n  }\n]\n\n4. Nie dodawaj nowych linii ani dodatkowego tekstu. \n5. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy.\n"
+              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia (służy również do wykrywania poleceń tłumaczenia)\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie Polecenia Tłumaczenia:\n   Polecenia tłumaczenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie Treści:\n   A. JEŻELI wykryjesz polecenie tłumaczenia w polu \"message\": \n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** od razu **w języku docelowym**.\n\n   B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** w **oryginalnym języku** pola message.\n\n3. Wymagane pola i limity:\n   - task_title: jedno zdanie, maksymalnie 100 znaków.\n   - task_description.interpretation: opis sytuacji na podstawie **message + subject + image_description**, maksymalnie 300 znaków.\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy."
             },
             {
-              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nimage_description: {{ $json.content[0] }}"
+              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nsubject: {{ $('Webhook-test').item.json.body.subject }}\nimage_description: image_description: {{ $json.content.join(' | ') }}"
             }
           ]
         },
@@ -1428,8 +1428,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        3664,
-        -336
+        3776,
+        -64
       ],
       "id": "d978a1ee-eed8-496a-b491-df565de467d1",
       "name": "Message a model",
@@ -1442,13 +1442,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pobierz surowy tekst z pola \"text\"\nlet raw = $input.first().json.text || \"\";\n\n// Usuń formatowanie ```json ... ```\nif (raw.includes(\"```json\") || raw.includes(\"```\")) {\n\traw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// Usuń niepotrzebne nowe linie\nraw = raw.replace(/\\\\n/g, \"\\n\").trim();\n\n// Zamień apostrofy na cudzysłowy — AI czasem miesza format\n// ale tylko gdy nie popsuje to JSON struktury\nif (raw.includes(\"'\") && !raw.includes(\"\\\"\")) {\n\traw = raw.replace(/'/g, \"\\\"\");\n}\n\n// Przygotowanie zmiennej na wynik\nlet parsed;\n\n// Spróbuj sparsować JSON\ntry {\n\tparsed = JSON.parse(raw);\n} catch (error) {\n\t// Jeśli JSON niepoprawny → ustaw pustą strukturę\n\treturn [{\n\t\tjson: {\n\t\t\ttask_title: \"\",\n\t\t\tinterpretation: \"\",\n\t\t\trecommendation: \"\",\n\t\t\t\"original-message\": \"\",\n\t\t\t_error: \"Nie udało się sparsować JSON\"\n\t\t}\n\t}];\n}\n\n// Oczekujemy tablicy z jednym obiektem\nif (!Array.isArray(parsed) || parsed.length === 0) {\n\treturn [{\n\t\tjson: {\n\t\t\ttask_title: \"\",\n\t\t\tinterpretation: \"\",\n\t\t\trecommendation: \"\",\n\t\t\t\"original-message\": \"\",\n\t\t\t_error: \"Struktura JSON nie jest tablicą z obiektem\"\n\t\t}\n\t}];\n}\n\nconst obj = parsed[0];\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n\tjson: {\n\t\ttask_title: obj.task_title || \"\",\n\t\tinterpretation: obj.task_description?.interpretation || \"\",\n\t\trecommendation: obj.task_description?.recommendation || \"\",\n\t\t\"original-message\": obj.task_description?.[\"original-message\"] || \"\"\n\t}\n}];\n"
+        "jsCode": "// Pobierz surowy tekst JSON z OpenAI (pierwsze wejście)\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Pobranie oryginalnej wiadomości, która nie jest już generowana przez AI\nconst originalMessage = $('Webhook-test').first().json.body.message || \"\"; \n\n// 1. Oczyszczanie surowego tekstu\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 2. Bezpieczne czyszczenie białych znaków\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \"\").trim(); \n\n// 3. Konwersja apostrofów na cudzysłowy\nraw = raw.replace(/'/g, \"\\\"\");\n\nlet parsed;\n\n// Parsowanie JSON i obsługa błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // Struktura błędu z wstrzykniętą wiadomością oryginalną\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            \"original-message\": originalMessage,\n            task_description: \"\", \n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 4. Transformacja do oczekiwanego płaskiego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 5. STWORZENIE NOWEGO POLA 'task_description' (podsumowanie)\nconst newTaskDescription = \n    `1: ${originalMessage}` +\n    ` | 2: ${interpretation}` +\n    ` | 3: ${recommendation}`;\n\n\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n\n\n        // Pola generowane przez AI\n        //interpretation: interpretation,\n        //recommendation: recommendation,\n        // Pole wypełnione bezpośrednio z Webhooka\n        //\"original-message\": originalMessage, \n\n      \n        // Nowe, połączone pole\n        task_description: newTaskDescription \n    }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4224,
-        -352
+        4192,
+        -64
       ],
       "id": "251d7130-dbcb-4260-b6b9-81eb976b32bb",
       "name": "Code in JavaScript"
@@ -1576,7 +1576,7 @@
       "main": [
         [
           {
-            "node": "Task content",
+            "node": "Message a model",
             "type": "main",
             "index": 0
           }
@@ -2047,7 +2047,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "5c02d644-3c37-424f-bd5e-e51566d4c34a",
+  "versionId": "f21de36f-d587-4daa-99b2-76ad15778cba",
   "triggerCount": 1,
   "shared": [
     {
