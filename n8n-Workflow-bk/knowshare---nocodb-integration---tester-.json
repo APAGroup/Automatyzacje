@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2025-11-25T13:48:14.000Z",
+  "updatedAt": "2025-11-27T07:30:39.000Z",
   "createdAt": "2025-10-30T06:10:38.241Z",
   "id": "TCaQwdRXAv2jEfs5",
   "name": "Knowshare - nocodb integration - tester",
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
