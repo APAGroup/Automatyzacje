@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-26T11:33:08.000Z",
+  "updatedAt": "2025-11-27T11:22:26.000Z",
   "createdAt": "2025-11-20T11:40:54.784Z",
   "id": "HLynFWpQ1tyOzZ4W",
   "name": "Knowshare - nocodb integration",
@@ -1135,7 +1135,7 @@
             {
               "id": "4df1a078-86b6-4c57-a90e-46715fc7fedb",
               "name": "message",
-              "value": "={{ $('SMS part 1').item.json.sms_firstPart }}{{ $('Translation Option - Parse').first().json.task_description }}",
+              "value": "={{ $('SMS Final').first().json.finalSmsText }}",
               "type": "string"
             }
           ]
@@ -2046,7 +2046,7 @@
       }
     ]
   },
-  "versionId": "d8b18bd9-0ca0-4335-8e00-5bf0c86e7459",
+  "versionId": "e22bd5b0-43ea-4578-a65b-8e11f57f5538",
   "triggerCount": 1,
   "shared": [
     {
