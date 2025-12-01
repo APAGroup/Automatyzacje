@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-24T08:48:22.000Z",
+  "updatedAt": "2025-12-01T10:48:31.000Z",
   "createdAt": "2025-11-19T07:53:24.908Z",
   "id": "9Y6U28cy581EO1pj",
   "name": "Nocodb webhook - upsert users from nazca",
@@ -42,7 +42,7 @@
           "conditions": [
             {
               "id": "4d4de2a7-a357-4b40-aaf6-4aea016a3e64",
-              "leftValue": "={{ $('Users convertion').item.json.assetList }}",
+              "leftValue": "={{ $('Users convertion').first().json.userList }}",
               "rightValue": "={{ $('Loop over assets').item.json.Id }}",
               "operator": {
                 "type": "array",
@@ -104,7 +104,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Wejście: wiele itemów od poprzedniego noda (np. NoCoDB)\n// Każdy item w formie: { Id, AssetId, ... }\n\nconst items = $input.all();\n\nconst userList = items.map(i => i.json.AssetId);\n\nconst userDict = {};\nfor (const i of items) {\n  userDict[i.json.UserId] = i.json.Id;\n}\n\nreturn [\n  {\n    json: {\n      userList,\n      userDict\n    }\n  }\n];\n"
+        "jsCode": "// Wejście: wiele itemów od poprzedniego noda (np. NoCoDB)\n// Każdy item w formie: { Id, AssetId, ... }\n\nconst items = $input.all();\n\nconst userList = items.map(i => i.json.UserId);\n\nconst userDict = {};\nfor (const i of items) {\n  userDict[i.json.UserId] = i.json.Id;\n}\n\nreturn [\n  {\n    json: {\n      userList,\n      userDict\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -195,23 +195,27 @@
           "fieldValues": [
             {
               "fieldName": "UserId",
-              "fieldValue": "={{ $json.Id }}"
+              "fieldValue": "={{ $('Loop over assets').item.json.Id }}"
             },
             {
               "fieldName": "Username",
-              "fieldValue": "={{ $json.Username }}"
+              "fieldValue": "={{ $('Loop over assets').item.json.Username }}"
             },
             {
               "fieldName": "FirstName",
-              "fieldValue": "={{ $json.FirstName }}"
+              "fieldValue": "={{ $('Loop over assets').item.json.FirstName }}"
             },
             {
               "fieldName": "LastName",
-              "fieldValue": "={{ $json.LastName }}"
+              "fieldValue": "={{ $('Loop over assets').item.json.LastName }}"
             },
             {
               "fieldName": "EmailAdress",
-              "fieldValue": "={{ $json.Email }}"
+              "fieldValue": "={{ $('Loop over assets').item.json.Email }}"
+            },
+            {
+              "fieldName": "Id",
+              "fieldValue": "={{ $json.id }}"
             }
           ]
         }
@@ -375,7 +379,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "316bf9a2-76d2-4f23-829a-7a165338a64b",
+  "versionId": "ccb4424f-98df-4558-83b5-027d5a2d6956",
   "triggerCount": 1,
   "shared": [
     {
