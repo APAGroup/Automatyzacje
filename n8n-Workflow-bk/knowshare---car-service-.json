@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-24T11:13:21.000Z",
+  "updatedAt": "2025-12-02T10:19:03.000Z",
   "createdAt": "2025-11-24T11:06:30.826Z",
   "id": "GBFX9PHHchJIF7sp",
   "name": "Knowshare - car service",
@@ -454,8 +454,8 @@
       "webhookId": "cf7f5d98-7f66-41ec-a19d-444ebbe427d2",
       "credentials": {
         "microsoftOutlookOAuth2Api": {
-          "id": "I8vnEihffZSIdc4c",
-          "name": "Microsoft Outlook account"
+          "id": "y05ybOzVHHFzrA9a",
+          "name": "Microsoft Outlook account 2"
         }
       }
     },
@@ -761,8 +761,8 @@
       "webhookId": "4f32fe48-6a83-40b2-ba04-42ca581416db",
       "credentials": {
         "microsoftOutlookOAuth2Api": {
-          "id": "I8vnEihffZSIdc4c",
-          "name": "Microsoft Outlook account"
+          "id": "y05ybOzVHHFzrA9a",
+          "name": "Microsoft Outlook account 2"
         }
       }
     },
@@ -1399,23 +1399,23 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "324",
+            "content-length": "354",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "99febbb0d61df17e-WAW",
+            "cf-ray": "9a79460fb1bcd2c5-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Mon, 17 Nov 2025 11:01:58 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.64.198.34",
+            "date": "Tue, 02 Dec 2025 07:57:28 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.198.35",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-jgqnt",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-865tl",
             "x-is-trusted": "yes",
             "x-real-ip": "51.83.252.104"
           },
@@ -1423,15 +1423,15 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2025-11-17T11:01:58.1726829Z",
-            "assetId": "08de15f6-f947-4790-8b92-1031b2692ae1",
-            "subject": "Stan pojazdu - test2",
-            "message": "Na zdjęciu załączono obecny stan pojazdu",
+            "createdAt": "2025-12-02T07:57:27.6430045Z",
+            "assetId": "08dd5bca-7982-4010-85f8-d679bbc346d6",
+            "subject": "Serwis CTTP",
+            "message": "Serwis CCTP demontaż urządzeń ORANGE",
             "type": 0,
-            "createdBy": "Michał Kobielski",
+            "createdBy": "Andrzej Boczula",
             "tenantId": "08dd5714-941b-4e58-817b-934c403cebb5",
             "attachments": [
-              "1000026327.jpg"
+              "3e6cb793-8aee-4cc7-9ed3-84b19e9b99842916406912091713668.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/4eacc5bb-82cc-47db-8589-a1c1ba8a2f72",
@@ -1440,7 +1440,7 @@
       }
     ]
   },
-  "versionId": "b8e44f7a-f620-425a-bc44-13f980d66fc5",
+  "versionId": "95aeaab3-681b-48c2-8b3d-15ccac523504",
   "triggerCount": 1,
   "shared": [
     {
