@@ -1,128 +1,11 @@
 {
-  "updatedAt": "2025-12-03T10:12:45.000Z",
+  "updatedAt": "2025-12-03T14:30:07.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
   "active": false,
   "isArchived": false,
   "nodes": [
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o",
-          "mode": "list",
-          "cachedResultName": "GPT-4O"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=esteś systemem do generowania ZWIĘZŁYCH OPISÓW zgłoszeń NocoDB. Twoje zadanie to analiza zgłoszenia i wygenerowanie dwóch kluczowych pól (interpretacji i rekomendacji) w czystym formacie JSON.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **JĘZYK:** ZACHOWAJ oryginalny język wejściowy.\n2. **LIMIT:** Zawartość pól 'interpretation' i 'recommendation' musi być opisana w **maksymalnie 2 prostych zdaniach** i nie może przekroczyć **50 słów** na pole.\n3. **FORMAT WYJŚCIA (JSON Safe):** Zwróć **WYŁĄCZNIE** czysty obiekt JSON, bez żadnych dodatkowych wyjaśnień, wstępów czy formatowania Markdown. Wszystkie znaki cudzysłowa (\") zamieniaj na apostrofy (').\n\n{\n  \"interpretation\": \"[Zwięzła interpretacja problemu na podstawie zgłoszenia i zdjęcia - max. 2 zdania]\",\n  \"recommendation\": \"[Zwięzłe rekomendacje, sugerowane kroki do podjęcia - max. 2 zdania]\"\n}",
-              "role": "system"
-            },
-            {
-              "content": "=Treść do przetworzenia na opis:\n{{ $('Create Picture Summary1').item.json.message.content }}"
-            }
-          ]
-        },
-        "options": {
-          "n": 1,
-          "temperature": 0.2,
-          "topP": 1
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [
-        4112,
-        -1008
-      ],
-      "id": "acb14f6f-1188-47ff-8c06-831b5a12b37b",
-      "name": "Create Task Content by Picture",
-      "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o",
-          "mode": "list",
-          "cachedResultName": "GPT-4O"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Jesteś systemem do generowania TYTUŁÓW zgłoszeń Trello. Twoje zadanie to skrócenie dostarczonego tekstu do postaci zwięzłego tytułu.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy. Nigdy, pod żadnym pozorem, nie zmieniaj języka odpowiedzi na polski, chyba że język wejściowy był polski.\n2. **LIMIT:** Tytuł musi być jednym zdaniem i **NIE MOŻE** przekroczyć 100 znaków.\n3. **FORMAT:** Zwróć **wyłącznie** finalny tekst tytułu. Wszystkie cudzysłowy (\") zamieniaj na apostrofy ('). Bez wstępów, wyjaśnień, nowych linii, czy formatowania Markdown.",
-              "role": "system"
-            },
-            {
-              "content": "=Treść do przetworzenia na tytuł:\n{{ $('Create Picture Summary1').item.json.message.content }}"
-            }
-          ]
-        },
-        "options": {
-          "maxTokens": 200,
-          "n": 1,
-          "temperature": 0.4,
-          "topP": 1
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [
-        3824,
-        -992
-      ],
-      "id": "ecafbadc-8ac3-461a-94a6-2a9fb0a4e8fc",
-      "name": "Create Task Title",
-      "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o",
-          "mode": "list",
-          "cachedResultName": "GPT-4O"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Jesteś systemem do generowania opisu zgłoszeń Trello. Twoje zadanie to analiza obrazu i tekstu oraz wygenerowanie krótkiego opisu problemu technicznego.\n\nZASADA BEZWZGLĘDNA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Musisz wykryć i ZACHOWAĆ oryginalny język z pola 'Opis'. Nigdy, pod żadnym pozorem, nie zmieniaj języka odpowiedzi na polski, chyba że język wejściowy był polski. Odpowiedź musi być w IDNETYCZNYM języku źródłowym.\n2. **ANALIZA WIZUALNA:** Połącz analizę załączonego obrazu z kontekstem z pola 'Opis'.\n3. **TREŚĆ:** Wygeneruj krótki i treściwy opis problemu technicznego, który ma trafić do zgłoszenia Trello.\n4. **FORMAT WYJŚCIA:** Zwróć tylko finalny tekst opisu. Bez tytułów, wyjaśnień, nowych linii, formatowania Markdown, cudzysłowów ani żadnych znaków utrudniających bezpośredni zapis do pola JSON/Trello.",
-              "role": "system"
-            },
-            {
-              "content": "=Poniżej znajdują się dane do analizy:\nOpis:  {{ $json.content }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [
-        3440,
-        -1008
-      ],
-      "id": "554ae54a-4d27-4d55-9f75-c93c2bdfc20f",
-      "name": "Create Picture Summary1",
-      "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
-        }
-      }
-    },
     {
       "parameters": {
         "resource": "image",
@@ -145,7 +28,7 @@
       "typeVersion": 1.8,
       "position": [
         2880,
-        -256
+        -352
       ],
       "id": "9aeea304-c793-4b25-a880-91bbb8948162",
       "name": "Create Picture Summary",
@@ -171,8 +54,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        3248,
-        -336
+        3264,
+        -384
       ],
       "id": "453a4bc4-0531-40db-9b4d-54363ef1a18c",
       "name": "Aggregate"
@@ -186,8 +69,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1296,
-        -384
+        1040,
+        -432
       ],
       "id": "9da7c1e4-35a0-4895-8b94-9a2e5181bdfe",
       "name": "Loop parameter - chat"
@@ -200,8 +83,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1456,
-        -384
+        1200,
+        -432
       ],
       "id": "de5670ec-1063-442f-b532-3e16e2c42d38",
       "name": "Split Out - chat"
@@ -213,8 +96,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1648,
-        -384
+        1392,
+        -432
       ],
       "id": "8f5dfc66-42cf-4928-88e6-4513f9275063",
       "name": "Loop Over Items - chat",
@@ -222,13 +105,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook-test').item.json;\n// === Minimalna Zmiana: Jawna konwersja na liczbę ===\nconst index = Number($('Set index').item.json.index);\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\n// === DODANE: Logika Walidacji ===\nconst ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nlet type_ok = false;\nlet fileName = null;\n\n// Próba uzyskania nazwy pliku z różnych formatów\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\n// Sprawdzenie rozszerzenia (tylko jeśli fileName istnieje)\nif (fileName) {\n    const normalizedFileName = fileName.toLowerCase().trim();\n    type_ok = ALLOWED_EXTENSIONS.some(ext => normalizedFileName.endsWith(`.${ext}`));\n}\n// === KONIEC DODANEJ LOGIKI ===\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment,\n      // === Minimalna Zmiana: Dodanie type_ok ===\n      type_ok: type_ok\n    }\n  }\n];"
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook-test').item.json;\nconst index = Number($('Set index').item.json.index);\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\n// Rozszerzenia obsługiwane przez OpenAI Whisper (audio)\nconst AUDIO_EXT = [\n    'mp3', 'wav', 'm4a', 'flac', 'ogg', 'webm'\n];\n\n// Rozszerzenia obsługiwane przez Gemini (wideo) – pełna lista\nconst VIDEO_EXT = [\n    'mp4', 'mov', 'mpeg', 'mpg', 'webm',\n    'wmv', 'flv', '3gp', 'avi'\n];\n\n// Obsługiwane obrazy\nconst IMAGE_EXT = [\n    'png', 'jpg', 'jpeg', 'gif', 'webp'\n];\n\n// Finalna wartość type_ok\n// 0 = unknown, 1 = image, 2 = audio (OpenAI Whisper), 3 = video (Gemini)\nlet type_ok = 0;\nlet fileName = null;\n\n// Próba uzyskania nazwy pliku\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\nif (fileName) {\n    const normalized = fileName.toLowerCase().trim();\n\n    if (IMAGE_EXT.some(ext => normalized.endsWith(`.${ext}`))) {\n        type_ok = 1;                // obraz\n    } \n    else if (AUDIO_EXT.some(ext => normalized.endsWith(`.${ext}`))) {\n        type_ok = 2;                // AUDIO → OpenAI Whisper\n    } \n    else if (VIDEO_EXT.some(ext => normalized.endsWith(`.${ext}`))) {\n        type_ok = 3;                // VIDEO → Gemini (wartość 3)\n    }\n}\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment,\n      type_ok: type_ok\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2096,
-        -256
+        1888,
+        -288
       ],
       "id": "d1466345-19d3-4ba7-b7c0-ea9f622918a8",
       "name": "Attachment - chat"
@@ -278,13 +161,13 @@
       "parameters": {
         "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
         "height": 496,
-        "width": 1792,
+        "width": 2096,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1232,
+        928,
         -560
       ],
       "id": "56d48234-2dfe-4648-81ea-3734df8a4e4b",
@@ -368,40 +251,6 @@
       ],
       "id": "4e9f25ce-81bd-46c0-8680-328addf310c0",
       "name": "Sticky Note12"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "92dbdc9c-4a93-4514-bf6d-a71f53e43803",
-              "leftValue": "={{ $('Webhook-test').item.json.body.attachments }}",
-              "rightValue": "",
-              "operator": {
-                "type": "array",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        3872,
-        -720
-      ],
-      "id": "151d59f7-c8c2-46a8-b03f-9793abf9a7a4",
-      "name": "If7"
     },
     {
       "parameters": {
@@ -496,8 +345,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1776,
-        -240
+        1520,
+        -288
       ],
       "id": "8f8749a8-e16f-485c-a244-3f63a37b2a9d",
       "name": "Set index"
@@ -529,8 +378,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1920,
-        -256
+        1664,
+        -304
       ],
       "id": "faaa6be5-f1e2-41b8-92ee-d38b0cc28807",
       "name": "Check index"
@@ -545,7 +394,7 @@
       "typeVersion": 1,
       "position": [
         2464,
-        -256
+        -352
       ],
       "id": "f2959261-69ae-4610-ad26-d31ccdb6abbc",
       "name": "Fetch image - chat",
@@ -564,47 +413,10 @@
       "typeVersion": 2,
       "position": [
         2688,
-        -256
+        -352
       ],
       "id": "464aa493-a7b8-4132-b8f0-d5a55defa758",
       "name": "Change mime type - chat"
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "GPT-4O-MINI"
-        },
-        "responses": {
-          "values": [
-            {
-              "role": "system",
-              "content": "=Twoim zadaniem jest tłumaczyć pola `task_title` i `task_description` **TYLKO wtedy**, gdy w polu \"message\" znajduje się wyraźne polecenie tłumaczenia.\n\nPolecenia tłumaczenia mogą zawierać słowa/zwroty:\n\"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\",\n\"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\nJeżeli wykryjesz polecenie tłumaczenia:\n1. Ustal język docelowy wskazany w poleceniu.\n2. Przetłumacz `task_title` i `task_description` **wyłącznie na ten język**.\n3. Tłumaczenie wykonuj TYLKO jeśli:\n   • tekst źródłowy jest napisany alfabetem łacińskim\n   • i język docelowy również korzysta z alfabetu łacińskiego.\n4. Nie tłumacz, jeśli język docelowy używa innego alfabetu.\n5. Jeśli język docelowy jest niejednoznaczny lub nieznany → zwróć tekst bez zmian.\n\nJeżeli w polu \"message\" **NIE ma polecenia tłumaczenia**:\n- **Wykryj język tekstu z pola \"message\".**\n- **Zwróć task_title i task_description w dokładnie tym samym języku.**\n- **Nie tłumacz, nie poprawiaj, nie parafrazuj, nie anglicyzuj, nie normalizuj.**\n- **Zachowaj dokładnie ten sam język, nawet jeśli jest to niderlandzki, niemiecki, francuski, polski itp.**\n\nModel NIGDY nie może tłumaczyć automatycznie bez wyraźnego polecenia.\n\nZawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n{\n  \"task_title\": \"...\",\n  \"task_description\": \"...\"\n}\n"
-            },
-            {
-              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\ntask_title: {{$json[\"task_title\"]}}\ntask_description: {{$json[\"task_description\"]}}"
-            }
-          ]
-        },
-        "builtInTools": {},
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2,
-      "position": [
-        4752,
-        -1008
-      ],
-      "id": "bb6a5330-429e-45de-9f1f-bcf41e1b27ac",
-      "name": "Translation Option",
-      "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
-        }
-      }
     },
     {
       "parameters": {
@@ -668,19 +480,6 @@
       ],
       "id": "64f1a183-ba66-4f85-a44f-28e32002432d",
       "name": "SMS part 1"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Pobierz surowy tekst z pola \"text\"\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Sprawdź, czy tekst zawiera ```json i usuń jeśli tak\nif (raw.includes(\"```json\")) {\n    raw = raw.replace(/```json\\\\n|```/g, '').replace(/\\\\n/g, '\\n').trim();\n} else {\n    // usuń ewentualne nowe linie i białe znaki z końca\n    raw = raw.trim();\n}\n\n// Spróbuj sparsować JSON\nlet parsed;\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // jeśli JSON jest niepoprawny, zwróć puste pola\n    parsed = {\n        task_title: \"\",\n        task_description: \"\"\n    };\n}\n\n// Zwróć jako JSON dla kolejnych węzłów\nreturn [{ json: parsed }];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        5072,
-        -1008
-      ],
-      "id": "7a9c40cd-bc40-44e6-893d-c8b734881167",
-      "name": "Translation Option - Parse"
     },
     {
       "parameters": {
@@ -1368,7 +1167,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "  {\n    \"params\": {},\n    \"query\": {},\n    \"body\": {\n      \"index\": \"notices\",\n      \"createdAt\": \"2025-11-26T10:00:19.3259736Z\",\n      \"assetId\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n      \"subject\": \"APA\",\n      \"message\": \" Skończyłem montować szafę na parterze na budynku na Tarnogórskiej 260 \",\n      \"type\": 0,\n      \"createdBy\": \"APA Group\",\n      \"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n      \"attachments\": [\n        \"image_picker_B6C1D93A-9AD2-423E-A7D4-D6776322EDD5-326-0000000360707B25.xls\"\n      ]\n    },\n    \"webhookUrl\": \"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n    \"executionMode\": \"production\"\n  }",
+        "jsonOutput": "  {\n    \"params\": {},\n    \"query\": {},\n    \"body\": {\n      \"index\": \"notices\",\n      \"createdAt\": \"2025-11-26T10:00:19.3259736Z\",\n      \"assetId\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n      \"subject\": \"APA\",\n      \"message\": \" Skończyłem montować szafę na parterze na budynku na Tarnogórskiej 260 \",\n      \"type\": 0,\n      \"createdBy\": \"APA Group\",\n      \"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n      \"attachments\": [\n        \"image_picker_B6C1D93A-9AD2-423E-A7D4-D6776322EDD5-326-0000000360707B25.jpg\"\n      ]\n    },\n    \"webhookUrl\": \"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n    \"executionMode\": \"production\"\n  }",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -1390,40 +1189,6 @@
       ],
       "id": "c6a79c03-750f-4708-8908-3688c4463f39",
       "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "41eae012-1dc3-45c0-ac40-40a756ef45e4",
-              "leftValue": "={{ $json.type_ok }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        2256,
-        -256
-      ],
-      "id": "71a923d5-0421-4406-8fb1-4e451f51a589",
-      "name": "Check type of attachement"
     },
     {
       "parameters": {
@@ -1532,36 +1297,176 @@
       ],
       "id": "d122d256-498a-45fd-9fc2-289f7f467c9e",
       "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        5296,
+        -576
+      ],
+      "id": "b36cf210-da1d-442e-9b75-291ea629296f",
+      "name": "Analyze video"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        5504,
+        -565.8862552191946
+      ],
+      "id": "a82aa340-ce64-4544-bb23-e0e15a3dc5b5",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        -224
+      ],
+      "id": "ccef405b-b76c-4e65-83b5-28a84b50b005",
+      "name": "Transcribe a recording1",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "194bfdf8-66ea-4568-9c3e-b06727c1a7d1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f6ea07d3-c359-4002-a0a4-215fad595428",
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a6135f05-9ad9-4413-bb95-3dbccdb68618",
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "394c8abb-c9bc-4397-b294-40c1fe1974d2",
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        2080,
+        -320
+      ],
+      "id": "551d733b-854b-4682-9a95-9275b8ef54f1",
+      "name": "Switch"
     }
   ],
   "connections": {
-    "Create Task Content by Picture": {
-      "main": [
-        []
-      ]
-    },
-    "Create Task Title": {
-      "main": [
-        [
-          {
-            "node": "Create Task Content by Picture",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create Picture Summary1": {
-      "main": [
-        [
-          {
-            "node": "Create Task Title",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Create Picture Summary": {
       "main": [
         [
@@ -1628,7 +1533,7 @@
       "main": [
         [
           {
-            "node": "Check type of attachement",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -1644,12 +1549,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "If7": {
-      "main": [
-        [],
-        []
       ]
     },
     "If there are attachments": {
@@ -1743,17 +1642,6 @@
         ]
       ]
     },
-    "Translation Option": {
-      "main": [
-        [
-          {
-            "node": "Translation Option - Parse",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Text shortening": {
       "main": [
         [
@@ -1785,11 +1673,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Translation Option - Parse": {
-      "main": [
-        []
       ]
     },
     "Get asset summary": {
@@ -2096,24 +1979,6 @@
         ]
       ]
     },
-    "Check type of attachement": {
-      "main": [
-        [
-          {
-            "node": "Fetch image - chat",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Loop Over Items - chat",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Create summary": {
       "main": [
         [
@@ -2146,6 +2011,35 @@
           }
         ]
       ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2156,7 +2050,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "01940037-d7fa-4fc6-bf6b-c88ec1a26b93",
+  "versionId": "81b48b55-23c3-4647-9720-8f5ac1577be3",
   "triggerCount": 1,
   "shared": [
     {
