@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-27T10:45:05.000Z",
+  "updatedAt": "2025-12-03T08:42:22.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -154,7 +154,8 @@
           "id": "7r6c9PgveQjC7ygm",
           "name": "OpenAi project n8n"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -170,7 +171,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        3120,
+        3248,
         -336
       ],
       "id": "453a4bc4-0531-40db-9b4d-54363ef1a18c",
@@ -185,7 +186,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1472,
+        1296,
         -384
       ],
       "id": "9da7c1e4-35a0-4895-8b94-9a2e5181bdfe",
@@ -199,7 +200,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1632,
+        1456,
         -384
       ],
       "id": "de5670ec-1063-442f-b532-3e16e2c42d38",
@@ -212,7 +213,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1824,
+        1648,
         -384
       ],
       "id": "8f5dfc66-42cf-4928-88e6-4513f9275063",
@@ -221,12 +222,12 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook-test').item.json;\nconst index = $('Set index').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook-test').item.json;\n// === Minimalna Zmiana: Jawna konwersja na liczbę ===\nconst index = Number($('Set index').item.json.index);\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\n// === DODANE: Logika Walidacji ===\nconst ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nlet type_ok = false;\nlet fileName = null;\n\n// Próba uzyskania nazwy pliku z różnych formatów\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\n// Sprawdzenie rozszerzenia (tylko jeśli fileName istnieje)\nif (fileName) {\n    const normalizedFileName = fileName.toLowerCase().trim();\n    type_ok = ALLOWED_EXTENSIONS.some(ext => normalizedFileName.endsWith(`.${ext}`));\n}\n// === KONIEC DODANEJ LOGIKI ===\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment,\n      // === Minimalna Zmiana: Dodanie type_ok ===\n      type_ok: type_ok\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2272,
+        2096,
         -256
       ],
       "id": "d1466345-19d3-4ba7-b7c0-ea9f622918a8",
@@ -261,13 +262,13 @@
       "parameters": {
         "content": "## Konfiguracja \nKonfiguracja flow odbywa się za pomocą pliku json.\n\nW celu dodania nowego użytkownika do adresatów powiadomień należy go dopisać do listy 'recipients', zawierającej dane adresowe użytkowników. Następnie w celu przypisania użytkownika do powiadomień danej usługi należy jego klucz zawrzeć w liście odbiorców tej usługi. ",
         "height": 520,
-        "width": 980,
+        "width": 1204,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2048,
+        1824,
         -48
       ],
       "id": "6d73a1b1-d56d-4bcb-a39d-a676d735fda7",
@@ -276,14 +277,14 @@
     {
       "parameters": {
         "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
-        "height": 480,
-        "width": 1600,
+        "height": 496,
+        "width": 1792,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1424,
+        1232,
         -560
       ],
       "id": "56d48234-2dfe-4648-81ea-3734df8a4e4b",
@@ -412,7 +413,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1424,
+        1232,
         -48
       ],
       "id": "5f5a7b61-0794-4f3d-ae6e-43c22e937d8e",
@@ -495,8 +496,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1952,
-        -256
+        1776,
+        -240
       ],
       "id": "8f8749a8-e16f-485c-a244-3f63a37b2a9d",
       "name": "Set index"
@@ -528,7 +529,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        2096,
+        1920,
         -256
       ],
       "id": "faaa6be5-f1e2-41b8-92ee-d38b0cc28807",
@@ -1283,7 +1284,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1744,
+        1552,
         176
       ],
       "id": "6f62d199-d358-4c2f-8fdf-d9c87a4c2faa",
@@ -1380,13 +1381,13 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "{\n\n\t\"params\": \n\t{\n\t},\n\t\"query\": \n\t{\n\t},\n\t\"body\": \n\t{\n\t\"index\": \n\t\"notices\",\n\t\"createdAt\": \n\t\"2025-11-26T12:16:31.9999287Z\",\n\t\"assetId\": \n\t\"08de2c14-d512-4bb5-8dea-afd4c4dbd8b8\",\n\t\"subject\": \n\t\"Kontrola kondensator RGS\",\n\t\"message\": \n\t\"OK. Przetłumacz na angielski\",\n\t\"type\": \n\t0,\n\t\"createdBy\": \n\t\"Bartosz Kondracki\",\n\t\"tenantId\": \n\t\"08de2c0e-aab6-469d-8951-6fa19e7a9eeb\",\n\t\"attachments\": \n\t[\n\t\"image_picker_8E15C987-6F5F-4900-8251-FC0E40A07D8C-2797-0000006F1682A01B.jpg\"\n\t]\n\t},\n\t\"webhookUrl\": \n\t\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\t\"executionMode\": \n\t\"production\"\n}",
+        "jsonOutput": "{\n\n\"params\": \n{\n},\n\"query\": \n{\n},\n\"body\": \n{\n\"index\": \n\"notices\",\n\"createdAt\": \n\"2025-11-20T14:06:55.4006006Z\",\n\"assetId\": \n\"08dd9922-b430-4372-87e1-bd636f11182a\",\n\"subject\": \n\"Hamulce wydają metaliczny dźwięk\",\n\"message\": \n\"Podczas hamowania słychać głośne tarcie metalu o metal. Dźwięk nasila się przy niższych prędkościach. Możliwe zużycie klocków lub uszkodzenie tarcz hamulcowych.\\r\\n\\rZmień język na hiszpanski\",\n\"type\": \n0,\n\"createdBy\": \n\"Marek Rachel\",\n\"tenantId\": \n\"08dd5714-941b-4e58-817b-934c403cebb5\"\n},\n\"webhookUrl\": \n\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\"executionMode\": \n\"production\"\n\n\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1504,
+        1312,
         176
       ],
       "id": "42d98bcf-8cca-48e4-821d-e2e30009b060",
@@ -1397,7 +1398,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        1232,
+        864,
         176
       ],
       "id": "c6a79c03-750f-4708-8908-3688c4463f39",
@@ -1418,7 +1419,7 @@
               "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia (służy również do wykrywania poleceń tłumaczenia)\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie Polecenia Tłumaczenia:\n   Polecenia tłumaczenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie Treści:\n   A. JEŻELI wykryjesz polecenie tłumaczenia w polu \"message\": \n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** od razu **w języku docelowym**.\n\n   B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** w **oryginalnym języku** pola message.\n\n3. Wymagane pola i limity:\n   - task_title: jedno zdanie, maksymalnie 100 znaków.\n   - task_description.interpretation: opis sytuacji na podstawie **message + subject + image_description**, maksymalnie 300 znaków.\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy."
             },
             {
-              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nsubject: {{ $('Webhook-test').item.json.body.subject }}\nimage_description: image_description: {{ $json.content.join(' | ') }}"
+              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nsubject: {{ $('Webhook-test').item.json.body.subject }}\nimage_description: {{ $json.content.join(' | ') }}"
             }
           ]
         },
@@ -1452,6 +1453,40 @@
       ],
       "id": "251d7130-dbcb-4260-b6b9-81eb976b32bb",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "41eae012-1dc3-45c0-ac40-40a756ef45e4",
+              "leftValue": "={{ $json.type_ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        -256
+      ],
+      "id": "71a923d5-0421-4406-8fb1-4e451f51a589",
+      "name": "Check type of attachement"
     }
   ],
   "connections": {
@@ -1548,7 +1583,7 @@
       "main": [
         [
           {
-            "node": "Fetch image - chat",
+            "node": "Check type of attachement",
             "type": "main",
             "index": 0
           }
@@ -2037,6 +2072,24 @@
           }
         ]
       ]
+    },
+    "Check type of attachement": {
+      "main": [
+        [
+          {
+            "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2047,7 +2100,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "f21de36f-d587-4daa-99b2-76ad15778cba",
+  "versionId": "5f91f70d-a503-42f1-b32a-ea6d87a13f73",
   "triggerCount": 1,
   "shared": [
     {
