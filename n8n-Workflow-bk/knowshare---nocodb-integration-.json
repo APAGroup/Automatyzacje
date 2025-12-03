@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-02T12:00:59.000Z",
+  "updatedAt": "2025-12-03T07:05:51.000Z",
   "createdAt": "2025-11-20T11:40:54.784Z",
   "id": "HLynFWpQ1tyOzZ4W",
   "name": "Knowshare - nocodb integration",
@@ -149,12 +149,15 @@
       ],
       "id": "a9d5d922-f7d6-4103-8542-63e5a78f4a3e",
       "name": "Create Picture Summary",
+      "retryOnFail": false,
+      "maxTries": 2,
       "credentials": {
         "openAiApi": {
           "id": "7r6c9PgveQjC7ygm",
           "name": "OpenAi project n8n"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -2047,7 +2050,7 @@
       }
     ]
   },
-  "versionId": "73da711c-55b3-46c5-9a57-8563307fec47",
+  "versionId": "24d54323-3a13-4ff9-bdff-650b53fa9e85",
   "triggerCount": 1,
   "shared": [
     {
