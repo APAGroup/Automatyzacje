@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-03T08:42:22.000Z",
+  "updatedAt": "2025-12-03T10:12:45.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -1068,19 +1068,6 @@
     },
     {
       "parameters": {
-        "jsCode": "let title;\nlet description;\n\n// --- Pobranie tytułu z OpenAI (fallback)\ntry {\n\ttitle = $('Create Task Title').item.json.message.content;\n} catch {\n\t//title = $('Create Task Title from Text').item.json.message.content;\n\ttitle =   $('Webhook-test').first().json.body.subject;\n}\n\n// --- Pobranie opisu z OpenAI (fallback)\ntry {\n\tdescription = $('Create Task Content by Picture').item.json.message.content;\n} catch {\n\t//description = $('Create Task Content').item.json.message.content;\n\tdescription =   $('Webhook-test').first().json.body.message;\n}\n\n\nreturn [\n\t{\n\t\tjson: {\n\t\t\ttask_title: title,\n\t\t\ttask_description: description\n\t\t}\n\t}\n];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        4592,
-        -1008
-      ],
-      "id": "a58812ee-44a0-4d10-98e6-05115a25a448",
-      "name": "Task content"
-    },
-    {
-      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
@@ -1381,7 +1368,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "{\n\n\"params\": \n{\n},\n\"query\": \n{\n},\n\"body\": \n{\n\"index\": \n\"notices\",\n\"createdAt\": \n\"2025-11-20T14:06:55.4006006Z\",\n\"assetId\": \n\"08dd9922-b430-4372-87e1-bd636f11182a\",\n\"subject\": \n\"Hamulce wydają metaliczny dźwięk\",\n\"message\": \n\"Podczas hamowania słychać głośne tarcie metalu o metal. Dźwięk nasila się przy niższych prędkościach. Możliwe zużycie klocków lub uszkodzenie tarcz hamulcowych.\\r\\n\\rZmień język na hiszpanski\",\n\"type\": \n0,\n\"createdBy\": \n\"Marek Rachel\",\n\"tenantId\": \n\"08dd5714-941b-4e58-817b-934c403cebb5\"\n},\n\"webhookUrl\": \n\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\"executionMode\": \n\"production\"\n\n\n}",
+        "jsonOutput": "  {\n    \"params\": {},\n    \"query\": {},\n    \"body\": {\n      \"index\": \"notices\",\n      \"createdAt\": \"2025-11-26T10:00:19.3259736Z\",\n      \"assetId\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n      \"subject\": \"APA\",\n      \"message\": \" Skończyłem montować szafę na parterze na budynku na Tarnogórskiej 260 \",\n      \"type\": 0,\n      \"createdBy\": \"APA Group\",\n      \"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n      \"attachments\": [\n        \"image_picker_B6C1D93A-9AD2-423E-A7D4-D6776322EDD5-326-0000000360707B25.xls\"\n      ]\n    },\n    \"webhookUrl\": \"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n    \"executionMode\": \"production\"\n  }",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -1403,56 +1390,6 @@
       ],
       "id": "c6a79c03-750f-4708-8908-3688c4463f39",
       "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "GPT-4O-MINI"
-        },
-        "responses": {
-          "values": [
-            {
-              "role": "system",
-              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia (służy również do wykrywania poleceń tłumaczenia)\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie Polecenia Tłumaczenia:\n   Polecenia tłumaczenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie Treści:\n   A. JEŻELI wykryjesz polecenie tłumaczenia w polu \"message\": \n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** od razu **w języku docelowym**.\n\n   B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** w **oryginalnym języku** pola message.\n\n3. Wymagane pola i limity:\n   - task_title: jedno zdanie, maksymalnie 100 znaków.\n   - task_description.interpretation: opis sytuacji na podstawie **message + subject + image_description**, maksymalnie 300 znaków.\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy."
-            },
-            {
-              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nsubject: {{ $('Webhook-test').item.json.body.subject }}\nimage_description: {{ $json.content.join(' | ') }}"
-            }
-          ]
-        },
-        "builtInTools": {},
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2,
-      "position": [
-        3776,
-        -64
-      ],
-      "id": "d978a1ee-eed8-496a-b491-df565de467d1",
-      "name": "Message a model",
-      "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Pobierz surowy tekst JSON z OpenAI (pierwsze wejście)\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Pobranie oryginalnej wiadomości, która nie jest już generowana przez AI\nconst originalMessage = $('Webhook-test').first().json.body.message || \"\"; \n\n// 1. Oczyszczanie surowego tekstu\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 2. Bezpieczne czyszczenie białych znaków\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \"\").trim(); \n\n// 3. Konwersja apostrofów na cudzysłowy\nraw = raw.replace(/'/g, \"\\\"\");\n\nlet parsed;\n\n// Parsowanie JSON i obsługa błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // Struktura błędu z wstrzykniętą wiadomością oryginalną\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            \"original-message\": originalMessage,\n            task_description: \"\", \n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 4. Transformacja do oczekiwanego płaskiego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 5. STWORZENIE NOWEGO POLA 'task_description' (podsumowanie)\nconst newTaskDescription = \n    `1: ${originalMessage}` +\n    ` | 2: ${interpretation}` +\n    ` | 3: ${recommendation}`;\n\n\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n\n\n        // Pola generowane przez AI\n        //interpretation: interpretation,\n        //recommendation: recommendation,\n        // Pole wypełnione bezpośrednio z Webhooka\n        //\"original-message\": originalMessage, \n\n      \n        // Nowe, połączone pole\n        task_description: newTaskDescription \n    }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        4192,
-        -64
-      ],
-      "id": "251d7130-dbcb-4260-b6b9-81eb976b32bb",
-      "name": "Code in JavaScript"
     },
     {
       "parameters": {
@@ -1487,6 +1424,114 @@
       ],
       "id": "71a923d5-0421-4406-8fb1-4e451f51a589",
       "name": "Check type of attachement"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia (służy również do wykrywania poleceń tłumaczenia)\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie Polecenia Tłumaczenia:\n   Polecenia tłumaczenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie Treści:\n   A. JEŻELI wykryjesz polecenie tłumaczenia w polu \"message\": \n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** od razu **w języku docelowym**.\n\n   B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** w **oryginalnym języku** pola message.\n\n3. Wymagane pola i limity:\n   - task_title: jedno zdanie, maksymalnie 100 znaków.\n   - task_description.interpretation: opis sytuacji na podstawie **message + subject + image_description**, maksymalnie 300 znaków.\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy."
+            },
+            {
+              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nsubject: {{ $('Webhook-test').item.json.body.subject }}\nimage_description: {{ $json.content.join(' | ') }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        3776,
+        -64
+      ],
+      "id": "d978a1ee-eed8-496a-b491-df565de467d1",
+      "name": "Create summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz surowy tekst JSON z OpenAI (pierwsze wejście)\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Pobranie oryginalnej wiadomości, która nie jest już generowana przez AI\nconst originalMessage = $('Webhook-test').first().json.body.message || \"\"; \n\n// 1. Oczyszczanie surowego tekstu\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 2. Bezpieczne czyszczenie białych znaków\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \"\").trim(); \n\n// 3. Konwersja apostrofów na cudzysłowy\nraw = raw.replace(/'/g, \"\\\"\");\n\nlet parsed;\n\n// Parsowanie JSON i obsługa błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // Struktura błędu z wstrzykniętą wiadomością oryginalną\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            \"original-message\": originalMessage,\n            task_description: \"\", \n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 4. Transformacja do oczekiwanego płaskiego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 5. STWORZENIE NOWEGO POLA 'task_description' (podsumowanie)\nconst newTaskDescription = \n    `1: ${originalMessage}` +\n    ` | 2: ${interpretation}` +\n    ` | 3: ${recommendation}`;\n\n\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n\n\n        // Pola generowane przez AI\n        interpretation: interpretation,\n        recommendation: recommendation,\n        // Pole wypełnione bezpośrednio z Webhooka\n        //\"original-message\": originalMessage, \n\n      \n        // Nowe, połączone pole\n        task_description: newTaskDescription \n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4192,
+        -64
+      ],
+      "id": "251d7130-dbcb-4260-b6b9-81eb976b32bb",
+      "name": "Task content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "63afff75-bff7-4364-af25-ce87833d472f",
+              "name": "task_title",
+              "value": "={{ $json.task_title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4704,
+        -80
+      ],
+      "id": "af255f2f-0937-45f6-a241-0cd1b8c83a72",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4bc986ac-a516-4a42-89f9-9325d71b7d3d",
+              "name": "",
+              "value": "={{ $('Task content').item.json.task_title }}",
+              "type": "string"
+            },
+            {
+              "id": "d206ce5a-a908-4d7e-8d81-c06226d9fcfb",
+              "name": "interpretation",
+              "value": "={{ $('Task content').item.json.interpretation }}",
+              "type": "string"
+            },
+            {
+              "id": "46f4c42b-9eb7-458b-888c-31d0fc8093cf",
+              "name": "recommendation",
+              "value": "={{ $('Task content').item.json.recommendation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4912,
+        -80
+      ],
+      "id": "d122d256-498a-45fd-9fc2-289f7f467c9e",
+      "name": "Edit Fields1"
     }
   ],
   "connections": {
@@ -1532,7 +1577,7 @@
       "main": [
         [
           {
-            "node": "Message a model",
+            "node": "Create summary",
             "type": "main",
             "index": 0
           }
@@ -1611,7 +1656,7 @@
       "main": [
         [
           {
-            "node": "Message a model",
+            "node": "Create summary",
             "type": "main",
             "index": 0
           }
@@ -1926,17 +1971,6 @@
         ]
       ]
     },
-    "Task content": {
-      "main": [
-        [
-          {
-            "node": "Translation Option",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "If sms notification enabled": {
       "main": [
         [
@@ -2062,17 +2096,6 @@
         ]
       ]
     },
-    "Message a model": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Check type of attachement": {
       "main": [
         [
@@ -2090,6 +2113,39 @@
           }
         ]
       ]
+    },
+    "Create summary": {
+      "main": [
+        [
+          {
+            "node": "Task content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task content": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2100,7 +2156,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "5f91f70d-a503-42f1-b32a-ea6d87a13f73",
+  "versionId": "01940037-d7fa-4fc6-bf6b-c88ec1a26b93",
   "triggerCount": 1,
   "shared": [
     {
