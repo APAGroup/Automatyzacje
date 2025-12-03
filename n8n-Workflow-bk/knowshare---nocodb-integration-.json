@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2025-12-03T07:05:51.000Z",
+  "updatedAt": "2025-12-03T10:51:13.000Z",
   "createdAt": "2025-11-20T11:40:54.784Z",
   "id": "HLynFWpQ1tyOzZ4W",
   "name": "Knowshare - nocodb integration",
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
@@ -1067,6 +1067,7 @@
           "name": "Microsoft Outlook account"
         }
       },
+      "disabled": true,
       "onError": "continueRegularOutput"
     },
     {
@@ -2050,7 +2051,7 @@
       }
     ]
   },
-  "versionId": "24d54323-3a13-4ff9-bdff-650b53fa9e85",
+  "versionId": "9950ebe8-8b62-4d0e-be53-5d0a168298f8",
   "triggerCount": 1,
   "shared": [
     {
