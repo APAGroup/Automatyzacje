@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-03T10:51:21.000Z",
+  "updatedAt": "2025-12-04T11:28:00.000Z",
   "createdAt": "2025-12-03T09:47:23.795Z",
   "id": "8kHMeDcB2Ciwooqg",
   "name": "Knowshare - nocodb integration V2",
@@ -846,25 +846,6 @@
     },
     {
       "parameters": {
-        "toRecipients": "={{ $('Loop over notification data').item.json.email }}",
-        "subject": "Knowshare - nowe zadanie",
-        "bodyContent": "=Temat: {{ $('Task content').first().json.task_title }}\nTreść: {{ $('Task content').first().json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').first().json.body.message }}\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.microsoftOutlook",
-      "typeVersion": 2,
-      "position": [
-        10160,
-        208
-      ],
-      "id": "ea97d41d-4237-4928-9fe4-ff9e9ff01c2a",
-      "name": "Send an email",
-      "webhookId": "27a880d9-ddf4-4ae7-b271-fee5671a5797",
-      "disabled": true,
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
         "jsCode": "// Pobierz surowy tekst JSON z OpenAI (pierwsze wejście)\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Pobranie oryginalnej wiadomości, która nie jest już generowana przez AI\nconst originalMessage = $('Webhook').first().json.body.message || \"\"; \n\n// 1. Oczyszczanie surowego tekstu\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 2. Bezpieczne czyszczenie białych znaków\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \"\").trim(); \n\n// 3. Konwersja apostrofów na cudzysłowy\nraw = raw.replace(/'/g, \"\\\"\");\n\nlet parsed;\n\n// Parsowanie JSON i obsługa błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // Struktura błędu z wstrzykniętą wiadomością oryginalną\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            \"original-message\": originalMessage,\n            task_description: \"\", \n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 4. Transformacja do oczekiwanego płaskiego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 5. STWORZENIE NOWEGO POLA 'task_description' (podsumowanie)\nconst newTaskDescription = \n    `1: ${originalMessage}` +\n    ` | 2: ${interpretation}` +\n    ` | 3: ${recommendation}`;\n\n\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n\n\n        // Pola generowane przez AI\n        interpretation: interpretation,\n        recommendation: recommendation,\n        // Pole wypełnione bezpośrednio z Webhooka\n        //\"original-message\": originalMessage, \n\n      \n        // Nowe, połączone pole\n        task_description: newTaskDescription \n    }\n}];"
       },
       "type": "n8n-nodes-base.code",
@@ -1269,6 +1250,33 @@
           "name": "Unnamed credential"
         }
       }
+    },
+    {
+      "parameters": {
+        "fromEmail": "nazca4@apagroup.pl",
+        "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+        "subject": "=Nowa wiadomość knowshare",
+        "emailFormat": "text",
+        "text": "=Temat: {{ $('Task content').first().json.task_title }}\nTreść: {{ $('Task content').first().json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').first().json.body.message }}\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        10160,
+        224
+      ],
+      "id": "6ee56b3b-0967-4da8-97c9-90ac12706672",
+      "name": "Send email",
+      "webhookId": "17252bd4-ba62-44c9-ab35-928f27c2cb09",
+      "credentials": {
+        "smtp": {
+          "id": "bTsU09ZudpWPlOEp",
+          "name": "SMTP account 3"
+        }
+      }
     }
   ],
   "connections": {
@@ -1648,17 +1656,6 @@
         ]
       ]
     },
-    "Send an email": {
-      "main": [
-        [
-          {
-            "node": "Loop over notification data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Task content": {
       "main": [
         [
@@ -1726,7 +1723,7 @@
       "main": [
         [
           {
-            "node": "Send an email",
+            "node": "Send email",
             "type": "main",
             "index": 0
           }
@@ -1812,6 +1809,17 @@
           }
         ]
       ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Loop over notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1871,7 +1879,7 @@
       }
     ]
   },
-  "versionId": "82b99d6d-b79c-4ecc-869c-005b23b3bb0f",
+  "versionId": "f30a9f5c-c194-4941-8e34-fc6d91bdf874",
   "triggerCount": 1,
   "shared": [
     {
