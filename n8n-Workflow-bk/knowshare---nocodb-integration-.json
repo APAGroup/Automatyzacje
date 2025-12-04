@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-03T10:51:13.000Z",
+  "updatedAt": "2025-12-04T11:25:21.000Z",
   "createdAt": "2025-11-20T11:40:54.784Z",
   "id": "HLynFWpQ1tyOzZ4W",
   "name": "Knowshare - nocodb integration",
@@ -1047,31 +1047,6 @@
     },
     {
       "parameters": {
-        "toRecipients": "={{ $('Loop over notification data').item.json.email }}",
-        "subject": "Knowshare - nowe zadanie",
-        "bodyContent": "=Temat: {{ $('Task content').first().json.task_title }}\nTreść: {{ $('Task content').first().json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').first().json.body.message }}\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.microsoftOutlook",
-      "typeVersion": 2,
-      "position": [
-        10160,
-        208
-      ],
-      "id": "f806db3a-82ec-422b-93f9-422e426da475",
-      "name": "Send an email",
-      "webhookId": "97f3e316-93d1-4246-9912-9eb0335bf788",
-      "credentials": {
-        "microsoftOutlookOAuth2Api": {
-          "id": "I8vnEihffZSIdc4c",
-          "name": "Microsoft Outlook account"
-        }
-      },
-      "disabled": true,
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
         "jsCode": "let title;\nlet description;\n\n// --- Pobranie tytułu z OpenAI (fallback)\ntry {\n\ttitle = $('Create Task Title').item.json.message.content;\n} catch {\n\t//title = $('Create Task Title from Text').item.json.message.content;\n\ttitle =   $('Webhook').first().json.body.subject;\n}\n\n// --- Pobranie opisu z OpenAI (fallback)\ntry {\n\tdescription = $('Create Task Content by Picture').item.json.message.content;\n} catch {\n\t//description = $('Create Task Content').item.json.message.content;\n\tdescription =   $('Webhook').first().json.body.message;\n}\n\n\nreturn [\n\t{\n\t\tjson: {\n\t\t\ttask_title: title,\n\t\t\ttask_description: description\n\t\t}\n\t}\n];\n"
       },
       "type": "n8n-nodes-base.code",
@@ -1403,6 +1378,33 @@
         "nocoDbApiToken": {
           "id": "qeCZEzG9ppXPu7Mh",
           "name": "NocoDB Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "nazca4@apagroup.pl",
+        "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+        "subject": "=Nowa wiadomość knowshare",
+        "emailFormat": "text",
+        "text": "=Temat: {{ $('Task content').first().json.task_title }}\nTreść: {{ $('Task content').first().json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').first().json.body.message }}\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        10176,
+        192
+      ],
+      "id": "25f4f3da-bc75-4d29-a347-157266bf2569",
+      "name": "Send email",
+      "webhookId": "17252bd4-ba62-44c9-ab35-928f27c2cb09",
+      "credentials": {
+        "smtp": {
+          "id": "bTsU09ZudpWPlOEp",
+          "name": "SMTP account 3"
         }
       }
     }
@@ -1857,17 +1859,6 @@
         ]
       ]
     },
-    "Send an email": {
-      "main": [
-        [
-          {
-            "node": "Loop over notification data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Task content": {
       "main": [
         [
@@ -1935,7 +1926,7 @@
       "main": [
         [
           {
-            "node": "Send an email",
+            "node": "Send email",
             "type": "main",
             "index": 0
           }
@@ -1987,6 +1978,17 @@
         [
           {
             "node": "Aggregate inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Loop over notification data",
             "type": "main",
             "index": 0
           }
@@ -2051,7 +2053,7 @@
       }
     ]
   },
-  "versionId": "9950ebe8-8b62-4d0e-be53-5d0a168298f8",
+  "versionId": "91ddc1cd-b65b-4a77-8271-455985fb9317",
   "triggerCount": 1,
   "shared": [
     {
