@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-03T14:30:07.000Z",
+  "updatedAt": "2025-12-04T11:57:30.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -27,8 +27,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        2880,
-        -352
+        2448,
+        -1136
       ],
       "id": "9aeea304-c793-4b25-a880-91bbb8948162",
       "name": "Create Picture Summary",
@@ -55,7 +55,7 @@
       "typeVersion": 1,
       "position": [
         3264,
-        -384
+        -400
       ],
       "id": "453a4bc4-0531-40db-9b4d-54363ef1a18c",
       "name": "Aggregate"
@@ -69,8 +69,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1040,
-        -432
+        400,
+        -1248
       ],
       "id": "9da7c1e4-35a0-4895-8b94-9a2e5181bdfe",
       "name": "Loop parameter - chat"
@@ -83,8 +83,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1200,
-        -432
+        560,
+        -1248
       ],
       "id": "de5670ec-1063-442f-b532-3e16e2c42d38",
       "name": "Split Out - chat"
@@ -96,8 +96,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        1392,
-        -432
+        720,
+        -1248
       ],
       "id": "8f5dfc66-42cf-4928-88e6-4513f9275063",
       "name": "Loop Over Items - chat",
@@ -105,13 +105,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook-test').item.json;\nconst index = Number($('Set index').item.json.index);\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\n// Rozszerzenia obsługiwane przez OpenAI Whisper (audio)\nconst AUDIO_EXT = [\n    'mp3', 'wav', 'm4a', 'flac', 'ogg', 'webm'\n];\n\n// Rozszerzenia obsługiwane przez Gemini (wideo) – pełna lista\nconst VIDEO_EXT = [\n    'mp4', 'mov', 'mpeg', 'mpg', 'webm',\n    'wmv', 'flv', '3gp', 'avi'\n];\n\n// Obsługiwane obrazy\nconst IMAGE_EXT = [\n    'png', 'jpg', 'jpeg', 'gif', 'webp'\n];\n\n// Finalna wartość type_ok\n// 0 = unknown, 1 = image, 2 = audio (OpenAI Whisper), 3 = video (Gemini)\nlet type_ok = 0;\nlet fileName = null;\n\n// Próba uzyskania nazwy pliku\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\nif (fileName) {\n    const normalized = fileName.toLowerCase().trim();\n\n    if (IMAGE_EXT.some(ext => normalized.endsWith(`.${ext}`))) {\n        type_ok = 1;                // obraz\n    } \n    else if (AUDIO_EXT.some(ext => normalized.endsWith(`.${ext}`))) {\n        type_ok = 2;                // AUDIO → OpenAI Whisper\n    } \n    else if (VIDEO_EXT.some(ext => normalized.endsWith(`.${ext}`))) {\n        type_ok = 3;                // VIDEO → Gemini (wartość 3)\n    }\n}\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment,\n      type_ok: type_ok\n    }\n  }\n];\n"
+        "jsCode": "// Bezpieczne pobieranie danych z poprzednich węzłów.\nconst webhookData = $('Webhook-test').first().json || {};\nconst indexData = $('Set index').first().json || {};\n\n// Zabezpieczony indeks załącznika\nconst index = Number(indexData.index) || 0; \n\n// Tablica załączników\nconst attachments = webhookData.body?.attachments || [];\nconst selectedAttachment = attachments[index] || null;\n\n// Definicje rozszerzeń plików\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'mov', 'mpeg', 'mpg', 'webm', 'wmv', 'flv', '3gp', 'avi'];\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\n\n// Klasyfikacja: 0 = unknown, 1 = image, 2 = audio (OpenAI), 3 = video (Gemini)\nlet type_ok = 0;\nlet fileName = null;\n\n// Pobieranie nazwy pliku\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (typeof selectedAttachment === 'object' && selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\n// Logika klasyfikacji\nif (fileName) {\n    const normalized = fileName.toLowerCase(); \n    const ext = normalized.split('.').pop(); // Wyciągnij samo rozszerzenie\n\n    if (ext) { // Sprawdź, czy rozszerzenie istnieje\n        if (IMAGE_EXT.includes(ext)) {\n            type_ok = 1; \n        } else if (AUDIO_EXT.includes(ext)) {\n            type_ok = 2;\n        } else if (VIDEO_EXT.includes(ext)) {\n            type_ok = 3; \n        }\n    }\n}\n\nreturn [\n    {\n        json: {\n            attachment: selectedAttachment,\n            type_ok: type_ok,\n        }\n    }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1888,
-        -288
+        1376,
+        -1120
       ],
       "id": "d1466345-19d3-4ba7-b7c0-ea9f622918a8",
       "name": "Attachment - chat"
@@ -160,15 +160,15 @@
     {
       "parameters": {
         "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
-        "height": 496,
-        "width": 2096,
+        "height": 880,
+        "width": 1632,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        928,
-        -560
+        -1584,
+        -976
       ],
       "id": "56d48234-2dfe-4648-81ea-3734df8a4e4b",
       "name": "Sticky Note1"
@@ -345,8 +345,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1520,
-        -288
+        992,
+        -1136
       ],
       "id": "8f8749a8-e16f-485c-a244-3f63a37b2a9d",
       "name": "Set index"
@@ -378,8 +378,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1664,
-        -304
+        1152,
+        -1136
       ],
       "id": "faaa6be5-f1e2-41b8-92ee-d38b0cc28807",
       "name": "Check index"
@@ -393,8 +393,8 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        2464,
-        -352
+        2016,
+        -1136
       ],
       "id": "f2959261-69ae-4610-ad26-d31ccdb6abbc",
       "name": "Fetch image - chat",
@@ -412,8 +412,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2688,
-        -352
+        2240,
+        -1136
       ],
       "id": "464aa493-a7b8-4132-b8f0-d5a55defa758",
       "name": "Change mime type - chat"
@@ -844,29 +844,6 @@
     },
     {
       "parameters": {
-        "toRecipients": "={{ $('Loop over notification data').item.json.email }}",
-        "subject": "Knowshare - nowe zadanie",
-        "bodyContent": "=Temat: {{ $('Task content').first().json.task_title }}\nTreść: {{ $('Task content').first().json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook-test').first().json.body.message }}\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook-test').first().json.body.createdBy }}",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.microsoftOutlook",
-      "typeVersion": 2,
-      "position": [
-        10288,
-        208
-      ],
-      "id": "7f77b84f-004d-47db-9a79-bc255271b750",
-      "name": "Send an email",
-      "webhookId": "107d7b96-5411-45ee-b9ca-d239838e0def",
-      "credentials": {
-        "microsoftOutlookOAuth2Api": {
-          "id": "I8vnEihffZSIdc4c",
-          "name": "Microsoft Outlook account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
@@ -1167,7 +1144,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "  {\n    \"params\": {},\n    \"query\": {},\n    \"body\": {\n      \"index\": \"notices\",\n      \"createdAt\": \"2025-11-26T10:00:19.3259736Z\",\n      \"assetId\": \"08dd9922-b430-4372-87e1-bd636f11182a\",\n      \"subject\": \"APA\",\n      \"message\": \" Skończyłem montować szafę na parterze na budynku na Tarnogórskiej 260 \",\n      \"type\": 0,\n      \"createdBy\": \"APA Group\",\n      \"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n      \"attachments\": [\n        \"image_picker_B6C1D93A-9AD2-423E-A7D4-D6776322EDD5-326-0000000360707B25.jpg\"\n      ]\n    },\n    \"webhookUrl\": \"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n    \"executionMode\": \"production\"\n  }",
+        "jsonOutput": "{\n\n\n\"params\": \n{\n},\n\"query\": \n{\n},\n\"body\": \n{\n\"index\": \n\"notices\",\n\"createdAt\": \n\"2025-12-04T09:22:57.5497683Z\",\n\"assetId\": \n\"08dd9922-b430-4372-87e1-bd636f11182a\",\n\"subject\": \n\"Brak lub urwana rynna\",\n\"message\": \n\"Urwana rynna leje się woda w czasie deszczu po scianach\",\n\"type\": \n0,\n\"createdBy\": \n\"Marek Rachel\",\n\"tenantId\": \n\"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": \n[\n\"audio_1764840153475.m4a\",\n\"image_picker_2A59B6D2-9F7E-482B-9CDA-754F98482BFD-607-000000188ADA42D1.jpg\"\n]\n},\n\"webhookUrl\": \n\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\"executionMode\": \n\"production\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -1184,7 +1161,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        864,
+        784,
         176
       ],
       "id": "c6a79c03-750f-4708-8908-3688c4463f39",
@@ -1242,123 +1219,83 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "63afff75-bff7-4364-af25-ce87833d472f",
-              "name": "task_title",
-              "value": "={{ $json.task_title }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "bucketName": "={{ $('Webhook-test').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook-test').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "audio"
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        4704,
-        -80
-      ],
-      "id": "af255f2f-0937-45f6-a241-0cd1b8c83a72",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "4bc986ac-a516-4a42-89f9-9325d71b7d3d",
-              "name": "",
-              "value": "={{ $('Task content').item.json.task_title }}",
-              "type": "string"
-            },
-            {
-              "id": "d206ce5a-a908-4d7e-8d81-c06226d9fcfb",
-              "name": "interpretation",
-              "value": "={{ $('Task content').item.json.interpretation }}",
-              "type": "string"
-            },
-            {
-              "id": "46f4c42b-9eb7-458b-888c-31d0fc8093cf",
-              "name": "recommendation",
-              "value": "={{ $('Task content').item.json.recommendation }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        4912,
-        -80
-      ],
-      "id": "d122d256-498a-45fd-9fc2-289f7f467c9e",
-      "name": "Edit Fields1"
-    },
-    {
-      "parameters": {
-        "resource": "video",
-        "operation": "analyze",
-        "modelId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        5296,
-        -576
+        1888,
+        -752
       ],
-      "id": "b36cf210-da1d-442e-9b75-291ea629296f",
-      "name": "Analyze video"
-    },
-    {
-      "parameters": {
-        "resource": "audio",
-        "operation": "transcribe",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2,
-      "position": [
-        5504,
-        -565.8862552191946
-      ],
-      "id": "a82aa340-ce64-4544-bb23-e0e15a3dc5b5",
-      "name": "Transcribe a recording",
+      "id": "2c8bcec7-ad8b-4633-9e28-f83c8849f5ae",
+      "name": "Download Audio",
       "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
+        "s3": {
+          "id": "smwCdXvghDY8DlJz",
+          "name": "S3 account"
         }
       }
     },
     {
       "parameters": {
+        "jsCode": "for (const item of items) {\n  if (!item.binary?.audio) continue;\n\n  const file = item.binary.audio;\n  if (!file.fileName) continue;\n\n  const name = file.fileName.toLowerCase();\n\n  if (name.endsWith('.mp3')) file.mimeType = 'audio/mpeg';\n  else if (name.endsWith('.wav')) file.mimeType = 'audio/wav';\n  else if (name.endsWith('.m4a')) file.mimeType = 'audio/mp4';\n  else if (name.endsWith('.flac')) file.mimeType = 'audio/flac';\n  else if (name.endsWith('.ogg') || name.endsWith('.oga')) file.mimeType = 'audio/ogg';\n  else if (name.endsWith('.webm')) file.mimeType = 'audio/webm';\n  else if (name.endsWith('.mp4')) file.mimeType = 'audio/mp4';\n  else if (name.endsWith('.mpeg') || name.endsWith('.mpga')) file.mimeType = 'audio/mpeg';\n  else if (name.endsWith('.aac')) file.mimeType = 'audio/aac';\n  else file.mimeType = 'application/octet-stream'; // fallback\n\n}\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        -752
+      ],
+      "id": "1159ecf7-540d-4e60-98ae-8ebf8f84b376",
+      "name": "Change mime type - audio"
+    },
+    {
+      "parameters": {
         "resource": "audio",
         "operation": "transcribe",
+        "binaryPropertyName": "audio",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        2848,
-        -224
+        2272,
+        -752
       ],
-      "id": "ccef405b-b76c-4e65-83b5-28a84b50b005",
-      "name": "Transcribe a recording1",
+      "id": "afba7734-9895-4831-809c-7b07b2860930",
+      "name": "Audio analyze",
       "credentials": {
         "openAiApi": {
           "id": "7r6c9PgveQjC7ygm",
           "name": "OpenAi project n8n"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "271ca89b-3769-4ebf-bb03-391a60af5ec9",
+              "name": "content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2496,
+        -752
+      ],
+      "id": "6e74c848-c106-49f5-a005-e61019261334",
+      "name": "Prepare audio output"
     },
     {
       "parameters": {
@@ -1375,7 +1312,7 @@
                 "conditions": [
                   {
                     "leftValue": "={{ $json.type_ok }}",
-                    "rightValue": 1,
+                    "rightValue": 0,
                     "operator": {
                       "type": "number",
                       "operation": "equals"
@@ -1398,7 +1335,7 @@
                   {
                     "id": "f6ea07d3-c359-4002-a0a4-215fad595428",
                     "leftValue": "={{ $json.type_ok }}",
-                    "rightValue": 2,
+                    "rightValue": 1,
                     "operator": {
                       "type": "number",
                       "operation": "equals"
@@ -1420,7 +1357,7 @@
                   {
                     "id": "a6135f05-9ad9-4413-bb95-3dbccdb68618",
                     "leftValue": "={{ $json.type_ok }}",
-                    "rightValue": 3,
+                    "rightValue": 2,
                     "operator": {
                       "type": "number",
                       "operation": "equals"
@@ -1442,7 +1379,7 @@
                   {
                     "id": "394c8abb-c9bc-4397-b294-40c1fe1974d2",
                     "leftValue": "={{ $json.type_ok }}",
-                    "rightValue": 0,
+                    "rightValue": 3,
                     "operator": {
                       "type": "number",
                       "operation": "equals"
@@ -1459,11 +1396,61 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        2080,
-        -320
+        1568,
+        -1152
       ],
       "id": "551d733b-854b-4682-9a95-9275b8ef54f1",
-      "name": "Switch"
+      "name": "Switch - type selection"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {
+          "maxOutputTokens": 300
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        -1536
+      ],
+      "id": "ba633d76-8f59-4db5-83db-aa4f6064e80f",
+      "name": "Analyze video"
+    },
+    {
+      "parameters": {
+        "fromEmail": "nazca4@apagroup.pl",
+        "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+        "subject": "=Nowa wiadomość knowshare",
+        "emailFormat": "text",
+        "text": "=Temat: {{ $('Task content').first().json.task_title }}\nTreść: {{ $('Task content').first().json.task_description }}\nOryginalne zgłoszenie: {{ $('Webhook').first().json.body.message }}\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        10288,
+        208
+      ],
+      "id": "064485a9-88ef-482f-b732-81587408bc5f",
+      "name": "Send email",
+      "webhookId": "17252bd4-ba62-44c9-ab35-928f27c2cb09",
+      "credentials": {
+        "smtp": {
+          "id": "bTsU09ZudpWPlOEp",
+          "name": "SMTP account 3"
+        }
+      },
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -1533,7 +1520,7 @@
       "main": [
         [
           {
-            "node": "Switch",
+            "node": "Switch - type selection",
             "type": "main",
             "index": 0
           }
@@ -1843,17 +1830,6 @@
         ]
       ]
     },
-    "Send an email": {
-      "main": [
-        [
-          {
-            "node": "Loop over notification data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "If sms notification enabled": {
       "main": [
         [
@@ -1910,7 +1886,7 @@
       "main": [
         [
           {
-            "node": "Send an email",
+            "node": "Send email",
             "type": "main",
             "index": 0
           }
@@ -1992,38 +1968,54 @@
     },
     "Task content": {
       "main": [
-        [
-          {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
-    "Edit Fields": {
+    "Download Audio": {
       "main": [
         [
           {
-            "node": "Edit Fields1",
+            "node": "Change mime type - audio",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Analyze video": {
+    "Change mime type - audio": {
       "main": [
         [
           {
-            "node": "Transcribe a recording",
+            "node": "Audio analyze",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Switch": {
+    "Audio analyze": {
+      "main": [
+        [
+          {
+            "node": "Prepare audio output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare audio output": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - type selection": {
       "main": [
         [
           {
@@ -2035,6 +2027,31 @@
         [
           {
             "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Loop over notification data",
             "type": "main",
             "index": 0
           }
@@ -2050,7 +2067,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "81b48b55-23c3-4647-9720-8f5ac1577be3",
+  "versionId": "4cc9d83e-38c1-4346-807b-9c42f09b447e",
   "triggerCount": 1,
   "shared": [
     {
