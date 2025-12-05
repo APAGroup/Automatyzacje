@@ -116,6 +116,7 @@
   "meta": null,
   "pinData": {},
   "versionId": "12b55b5a-94f0-4d14-8a68-4e503e740c59",
+  "activeVersionId": "12b55b5a-94f0-4d14-8a68-4e503e740c59",
   "triggerCount": 1,
   "shared": [
     {
@@ -133,5 +134,118 @@
       "projectId": "CjfG3RcAlbeZbF4G"
     }
   ],
+  "activeVersion": {
+    "updatedAt": "2025-12-05T05:43:07.618Z",
+    "createdAt": "2025-12-05T05:43:07.618Z",
+    "versionId": "12b55b5a-94f0-4d14-8a68-4e503e740c59",
+    "workflowId": "gW4OZ4E48kRM7ldv",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "fee8cc10-e8e1-47a8-a923-5b803dfb6c29",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          16,
+          0
+        ],
+        "id": "75850fc1-f007-405d-8606-9ad6d3bd2150",
+        "name": "Webhook",
+        "webhookId": "fee8cc10-e8e1-47a8-a923-5b803dfb6c29"
+      },
+      {
+        "parameters": {
+          "authentication": "nocoDbApiToken",
+          "operation": "getAll",
+          "projectId": "pqt495lyos0y4do",
+          "table": "mzeiewh8c1639ie",
+          "limit": 100,
+          "options": {
+            "where": "=(AssetId,like,{{ $json.body.data.rows[0].AssetId }})"
+          }
+        },
+        "type": "n8n-nodes-base.nocoDb",
+        "typeVersion": 3,
+        "position": [
+          208,
+          0
+        ],
+        "id": "d6d24d97-ac94-4328-bc59-26e4baee9d4a",
+        "name": "Get asset",
+        "alwaysOutputData": true,
+        "credentials": {
+          "nocoDbApiToken": {
+            "id": "qeCZEzG9ppXPu7Mh",
+            "name": "NocoDB Token account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "nocoDbApiToken",
+          "operation": "update",
+          "projectId": "={{ $('Webhook').item.json.body.base_id }}",
+          "table": "={{ $('Webhook').item.json.body.data.table_id }}",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldName": "Id",
+                "fieldValue": "={{ $('Webhook').item.json.body.data.rows[0].Id }}"
+              },
+              {
+                "fieldName": "Asset",
+                "fieldValue": "={{ $json.Name }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.nocoDb",
+        "typeVersion": 3,
+        "position": [
+          400,
+          0
+        ],
+        "id": "7d226d31-0b7f-4f0f-9f3b-ca0a6f2fcd56",
+        "name": "Update record",
+        "alwaysOutputData": true,
+        "credentials": {
+          "nocoDbApiToken": {
+            "id": "qeCZEzG9ppXPu7Mh",
+            "name": "NocoDB Token account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get asset",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get asset": {
+        "main": [
+          [
+            {
+              "node": "Update record",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null
+  },
   "tags": []
 }
