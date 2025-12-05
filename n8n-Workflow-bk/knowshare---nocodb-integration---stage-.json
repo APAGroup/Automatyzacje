@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-04T11:57:30.000Z",
+  "updatedAt": "2025-12-05T13:57:01.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -27,8 +27,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        2448,
-        -1136
+        2432,
+        -1120
       ],
       "id": "9aeea304-c793-4b25-a880-91bbb8948162",
       "name": "Create Picture Summary",
@@ -256,13 +256,13 @@
       "parameters": {
         "content": "## Webhook",
         "height": 520,
-        "width": 580,
+        "width": 692,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1232,
+        1120,
         -48
       ],
       "id": "5f5a7b61-0794-4f3d-ae6e-43c22e937d8e",
@@ -880,7 +880,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        9440,
+        9520,
         208
       ],
       "id": "d7f52dff-bd16-4bfd-a049-f6f3be633165",
@@ -1031,7 +1031,7 @@
           "conditions": [
             {
               "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
-              "leftValue": "={{ $json.body.index }}",
+              "leftValue": "={{ $('Webhook-test').item.json.body.index }}",
               "rightValue": "notices",
               "operator": {
                 "type": "string",
@@ -1047,7 +1047,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1552,
+        1680,
         176
       ],
       "id": "6f62d199-d358-4c2f-8fdf-d9c87a4c2faa",
@@ -1150,7 +1150,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1312,
+        1200,
         176
       ],
       "id": "42d98bcf-8cca-48e4-821d-e2e30009b060",
@@ -1171,18 +1171,18 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "gpt-4o-mini",
+          "value": "gpt-4o",
           "mode": "list",
-          "cachedResultName": "GPT-4O-MINI"
+          "cachedResultName": "GPT-4O"
         },
         "responses": {
           "values": [
             {
               "role": "system",
-              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia (służy również do wykrywania poleceń tłumaczenia)\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie Polecenia Tłumaczenia:\n   Polecenia tłumaczenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie Treści:\n   A. JEŻELI wykryjesz polecenie tłumaczenia w polu \"message\": \n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** od razu **w języku docelowym**.\n\n   B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n      - Wygeneruj **task_title**, **task_description.interpretation** i **task_description.recommendation** w **oryginalnym języku** pola message.\n\n3. Wymagane pola i limity:\n   - task_title: jedno zdanie, maksymalnie 100 znaków.\n   - task_description.interpretation: opis sytuacji na podstawie **message + subject + image_description**, maksymalnie 300 znaków.\n   - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 200 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON, bez dodatkowych opisów czy znaków:\n\n[\n  {\n    \"task_title\": \"…\",\n    \"task_description\": {\n      \"interpretation\": \"…\",\n      \"recommendation\": \"…\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny. Cudzysłowy w treści zamieniaj na apostrofy."
+              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie polecenia tłumaczenia:\n   Polecenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie treści:\n  A. JEŻELI wykryjesz polecenie tłumaczenia w polu message:\n     - Wygeneruj task_title, task_description.interpretation i task_description.recommendation w języku docelowym.\n\n  B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n     - Wygeneruj task_title, task_description.interpretation i task_description.recommendation w oryginalnym języku pola message.\n\n3. Wymagane pola i limity:\n  - task_title: jedno zdanie, maksymalnie 100 znaków.\n  - task_description.interpretation: opis sytuacji na podstawie message + subject + image_description, maksymalnie 300 znaków.\n  - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 300 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON:\n\n[\n  {\n    \"task_title\": \"...\",\n    \"task_description\": {\n      \"interpretation\": \"...\",\n      \"recommendation\": \"...\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny.\n"
             },
             {
-              "content": "=message: {{ $('Webhook-test').item.json.body.message }}\nsubject: {{ $('Webhook-test').item.json.body.subject }}\nimage_description: {{ $json.content.join(' | ') }}"
+              "content": "=subject: {{ $('Safe subject and message').item.json.safe_subject }}\nmessage: {{ $('Safe subject and message').item.json.safe_message }}\nimage_description: {{ $json.content.join(' | ') }}\n\nZwróć wyłącznie JSON w powyższym formacie."
             }
           ]
         },
@@ -1202,11 +1202,12 @@
           "id": "7r6c9PgveQjC7ygm",
           "name": "OpenAi project n8n"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "jsCode": "// Pobierz surowy tekst JSON z OpenAI (pierwsze wejście)\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// Pobranie oryginalnej wiadomości, która nie jest już generowana przez AI\nconst originalMessage = $('Webhook-test').first().json.body.message || \"\"; \n\n// 1. Oczyszczanie surowego tekstu\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 2. Bezpieczne czyszczenie białych znaków\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \"\").trim(); \n\n// 3. Konwersja apostrofów na cudzysłowy\nraw = raw.replace(/'/g, \"\\\"\");\n\nlet parsed;\n\n// Parsowanie JSON i obsługa błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    // Struktura błędu z wstrzykniętą wiadomością oryginalną\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            \"original-message\": originalMessage,\n            task_description: \"\", \n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 4. Transformacja do oczekiwanego płaskiego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 5. STWORZENIE NOWEGO POLA 'task_description' (podsumowanie)\nconst newTaskDescription = \n    `1: ${originalMessage}` +\n    ` | 2: ${interpretation}` +\n    ` | 3: ${recommendation}`;\n\n\n\n// Zwrot finalnego, spójnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n\n\n        // Pola generowane przez AI\n        interpretation: interpretation,\n        recommendation: recommendation,\n        // Pole wypełnione bezpośrednio z Webhooka\n        //\"original-message\": originalMessage, \n\n      \n        // Nowe, połączone pole\n        task_description: newTaskDescription \n    }\n}];"
+        "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first().json.safe_message || \"\"; \n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim(); \n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Tworzenie nowego pola 'task_description' (podsumowanie)\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 9. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription\n    }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1397,32 +1398,10 @@
       "typeVersion": 3.3,
       "position": [
         1568,
-        -1152
+        -944
       ],
       "id": "551d733b-854b-4682-9a95-9275b8ef54f1",
       "name": "Switch - type selection"
-    },
-    {
-      "parameters": {
-        "resource": "video",
-        "operation": "analyze",
-        "modelId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
-        },
-        "options": {
-          "maxOutputTokens": 300
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.googleGemini",
-      "typeVersion": 1,
-      "position": [
-        2128,
-        -1536
-      ],
-      "id": "ba633d76-8f59-4db5-83db-aa4f6064e80f",
-      "name": "Analyze video"
     },
     {
       "parameters": {
@@ -1451,6 +1430,32 @@
         }
       },
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane wejściowe z Webhook\nconst subject = $input.first().json.body.subject || \"\";\nconst message = $input.first().json.body.message || \"\";\n\n// Funkcja do oczyszczania tekstu\nfunction sanitizeTextSafe(text) {\n    if (!text) return \"\";\n\n    // 1. Usuń wszystkie znaki kontrolne ASCII (0-31 i 127)\n    text = text.replace(/[\\x00-\\x1F\\x7F]/g, \"\");\n\n    // 2. Usuń potencjalnie niebezpieczne znaki w JSON lub kodzie\n    text = text.replace(/[`\\\\<>${}[\\]]/g, \"\");\n\n    // 3. Usuń wszystkie cudzysłowy i apostrofy (proste + typograficzne)\n    text = text.replace(/[\"'‘’“”„‚«»]/g, \"\");\n\n    // 4. Usuń nadmiarowe białe znaki (nowa linia, tab, niełamiąca spacja)\n    text = text.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\n    // 5. Zamień wielokrotne spacje na pojedynczą\n    text = text.replace(/\\s{2,}/g, \" \");\n\n    return text;\n}\n\n// Oczyszczone pola\nconst safeSubject = sanitizeTextSafe(subject);\nconst safeMessage = sanitizeTextSafe(message);\n\n// Zwrot danych do workflow\nreturn [{\n    json: {\n        safe_subject: safeSubject,\n        safe_message: safeMessage\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        176
+      ],
+      "id": "459b981c-cc26-4f64-8af3-8da74c009db9",
+      "name": "Safe subject and message"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nazwa węzła OpenAI, z którego przechwytujemy błędy\nconst parentNodeName = \"Create Picture Summary\";\n\n// Pobierz istniejącą listę błędów (zmienna workflow-level)\nlet errorLog = this.getVariable('errorLog') || [];\n\n// Przejdź przez wszystkie rekordy z wejścia\nconst result = $input.all().map((item, index) => {\n    const original = item.json;\n\n    // wykrywanie błędu\n    const possibleError =\n        original.error ||\n        original.__error ||\n        original.rawError ||\n        null;\n\n    if (possibleError) {\n        errorLog.push({\n            node: parentNodeName,\n            message: possibleError.message || possibleError,\n            timestamp: new Date().toISOString(),\n            itemIndex: index,\n            raw: original\n        });\n    }\n\n    return {\n        json: {\n            ok: !possibleError,\n            originalItemIndex: index,\n            original\n        }\n    };\n});\n\n// Zapisz zaktualizowaną listę błędów do zmiennej dostępnej dalej w workflow\nthis.setVariable('errorLog', errorLog);\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2656,
+        -1136
+      ],
+      "id": "fe1319b0-c51a-4892-8f81-60c480d79f98",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
@@ -1458,7 +1463,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Items - chat",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -1937,7 +1942,7 @@
       "main": [
         [
           {
-            "node": "If it's notice",
+            "node": "Safe subject and message",
             "type": "main",
             "index": 0
           }
@@ -2026,14 +2031,14 @@
         ],
         [
           {
-            "node": "Fetch image - chat",
+            "node": "Download Audio",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Download Audio",
+            "node": "Fetch image - chat",
             "type": "main",
             "index": 0
           }
@@ -2057,17 +2062,43 @@
           }
         ]
       ]
+    },
+    "Safe subject and message": {
+      "main": [
+        [
+          {
+            "node": "If it's notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "bhjAeSzRqg04Ag71"
   },
   "staticData": null,
   "meta": {
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "4cc9d83e-38c1-4346-807b-9c42f09b447e",
+  "versionId": "05e8e7f4-728e-416a-bd99-a356e64ea799",
+  "activeVersionId": null,
   "triggerCount": 1,
   "shared": [
     {
@@ -2085,5 +2116,6 @@
       "projectId": "CjfG3RcAlbeZbF4G"
     }
   ],
+  "activeVersion": null,
   "tags": []
 }
