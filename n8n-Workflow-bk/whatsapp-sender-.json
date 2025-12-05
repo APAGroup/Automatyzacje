@@ -301,6 +301,7 @@
   "meta": null,
   "pinData": {},
   "versionId": "dafbf8b3-8ad5-4ed2-a3ca-83e25b8a45e7",
+  "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
     {
@@ -311,5 +312,6 @@
       "projectId": "v3iOlUQZPnWy0OLx"
     }
   ],
+  "activeVersion": null,
   "tags": []
 }
