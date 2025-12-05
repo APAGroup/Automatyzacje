@@ -380,6 +380,7 @@
   },
   "pinData": {},
   "versionId": "ccb4424f-98df-4558-83b5-027d5a2d6956",
+  "activeVersionId": "ccb4424f-98df-4558-83b5-027d5a2d6956",
   "triggerCount": 1,
   "shared": [
     {
@@ -397,5 +398,380 @@
       "projectId": "CjfG3RcAlbeZbF4G"
     }
   ],
+  "activeVersion": {
+    "updatedAt": "2025-12-05T05:43:07.618Z",
+    "createdAt": "2025-12-05T05:43:07.618Z",
+    "versionId": "ccb4424f-98df-4558-83b5-027d5a2d6956",
+    "workflowId": "9Y6U28cy581EO1pj",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          112,
+          -80
+        ],
+        "id": "55f8e80f-414a-4c1d-b77f-c68415a6df15",
+        "name": "When clicking ‘Execute workflow’"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1040,
+          0
+        ],
+        "id": "055f4156-b5ec-4dfe-86ec-7c60fc4e85a1",
+        "name": "Loop over assets"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "4d4de2a7-a357-4b40-aaf6-4aea016a3e64",
+                "leftValue": "={{ $('Users convertion').first().json.userList }}",
+                "rightValue": "={{ $('Loop over assets').item.json.Id }}",
+                "operator": {
+                  "type": "array",
+                  "operation": "notContains",
+                  "rightType": "any"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1264,
+          96
+        ],
+        "id": "9ae0be75-7291-4c9d-9fa7-a0570c7027a1",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Pobranie wejściowych danych:\nconst userId = $input.first().json.Id;     // szukany AssetId\nconst userDict = $('Users convertion').first().json.userDict; // słownik { assetId: Id }\n\n// Pobranie wartości:\nconst id = userDict[userId] ?? null;\n\nreturn [\n  {\n    json: { id }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1472,
+          192
+        ],
+        "id": "663c8592-ba9b-469c-8ff2-9f9428c83eca",
+        "name": "Get id"
+      },
+      {
+        "parameters": {
+          "authentication": "nocoDbApiToken",
+          "operation": "getAll",
+          "projectId": "pqt495lyos0y4do",
+          "table": "mq8n0dce8y7al2g",
+          "returnAll": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.nocoDb",
+        "typeVersion": 3,
+        "position": [
+          352,
+          0
+        ],
+        "id": "e96307d6-99c7-4176-9428-2e2b0569ca42",
+        "name": "Get all users - nocodb",
+        "alwaysOutputData": true,
+        "credentials": {
+          "nocoDbApiToken": {
+            "id": "qeCZEzG9ppXPu7Mh",
+            "name": "NocoDB Token account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Wejście: wiele itemów od poprzedniego noda (np. NoCoDB)\n// Każdy item w formie: { Id, AssetId, ... }\n\nconst items = $input.all();\n\nconst userList = items.map(i => i.json.UserId);\n\nconst userDict = {};\nfor (const i of items) {\n  userDict[i.json.UserId] = i.json.Id;\n}\n\nreturn [\n  {\n    json: {\n      userList,\n      userDict\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          560,
+          0
+        ],
+        "id": "c634d4ec-a334-40f6-b724-eaafb3d52822",
+        "name": "Users convertion"
+      },
+      {
+        "parameters": {
+          "authentication": "nocoDbApiToken",
+          "operation": "getAll",
+          "projectId": "pqt495lyos0y4do",
+          "table": "m1nyt0dei6ngj28",
+          "returnAll": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.nocoDb",
+        "typeVersion": 3,
+        "position": [
+          800,
+          0
+        ],
+        "id": "83873811-8cf7-495c-a5fa-ca29d80205b0",
+        "name": "Get all users - nazca",
+        "credentials": {
+          "nocoDbApiToken": {
+            "id": "qeCZEzG9ppXPu7Mh",
+            "name": "NocoDB Token account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "nocoDbApiToken",
+          "operation": "create",
+          "projectId": "pqt495lyos0y4do",
+          "table": "mq8n0dce8y7al2g",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldName": "UserId",
+                "fieldValue": "={{ $json.Id }}"
+              },
+              {
+                "fieldName": "Username",
+                "fieldValue": "={{ $json.Username }}"
+              },
+              {
+                "fieldName": "FirstName",
+                "fieldValue": "={{ $json.FirstName }}"
+              },
+              {
+                "fieldName": "LastName",
+                "fieldValue": "={{ $json.LastName }}"
+              },
+              {
+                "fieldName": "EmailAdress",
+                "fieldValue": "={{ $json.Email }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.nocoDb",
+        "typeVersion": 3,
+        "position": [
+          1856,
+          128
+        ],
+        "id": "36162098-138f-4bd3-bd0c-59dac40b0fc0",
+        "name": "Add user",
+        "credentials": {
+          "nocoDbApiToken": {
+            "id": "qeCZEzG9ppXPu7Mh",
+            "name": "NocoDB Token account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "nocoDbApiToken",
+          "operation": "update",
+          "projectId": "pqt495lyos0y4do",
+          "table": "mq8n0dce8y7al2g",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldName": "UserId",
+                "fieldValue": "={{ $('Loop over assets').item.json.Id }}"
+              },
+              {
+                "fieldName": "Username",
+                "fieldValue": "={{ $('Loop over assets').item.json.Username }}"
+              },
+              {
+                "fieldName": "FirstName",
+                "fieldValue": "={{ $('Loop over assets').item.json.FirstName }}"
+              },
+              {
+                "fieldName": "LastName",
+                "fieldValue": "={{ $('Loop over assets').item.json.LastName }}"
+              },
+              {
+                "fieldName": "EmailAdress",
+                "fieldValue": "={{ $('Loop over assets').item.json.Email }}"
+              },
+              {
+                "fieldName": "Id",
+                "fieldValue": "={{ $json.id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.nocoDb",
+        "typeVersion": 3,
+        "position": [
+          1856,
+          368
+        ],
+        "id": "8436669b-7166-4ac7-80a3-b03c331fc6bf",
+        "name": "Update user",
+        "credentials": {
+          "nocoDbApiToken": {
+            "id": "qeCZEzG9ppXPu7Mh",
+            "name": "NocoDB Token account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "path": "eccf4932-21ed-45bc-b3fa-dae56960d888",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          112,
+          112
+        ],
+        "id": "134f6fdb-7a21-4175-a641-6ea4e09c68eb",
+        "name": "Webhook",
+        "webhookId": "eccf4932-21ed-45bc-b3fa-dae56960d888"
+      }
+    ],
+    "connections": {
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Get all users - nocodb",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop over assets": {
+        "main": [
+          [],
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Add user",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get id",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get id": {
+        "main": [
+          [
+            {
+              "node": "Update user",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get all users - nocodb": {
+        "main": [
+          [
+            {
+              "node": "Users convertion",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Users convertion": {
+        "main": [
+          [
+            {
+              "node": "Get all users - nazca",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get all users - nazca": {
+        "main": [
+          [
+            {
+              "node": "Loop over assets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Add user": {
+        "main": [
+          [
+            {
+              "node": "Loop over assets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update user": {
+        "main": [
+          [
+            {
+              "node": "Loop over assets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get all users - nocodb",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null
+  },
   "tags": []
 }
