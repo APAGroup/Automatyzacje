@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2025-12-04T11:28:00.000Z",
+  "updatedAt": "2025-12-05T12:03:34.000Z",
   "createdAt": "2025-12-03T09:47:23.795Z",
   "id": "8kHMeDcB2Ciwooqg",
   "name": "Knowshare - nocodb integration V2",
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
@@ -1880,6 +1880,7 @@
     ]
   },
   "versionId": "f30a9f5c-c194-4941-8e34-fc6d91bdf874",
+  "activeVersionId": null,
   "triggerCount": 1,
   "shared": [
     {
@@ -1897,5 +1898,6 @@
       "projectId": "CjfG3RcAlbeZbF4G"
     }
   ],
+  "activeVersion": null,
   "tags": []
 }
