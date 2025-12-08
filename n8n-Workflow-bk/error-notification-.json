@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-05T07:42:50.000Z",
+  "updatedAt": "2025-12-08T14:25:18.000Z",
   "createdAt": "2025-12-05T07:42:32.823Z",
   "id": "bIsCrlr6EX8DNZDK",
   "name": "Error-notification",
@@ -11,22 +11,58 @@
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
       "position": [
-        -320,
-        32
+        0,
+        0
       ],
-      "id": "bb29ded1-54e5-4f48-9def-4b84d1df475b",
-      "name": "Error Trigger",
-      "alwaysOutputData": true
+      "id": "07e1a2cb-757e-4d06-a5e1-8017213ee406",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ee0bac4d-52a3-4e1a-b54b-661c37d0078a",
+              "name": "Licznik_1",
+              "value": 123,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        0
+      ],
+      "id": "e6db2140-5a98-489f-86a0-e3337fdd977e",
+      "name": "Edit Fields"
     }
   ],
-  "connections": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "callerPolicy": "any",
+    "availableInMCP": false
   },
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "490c913b-3561-4b73-a1eb-59d6d280cc73",
+  "versionId": "436f2ff7-5789-4c91-8a23-6b2bf57732d4",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
