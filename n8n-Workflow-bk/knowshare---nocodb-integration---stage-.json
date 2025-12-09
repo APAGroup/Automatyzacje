@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-08T13:54:27.000Z",
+  "updatedAt": "2025-12-09T08:07:15.000Z",
   "createdAt": "2025-11-20T12:51:10.510Z",
   "id": "bhjAeSzRqg04Ag71",
   "name": "Knowshare - nocodb integration - stage",
@@ -333,7 +333,8 @@
           "id": "smwCdXvghDY8DlJz",
           "name": "S3 account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -474,8 +475,9 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "gpt-9999",
-          "mode": "id"
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
         },
         "responses": {
           "values": [
@@ -540,7 +542,8 @@
           "id": "smwCdXvghDY8DlJz",
           "name": "S3 account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -745,45 +748,6 @@
     },
     {
       "parameters": {
-        "jsCode": "for (const item of items) {\n  const nodeName = \"Create Picture Summary\";\n\n  let errorMessage = \"\";\n\n  // Jeśli item.json jest tablicą z błędem\n  if (Array.isArray(item.json) && item.json[0]?.error) {\n    errorMessage = item.json[0].error;\n    // Dopisujemy pole do pierwszego elementu tablicy\n    item.json[0].errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli item.json jest obiektem z błędem\n  else if (item.json?.error) {\n    errorMessage = item.json.error;\n    item.json.errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli brak błędu\n  else {\n    // Tworzymy zmienną pustą\n    if (Array.isArray(item.json) && item.json[0]) {\n      item.json[0].errorOpenAI1 = \"\";\n    } else {\n      item.json.errorOpenAI1 = \"\";\n    }\n  }\n}\n\nreturn items;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2672,
-        -1088
-      ],
-      "id": "8662f593-45f9-4b03-a188-b1df82e80898",
-      "name": "Create Picture Summary - error handling"
-    },
-    {
-      "parameters": {
-        "jsCode": "for (const item of items) {\n  const nodeName = \"Audio analyze\";\n\n  let errorMessage = \"\";\n\n  // Jeśli item.json jest tablicą z błędem\n  if (Array.isArray(item.json) && item.json[0]?.error) {\n    errorMessage = item.json[0].error;\n    // Dopisujemy pole do pierwszego elementu tablicy\n    item.json[0].errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli item.json jest obiektem z błędem\n  else if (item.json?.error) {\n    errorMessage = item.json.error;\n    item.json.errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli brak błędu\n  else {\n    // Tworzymy zmienną pustą\n    if (Array.isArray(item.json) && item.json[0]) {\n      item.json[0].errorOpenAI1 = \"\";\n    } else {\n      item.json.errorOpenAI1 = \"\";\n    }\n  }\n}\n\nreturn items;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2704,
-        -704
-      ],
-      "id": "eca9bc0c-8939-47d8-b518-afaee4f9ea3b",
-      "name": "Audio analyze - error handling"
-    },
-    {
-      "parameters": {
-        "jsCode": "for (const item of items) {\n  const nodeName = \"Create summary\";\n\n  let errorMessage = \"\";\n\n  // Jeśli item.json jest tablicą z błędem\n  if (Array.isArray(item.json) && item.json[0]?.error) {\n    errorMessage = item.json[0].error;\n    // Dopisujemy pole do pierwszego elementu tablicy\n    item.json[0].errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli item.json jest obiektem z błędem\n  else if (item.json?.error) {\n    errorMessage = item.json.error;\n    item.json.errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli brak błędu\n  else {\n    // Tworzymy zmienną pustą\n    if (Array.isArray(item.json) && item.json[0]) {\n      item.json[0].errorOpenAI1 = \"\";\n    } else {\n      item.json.errorOpenAI1 = \"\";\n    }\n  }\n}\n\nreturn items;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        4224,
-        32
-      ],
-      "id": "ce1fb1f1-fc63-4e65-b4f1-747ae64b1151",
-      "name": "Create summary - error handling"
-    },
-    {
-      "parameters": {
         "from": "MG57b1eeb171ed820e74d29ebc017e22cc",
         "to": "={{ $json.phone }}",
         "message": "={{ $('Notification data').first().json.message }}",
@@ -835,8 +799,9 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "gpt-4999",
-          "mode": "id"
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
         },
         "responses": {
           "values": [
@@ -1109,37 +1074,11 @@
     },
     {
       "parameters": {
-        "jsCode": "for (const item of items) {\n  const nodeName = \"Twilio\";\n\n  let errorMessage = \"\";\n\n  // Jeśli item.json jest tablicą z błędem\n  if (Array.isArray(item.json) && item.json[0]?.error) {\n    errorMessage = item.json[0].error;\n    // Dopisujemy pole do pierwszego elementu tablicy\n    item.json[0].errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli item.json jest obiektem z błędem\n  else if (item.json?.error) {\n    errorMessage = item.json.error;\n    item.json.errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli brak błędu\n  else {\n    // Tworzymy zmienną pustą\n    if (Array.isArray(item.json) && item.json[0]) {\n      item.json[0].errorOpenAI1 = \"\";\n    } else {\n      item.json.errorOpenAI1 = \"\";\n    }\n  }\n}\n\nreturn items;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        8272,
-        -160
-      ],
-      "id": "a2adc842-278d-49ed-9c74-3666e3187cc9",
-      "name": "Twilio - error handling"
-    },
-    {
-      "parameters": {
-        "jsCode": "for (const item of items) {\n  const nodeName = \"Text shortening\";\n\n  let errorMessage = \"\";\n\n  // Jeśli item.json jest tablicą z błędem\n  if (Array.isArray(item.json) && item.json[0]?.error) {\n    errorMessage = item.json[0].error;\n    // Dopisujemy pole do pierwszego elementu tablicy\n    item.json[0].errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli item.json jest obiektem z błędem\n  else if (item.json?.error) {\n    errorMessage = item.json.error;\n    item.json.errorOpenAI1 = `${nodeName}: ${errorMessage}`;\n  } \n  // Jeśli brak błędu\n  else {\n    // Tworzymy zmienną pustą\n    if (Array.isArray(item.json) && item.json[0]) {\n      item.json[0].errorOpenAI1 = \"\";\n    } else {\n      item.json.errorOpenAI1 = \"\";\n    }\n  }\n}\n\nreturn items;\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        6336,
-        -32
-      ],
-      "id": "2bf3ab60-2274-4b05-8fb4-a89126d54047",
-      "name": "Text shortening - error handling"
-    },
-    {
-      "parameters": {
         "fromEmail": "nazca4@apagroup.pl",
-        "toEmail": "marek.rachel@apagroup.pl",
+        "toEmail": "marek.rachel@apagroup.pl; grzegorz.bojdo@apagroup.pl",
         "subject": "=Knowshare - wykryto błąd w workflow",
         "emailFormat": "text",
-        "text": "=Treść:\n\n{{ $json.body }}",
+        "text": "=Wykryto błąd w workflow \"Knowshare - nocodb integration\".\n\n{{ $json.body }}",
         "options": {
           "appendAttribution": false
         }
@@ -1162,7 +1101,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const allErrors = [];\n\n// Lista węzłów do sprawdzenia\nconst nodes = [\n    'Create Picture Summary - error handling',\n    'Audio analyze - error handling',\n    'Create summary - error handling',\n    'Text shortening - error handling',\n    'Twilio - error handling'\n];\n\nfor (const nodeName of nodes) {\n    try {\n        // Sprawdzenie, czy węzeł istnieje i został wykonany\n        const node = $node[nodeName];\n        if (node?.json) {\n            // Zakładamy, że errorOpenAI1 zawiera treść błędu jako string\n            const nodeError = node.json.errorOpenAI1; \n            \n            // Tylko jeśli jest treść, dodajemy ją do raportu\n            if (nodeError) allErrors.push(nodeError); \n        }\n    } catch (err) {\n        // Błąd dostępu do $node[nodeName] - ignorujemy\n        continue;\n    }\n}\n\n// Zwracamy finalny item z raportem błędów\nreturn [{\n    json: {\n        // Ustawienie flagi do wysyłki maila\n        sendEmail: allErrors.length > 0, \n        \n        // Zastosowanie podwójnej nowej linii (\"\\n\\n\") jako separatora.\n        // Gwarantuje to pustą linię pomiędzy poszczególnymi błędami.\n        body: allErrors.join(\"\\n\\n\") \n    }\n}];"
+        "jsCode": "const allErrors = [];\n\nconst nodes = [\n    'Create Picture Summary - error handling',\n    'Audio analyze - error handling',\n    'Create summary - error handling',\n    'Text shortening - error handling',\n    'Twilio - error handling'\n];\n\nfor (const nodeName of nodes) {\n    try {\n        // Pobranie itemu w poprawny sposób\n        const nodeItem = $node[nodeName]?.json;\n\n        if (!nodeItem) continue;\n\n        const nodeError = nodeItem.errorOpenAI1;\n\n        if (\n            typeof nodeError === 'string' &&\n            nodeError.trim().length > 0\n        ) {\n            allErrors.push(nodeError);\n        }\n\n    } catch (err) {\n        continue;\n    }\n}\n\nreturn [{\n    json: {\n        sendEmail: allErrors.length > 0,\n        body: allErrors.join(\"\\n\\n\")\n    }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1210,7 +1149,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "{\n\n\n\"params\": \n{\n},\n\"query\": \n{\n},\n\"body\": \n{\n\"index\": \n\"notices\",\n\"createdAt\": \n\"2025-12-04T08:41:40.9868596Z\",\n\"assetId\": \n\"08dd9922-b430-4372-87e1-bd636f11182a\",\n\"subject\": \n\"Lampa nie dziala\",\n\"message\": \n\"Lampa nie działa, przy próbie podania napięcia zaczyna piszczec\",\n\"type\": \n0,\n\"createdBy\": \n\"Marek Rachel\",\n\"tenantId\": \n\"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": \n[\n\"audio_1764837682371.jpg\",\n\"image_picker_70CA76B9-6D9F-4998-B321-09FFDEA417BE-607-00000014B3473A55.mp4\"\n]\n},\n\"webhookUrl\": \n\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\"executionMode\": \n\"production\"\n}",
+        "jsonOutput": "{\n\n\n\"params\": \n{\n},\n\"query\": \n{\n},\n\"body\": \n{\n\"index\": \n\"notices\",\n\"createdAt\": \n\"2025-12-04T08:41:40.9868596Z\",\n\"assetId\": \n\"08dd9922-b430-4372-87e1-bd636f11182a\",\n\"subject\": \n\"Lampa nie dziala\",\n\"message\": \n\"Lampa nie działa, przy próbie podania napięcia zaczyna piszczec\",\n\"type\": \n0,\n\"createdBy\": \n\"Marek Rachel\",\n\"tenantId\": \n\"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": \n[\n\"image_picker_70CA76B9-6D9F-4998-B321-09FFDEA417BE-607-00000014B3473A55.jpg\",\n\"audio_1764837682371.jpg\"\n\n]\n},\n\"webhookUrl\": \n\"https://apagroup.app.n8n.cloud/webhook/9fa3910c-8207-4351-b79b-b74b65ec4a3c\",\n\"executionMode\": \n\"production\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -1232,6 +1171,121 @@
       ],
       "id": "321bc85d-2114-4f7a-a8da-72a41c4a70de",
       "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Create Picture Summary\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2704,
+        -1120
+      ],
+      "id": "1736f54e-faf2-431c-937b-f5c725a5270e",
+      "name": "Create Picture Summary - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Audio analyze\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2752,
+        -736
+      ],
+      "id": "e6dbdad1-152c-4815-b729-5b2040367e25",
+      "name": "Audio analyze - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Create summary\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4208,
+        80
+      ],
+      "id": "b41f5e9f-48fe-4e9a-aa2b-d2d8a1faf5f7",
+      "name": "Create summary - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Text shortening\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6352,
+        0
+      ],
+      "id": "b536a071-15fd-4a00-b458-6a954ebce3b1",
+      "name": "Text shortening - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Twilio\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8208,
+        -224
+      ],
+      "id": "176ad947-b753-4907-aeb8-6ad1c7c8ac38",
+      "name": "Twilio - error handling"
     }
   ],
   "connections": {
@@ -1573,39 +1627,6 @@
         ]
       ]
     },
-    "Create Picture Summary - error handling": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items - chat",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Audio analyze - error handling": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items - chat",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create summary - error handling": {
-      "main": [
-        [
-          {
-            "node": "Task content",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Twilio": {
       "main": [
         [
@@ -1762,28 +1783,6 @@
         ]
       ]
     },
-    "Twilio - error handling": {
-      "main": [
-        [
-          {
-            "node": "If email notification enabled",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Text shortening - error handling": {
-      "main": [
-        [
-          {
-            "node": "SMS Final",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Error raport prepare": {
       "main": [
         [
@@ -1832,6 +1831,61 @@
           }
         ]
       ]
+    },
+    "Create Picture Summary - error handling": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio analyze - error handling": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create summary - error handling": {
+      "main": [
+        [
+          {
+            "node": "Task content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text shortening - error handling": {
+      "main": [
+        [
+          {
+            "node": "SMS Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio - error handling": {
+      "main": [
+        [
+          {
+            "node": "If email notification enabled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1845,7 +1899,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "bafa73be-a5ec-4979-8b42-951d77d29dd7",
+  "versionId": "9055b21e-9dee-4cf9-b719-a71d6ad58d84",
   "activeVersionId": null,
   "triggerCount": 1,
   "shared": [
