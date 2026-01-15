@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-11-24T10:53:09.000Z",
+  "updatedAt": "2026-01-15T12:37:06.000Z",
   "createdAt": "2025-11-14T11:57:15.228Z",
   "id": "uawW0w7Ys0QCTDOm",
   "name": "Knowshare - car service - stage",
@@ -34,7 +34,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        32,
+        512,
         208
       ],
       "id": "d8e4721a-1e8a-4bf7-a230-369dd0b97b97",
@@ -154,14 +154,15 @@
         "messages": {
           "values": [
             {
-              "content": "=Scal wszystkie dane pojazdu jeden json:\n{\n  \"name\",\"carId\",\"worker\",\"datetime\",\"mileage\",\"subject\"\n}\n",
+              "content": "=Otrzymujesz zbiór wartości przebiegu pojazdu.\nKażda wartość jest albo:\n- poprawnym przebiegiem w formacie \"<LICZBA> km\"\n- albo null\n\nTwoje zadanie:\n1. Odrzuć wszystkie wartości null.\n2. Jeśli po odrzuceniu null:\n   - nie ma żadnej wartości → zwróć null\n   - jest dokładnie jedna wartość → zwróć ją\n   - jest kilka wartości:\n     - jeśli wszystkie są IDENTYCZNE → zwróć tę wartość\n     - jeśli różnią się między sobą → zwróć null (konflikt danych)\n\nZwróć wynik jako poprawny JSON w dokładnie tym formacie (bez żadnego innego tekstu):\n\n{\n  \"mileage\": \"<LICZBA> km lub null\"\n}\n\nZasady:\n- Nie modyfikuj formatu przebiegu.\n- Nie przeliczaj jednostek.\n- Nie zgaduj wartości.\n- Nie dodawaj żadnych opisów ani komentarzy.\n- Jeśli masz jakąkolwiek wątpliwość — zwróć null.",
               "role": "system"
             },
             {
-              "content": "=Dane samochodu:  {{ $json.content }}"
+              "content": "=Przebieg samochodu:  {{ $json.content }}"
             }
           ]
         },
+        "jsonOutput": true,
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
@@ -185,13 +186,13 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict",
+            "typeValidation": "loose",
             "version": 2
           },
           "conditions": [
             {
               "id": "e9bf7821-d969-41b2-a0a4-aa647bb37199",
-              "leftValue": "={{ $json.asset.isCar }}",
+              "leftValue": "={{ $json.data[0].carAsset }}",
               "rightValue": "={{ $('Webhook').item.json.body.assetId }}",
               "operator": {
                 "type": "boolean",
@@ -202,52 +203,17 @@
           ],
           "combinator": "and"
         },
+        "looseTypeValidation": true,
         "options": {}
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        736,
+        992,
         208
       ],
       "id": "b3e49bef-1bee-47cc-bcf5-df4077403d2e",
       "name": "Check if it's a car"
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "chatgpt-4o-latest",
-          "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Przeszukaj poniższe dane w poszukiwaniu numeru rejestracyjnego pojazdu. \nNumery rejestracyjne mogą mieć różne formaty (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\"), \nale zawsze zawierają litery i cyfry, często z lub bez spacji/podkreślników.\n\nTytuł: {{ $('Webhook').item.json.body.subject }}\nOpis:  {{ $('Webhook').item.json.body.message }}\n\nTwoje zadanie:\n1. Znajdź w tekście numer rejestracyjny, jeśli występuje.\n2. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"<znaleziony numer rejestracyjny lub null>\",\n  \"carId\": \"{{ $json.carId }}\",\n  \"worker\": \"{{ $json.worker }}\",\n  \"datetime\": \"{{ $json.datetime }}\",\n  \"mileage\": \"{{ $json.mileage }}\"\n  \"subject\": \"{{ $json.subject }}\"\n}\n\nWymagania:\n- Nie dodawaj żadnych opisów, komentarzy ani tekstów poza czystym JSON-em.\n- Jeśli numer nie występuje, zwróć \"name\": null\n- Nie poprawiaj formatu numeru — zwróć go dokładnie tak, jak występuje w tekście.\n",
-              "role": "system"
-            }
-          ]
-        },
-        "jsonOutput": true,
-        "options": {
-          "maxTokens": 100
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [
-        3712,
-        224
-      ],
-      "id": "51a6e20b-a897-4de5-b38c-cdf6b77037b8",
-      "name": "Find plates",
-      "credentials": {
-        "openAiApi": {
-          "id": "7r6c9PgveQjC7ygm",
-          "name": "OpenAi project n8n"
-        }
-      }
     },
     {
       "parameters": {
@@ -303,7 +269,7 @@
           "mode": "list",
           "cachedResultName": "CHATGPT-4O-LATEST"
         },
-        "text": "=Otrzymujesz zdjęcie, które może przedstawiać:\n- licznik przebiegu pojazdu (wartość w kilometrach),\n- kod QR zawierający identyfikator pojazdu (ID),\n- numer rejestracyjny pojazdu.\n\nTwoje zadanie:\n1. Odczytaj z obrazu wszystkie możliwe informacje:\n   - przebieg w kilometrach (z dokładnie jedną spacją przed \"km\"),\n   - ID z kodu QR (surowy, bez prefixów, suffixów ani opisów),\n   - numer rejestracyjny pojazdu (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\" – format alfanumeryczny, czasem z odstępem lub podkreśleniem).\n2. Jeśli na zdjęciu znajduje się tylko część z tych informacji, brakujące pola ustaw jako null.\n3. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"{{ $('Get car data').item.json['Plate number'] }}\",\n  \"carId\": \"<odczytane ID z kodu QR lub null>\",\n  \"worker\": \"{{ $('Webhook').item.json.body.createdBy }}\",\n  \"datetime\": \"{{ $now.format('yyyy-MM-dd HH:mmZZ') }}\",\n  \"mileage\": \"<wartość przebiegu w formacie 'XXXXXX km' lub null>\",\n  \"subject\": \"{{ $('Webhook').item.json.body.subject }}\"\n}\n\n4. Zasady dotyczące pola \"name\":\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma wartość null lub pustą, a na zdjęciu znajduje się numer rejestracyjny, **nadpisz pole \"name\" odczytanym numerem rejestracyjnym**.\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma już wartość tekstową, pozostaw ją bez zmian.\n   - Nie dodawaj żadnych opisów ani komunikatów o tej decyzji.\n\n5. Zasady dotyczące pola \"id\":\n   - ID w kodzie QR to zwykle numer rejestracyjny zapisany z podkreśleniem zamiast spacji (np. \"SM_5669C\") lub prosty identyfikator typu \"car1\", \"car2\", itp.\n   - **Zwróć wartość z QR tylko wtedy, gdy jesteś niemal w 100% pewny poprawnego odczytu.**\n   - Jeśli QR jest nieczytelny, niepewny lub częściowy — ustaw `\"id\": null`.\n   - Nie próbuj zgadywać ani uzupełniać brakujących znaków.\n\nWymagania:\n- JSON musi być poprawny składniowo.\n- Wartość przebiegu zapisz z dokładnie jedną spacją między liczbą a jednostką (np. \"249415 km\").\n- Wartość ID z QR zwróć dokładnie tak, jak jest zakodowana (bez zmian).\n- Nie dodawaj żadnych opisów, komentarzy, tłumaczeń ani tekstów poza JSON-em.\n- Jeśli nie uda się odczytać któregokolwiek pola, ustaw je na null.\n",
+        "text": "=Otrzymujesz zdjęcie licznika przebiegu pojazdu.\n\nTwoje zadanie:\n1. Jeśli na zdjęciu widać przebieg (odczyt licznika), zwróć go jako tekst w formacie: \"<LICZBA> km\"\n   - tylko cyfry\n   - dokładnie jedna spacja przed \"km\" (np. \"249415 km\")\n2. Jeśli przebieg nie jest widoczny, jest nieczytelny, ucięty, zasłonięty lub masz jakąkolwiek wątpliwość co do odczytu — zwróć null.\n\nZwróć wynik jako poprawny JSON w dokładnie tym formacie (bez żadnego innego tekstu):\n\n{\n  \"mileage\": \"<LICZBA> km lub null\"\n}\n\nWymagania:\n- Nie zwracaj nic poza JSON-em.\n- Nie dodawaj komentarzy, opisów, wyjaśnień ani dodatkowych pól.\n- Nie zgaduj brakujących cyfr.",
         "inputType": "base64",
         "binaryPropertyName": "image",
         "options": {
@@ -348,167 +314,14 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $input.first().json.message.content;\nconst match = text.match(/```json\\s*([\\s\\S]*?)\\s*```/);\nlet data = {};\n\nif (match) {\n\ttry {\n\t\tdata = JSON.parse(match[1]);\n\t} catch (error) {\n\t\tdata = { error: 'Invalid JSON', details: error.message };\n\t}\n}\n\nreturn [{ json: data }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3200,
-        224
-      ],
-      "id": "332f2979-fda8-40f9-b136-b0d7e415da55",
-      "name": "Car summary to json"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "1729d11e-d498-4dc7-9c02-66c780becbdc",
-              "leftValue": "={{ $json.name }}",
-              "rightValue": "Undefined",
-              "operator": {
-                "type": "string",
-                "operation": "empty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        3456,
-        224
-      ],
-      "id": "0699312f-b42e-4b6b-aace-85e2dfdf8c33",
-      "name": "If name is empty"
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "dataTableId": {
-          "__rl": true,
-          "value": "zVavLntkta84oKO7",
-          "mode": "list",
-          "cachedResultName": "Vehicles",
-          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/zVavLntkta84oKO7"
-        },
-        "matchType": "allConditions",
-        "filters": {
-          "conditions": [
-            {
-              "keyValue": "={{ $('Get vehicle').first().json.id }}"
-            }
-          ]
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "name": "={{ $('Final json').first().json.name }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "name",
-              "displayName": "name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "carId",
-              "displayName": "carId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": true
-            },
-            {
-              "id": "orgId",
-              "displayName": "orgId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": true
-            },
-            {
-              "id": "workbookId",
-              "displayName": "workbookId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": true
-            },
-            {
-              "id": "assetId",
-              "displayName": "assetId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": true
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        6176,
-        224
-      ],
-      "id": "2089264c-2608-4595-89eb-65ce450addb7",
-      "name": "Update vehicle",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "mode": "raw",
-        "jsonOutput": "={{ $json.message.content }}",
+        "jsonOutput": "={\"data\":{\n  \"vehicle\":{{ $('Get asset summary').item.json.data[0].id }},\n  \"driver\":{{ $json.data[0].id }},\n  \"mileage\": \"{{ $('Car summary').item.json.message.content.mileage }}\"\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3968,
-        224
-      ],
-      "id": "6c212221-5856-4ecd-91ad-aa89e3975e66",
-      "name": "Normalize"
-    },
-    {
-      "parameters": {
-        "mode": "raw",
-        "jsonOutput": "={{$input.item.json}}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        4208,
+        3504,
         224
       ],
       "id": "b5accd22-75c0-41f0-945e-4593edc18389",
@@ -516,28 +329,15 @@
     },
     {
       "parameters": {
-        "jsCode": "// Pobierz dane z poprzedniego węzła (pierwszy element)\nconst item = $('Final json').first().json;\n\n// Przygotuj tablicę komunikatów o brakach\nconst issues = [];\n\nif (item.name === null || item.name === undefined || item.name === \"\" || (typeof item.name === \"string\" && item.name.trim() === \"\")) {\n  issues.push(\"- Brak informacji o numerze rejestracyjnym pojazdu\");\n}\n\n// if (!item.carId || item.carId === null || item.carId.trim() === \"\") {\n//   issues.push(\"- Brak informacji o Id pojazdu (zła jakość qr na zdjęciu lub jego brak)\");\n// }\n\n// Złóż treść maila\nlet message = \"\";\n\nif (issues.length > 0) {\n  message += \"Wykryto następujące braki w przesłanych danych:\\n\\n\";\n  message += issues.join(\"\\n\");\n  message += \"\\n\\nUprzejmie prosimy o wprowadzenie korekty w arkuszu.\";\n} else {\n  message = \"Brak problemów do korekty.\";\n}\n\n// Zwróć wynik\nreturn [\n  {\n    json: {\n      subject: \"Prośba o korektę danych pojazdu\",\n      body: message\n    }\n  }\n];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        4448,
-        224
-      ],
-      "id": "88dc31f2-f23e-418b-af7d-8353ed4b228f",
-      "name": "Create feedback"
-    },
-    {
-      "parameters": {
-        "toRecipients": "={{ $json.EmailAdress }}",
-        "subject": "={{ $('Get asset summary - journal').item.json.organization }} - Nowy wpis do rejestru floty pojazdów ",
-        "bodyContent": "=Dodano nowy wpis do rejestru floty pojazdów.\n\n{{ $('Create feedback').first().json.body }}",
+        "toRecipients": "={{ $('Get user').item.json.data[0].email }}",
+        "subject": "={{ $('Get asset summary').item.json.data[0].organizations[0].name }} - Nowy wpis do rejestru floty pojazdów ",
+        "bodyContent": "Dodano nowy wpis do rejestru floty pojazdów.\n\nLink do dziennika: https://knowshare.nazca40.com",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.microsoftOutlook",
       "typeVersion": 2,
       "position": [
-        5456,
+        4000,
         224
       ],
       "id": "991291d5-94f0-4549-9dd1-f25fbc3977d7",
@@ -545,50 +345,21 @@
       "webhookId": "451e98b7-f0af-4ba8-bba8-8bbf4db5cedc",
       "credentials": {
         "microsoftOutlookOAuth2Api": {
-          "id": "I8vnEihffZSIdc4c",
+          "id": "ZDgGFyPP1hNPV1lR",
           "name": "Microsoft Outlook account"
         }
       }
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "7d4d2e53-c8a8-4a0b-a302-1a78a9386201",
-              "name": "name",
-              "value": "={{ $('Webhook').first().json.body.createdBy.split(' ')[0] }}",
-              "type": "string"
-            },
-            {
-              "id": "5df2bee1-b951-4cdc-9fbf-cf80a55fcb64",
-              "name": "surname",
-              "value": "={{ $('Webhook').first().json.body.createdBy.split(' ')[1] }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        4944,
-        224
-      ],
-      "id": "b4b7040e-fc0f-4141-9bd3-3d265a8e8c0e",
-      "name": "User data"
-    },
-    {
-      "parameters": {
         "content": "## Główne flow testujące\nOdpowiada za publikację wpisu excel odnośnie samochodu i wysyłą powiadomienie użytkownikowi. ",
         "height": 608,
-        "width": 6768
+        "width": 4752
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -352,
+        176,
         -80
       ],
       "id": "ff5afb26-2226-4724-8210-71f8e17ab929",
@@ -604,7 +375,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -32,
+        448,
         32
       ],
       "id": "21f6d432-76c0-4327-91b2-aca0ec2481c7",
@@ -620,7 +391,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        672,
+        928,
         32
       ],
       "id": "3e84a130-9068-4fd1-b3b9-f22c94ebc9a1",
@@ -662,7 +433,7 @@
       "parameters": {
         "content": "## Tworzenie  jednego jsona wyjściowego\n",
         "height": 432,
-        "width": 512,
+        "width": 320,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -676,22 +447,6 @@
     },
     {
       "parameters": {
-        "content": "## Sprawdzanie czy jest dodany nr rejesracyjny pojazdu\n",
-        "height": 432,
-        "width": 224,
-        "color": 4
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        3392,
-        32
-      ],
-      "id": "34c355fb-d156-4b86-846d-62816cf17d08",
-      "name": "Sticky Note8"
-    },
-    {
-      "parameters": {
         "content": "## Tworzenie finalnej struktury danych\n\n",
         "height": 432,
         "width": 224,
@@ -700,27 +455,11 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        4144,
+        3440,
         32
       ],
       "id": "81a192a6-dd93-4595-b935-54559e053e94",
       "name": "Sticky Note9"
-    },
-    {
-      "parameters": {
-        "content": "## Dodatkowe szukanie numeru rejestracyjnego w treści\n\n",
-        "height": 432,
-        "width": 496,
-        "color": 6
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        3632,
-        32
-      ],
-      "id": "c25e462c-80cd-448a-aa01-1e252ebe32a9",
-      "name": "Sticky Note10"
     },
     {
       "parameters": {
@@ -732,7 +471,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -272,
+        208,
         32
       ],
       "id": "ee34e300-225b-447d-83ee-65fc6f25c002",
@@ -748,7 +487,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        208,
+        688,
         32
       ],
       "id": "27bd7d5d-c2ba-4736-9eb5-76369844b1af",
@@ -772,54 +511,6 @@
     },
     {
       "parameters": {
-        "content": "## Tworzenie feedbacku dla zgłaszającego\n\n",
-        "height": 432,
-        "width": 224,
-        "color": 5
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        4384,
-        32
-      ],
-      "id": "b24f406b-64cd-43f6-b309-73c4e3c81eff",
-      "name": "Sticky Note15"
-    },
-    {
-      "parameters": {
-        "content": "## Publikacja wpisu w tabeli excel\n\n",
-        "height": 432,
-        "width": 224,
-        "color": 5
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        4880,
-        32
-      ],
-      "id": "08b5cde4-9511-4688-be2e-0140204027b3",
-      "name": "Sticky Note17"
-    },
-    {
-      "parameters": {
-        "content": "## Pobranie listy użytkowników",
-        "height": 432,
-        "width": 224,
-        "color": 3
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        5136,
-        32
-      ],
-      "id": "7f27cf0e-fe45-4247-9760-e2f2ea3dd184",
-      "name": "Sticky Note18"
-    },
-    {
-      "parameters": {
         "content": "## Wysłanie maila z powiadomieniem\n\n",
         "height": 432,
         "width": 224,
@@ -828,7 +519,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5392,
+        3936,
         32
       ],
       "id": "383f60e2-5681-4905-b948-fdedb0debd17",
@@ -836,91 +527,6 @@
     },
     {
       "parameters": {
-        "content": "## Wysłanie maila z powiadomieniem\n\n",
-        "height": 432,
-        "width": 224,
-        "color": 3
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        6112,
-        32
-      ],
-      "id": "de058154-0b53-47d6-a6d4-43324d4702b3",
-      "name": "Sticky Note20"
-    },
-    {
-      "parameters": {
-        "operation": "get",
-        "dataTableId": {
-          "__rl": true,
-          "value": "x5jrioWSG6eIovFc",
-          "mode": "list",
-          "cachedResultName": "Users",
-          "cachedResultUrl": "/projects/98BhLNTRDdyyDRlO/datatables/x5jrioWSG6eIovFc"
-        },
-        "matchType": "allConditions",
-        "filters": {
-          "conditions": [
-            {
-              "keyValue": "=2"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.dataTable",
-      "typeVersion": 1,
-      "position": [
-        5696,
-        224
-      ],
-      "id": "b26e508a-7cc2-43a0-94dd-5ede84dc5e93",
-      "name": "Get users1",
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "toRecipients": "={{ $json.email }}",
-        "subject": "={{ $('Get organisation').first().json.name }} - Nowy wpis do rejestru floty pojazdów ",
-        "bodyContent": "=Dodano nowy wpis do rejestru floty pojazdów.\nRejestr znajduje się pod linkiem: {{ $('Get workbooks').first().json.url }}\n\n{{ $('Create feedback').first().json.body }}",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.microsoftOutlook",
-      "typeVersion": 2,
-      "position": [
-        5936,
-        224
-      ],
-      "id": "753e0485-4c92-4646-a054-a8103f70969e",
-      "name": "Send email1",
-      "webhookId": "c94b29de-839c-42d6-90f7-c3f48f1d06d8",
-      "credentials": {
-        "microsoftOutlookOAuth2Api": {
-          "id": "I8vnEihffZSIdc4c",
-          "name": "Microsoft Outlook account"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "content": "## Pobranie listy użytkowników",
-        "height": 432,
-        "width": 224,
-        "color": 3
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        5632,
-        32
-      ],
-      "id": "9e5024ba-d4bc-418a-9599-5ec96c27740c",
-      "name": "Sticky Note21"
-    },
-    {
-      "parameters": {
         "content": "## Publikacja wpisu w tabeli excel\n\n",
         "height": 432,
         "width": 224,
@@ -929,7 +535,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5872,
+        4192,
         32
       ],
       "id": "416ef8fe-50a6-4b89-a06d-7eac2af9c7d6",
@@ -937,7 +543,7 @@
     },
     {
       "parameters": {
-        "content": "## Publikacja wpisu w tabeli nocodb\n\n",
+        "content": "## Publikacja wpisu w tabeli nocobase\n\n",
         "height": 432,
         "width": 224,
         "color": 5
@@ -945,7 +551,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        4640,
+        3680,
         32
       ],
       "id": "23af1770-d125-4340-a4a5-e78d29750ae7",
@@ -954,94 +560,28 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "{\n\"params\": {\n},\n\"query\": {\n},\n\"body\": {\n\"index\": \"notices\",\n\"createdAt\": \"2025-11-12T08:22:40.1315895Z\",\n\"assetId\": \"08de178e-99cb-4e94-89a1-8533f243e74e\",\n\"subject\": \"tankowanie\",\n\"message\": \"tankowanie\",\n\"type\": 0,\n\"createdBy\": \"Michał Kobielski\",\n\"tenantId\": \"08dd5714-941b-4e58-817b-934c403cebb5\",\n\"attachments\": [\n\"2f03e9c4-0ab0-42d7-be57-4ce4861add374858013090380540988.jpg\",\n\"34c0f4ce-3ff9-45c1-9a2f-0575038fd9853347629284031052319.jpg\"\n]\n}\n}\n",
+        "jsonOutput": "{\n\"params\": {\n},\n\"query\": {\n},\n\"body\": {\n\"index\": \"notices\",\n\"createdAt\": \"2025-11-12T08:22:40.1315895Z\",\n\"assetId\": \"08de541a-5365-4cc8-83c8-56ec435aabbf\",\n\"subject\": \"tankowanie\",\n\"message\": \"tankowanie\",\n\"type\": 0,\n\"createdBy\": \"Michał Kobielski\",\n\"tenantId\": \"08de2d89-d074-443f-84b5-4ac826ef21f5\",\n\"attachments\": [\n\"1000027892.jpg\"\n]\n}\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -208,
+        272,
         208
       ],
       "id": "c84fd637-41fb-4912-a1e0-5911a98122e2",
       "name": "Webhook"
     },
     {
-      "parameters": {
-        "authentication": "nocoDbApiToken",
-        "operation": "create",
-        "projectId": "={{ $('Get asset summary - journal').item.json.table.BaseId }}",
-        "table": "={{ $('Get asset summary - journal').item.json.table.TableId }}",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "Datetime",
-              "fieldValue": "={{ $('Final json').item.json.datetime }}"
-            },
-            {
-              "fieldName": "Plate number",
-              "fieldValue": "={{ $('Final json').item.json.name }}"
-            },
-            {
-              "fieldName": "Vahicle id",
-              "fieldValue": "={{ $('Final json').item.json.carId }}"
-            },
-            {
-              "fieldName": "Worker",
-              "fieldValue": "={{ $('Final json').item.json.worker }}"
-            },
-            {
-              "fieldName": "Mileage",
-              "fieldValue": "={{ $('Final json').item.json.mileage }}"
-            },
-            {
-              "fieldName": "Subject",
-              "fieldValue": "={{ $('Final json').item.json.subject }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.nocoDb",
-      "typeVersion": 3,
-      "position": [
-        4704,
-        224
-      ],
-      "id": "0f8808d3-eee0-49fa-a151-f899e4bc0f16",
-      "name": "Create a row",
-      "credentials": {
-        "nocoDbApiToken": {
-          "id": "qeCZEzG9ppXPu7Mh",
-          "name": "NocoDB Token account"
-        }
-      }
-    },
-    {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -464,
+        16,
         208
       ],
       "id": "73c85eba-cdb4-45ed-9582-b4e52689c08e",
       "name": "When clicking ‘Execute workflow’"
-    },
-    {
-      "parameters": {
-        "content": "## Pobranie z bazy info o samochodzie\n\n\n\n",
-        "height": 432,
-        "width": 214,
-        "color": 3
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        928,
-        32
-      ],
-      "id": "4e35460e-fb7e-49fb-9941-995d4be49339",
-      "name": "Sticky Note27"
     },
     {
       "parameters": {
@@ -1053,165 +593,120 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        432,
+        3200,
         32
       ],
-      "id": "f22dd646-d09d-4b4a-8078-20f70fa473a6",
-      "name": "Sticky Note28"
+      "id": "aa5f19dc-7b88-48c5-9f37-d9bf3ceb8c78",
+      "name": "Sticky Note14"
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "c6gReJDAxZwjoiwY",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/c6gReJDAxZwjoiwY",
-          "cachedResultName": "Nocodb function - get asset summary"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "assetId": "={{ $('Webhook').item.json.body.assetId }}",
-            "case": "Fleet-vehicles"
-          },
-          "matchingColumns": [],
-          "schema": [
+        "url": "https://nocobase.nazca40.com/api/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "id": "assetId",
-              "displayName": "assetId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "case",
-              "displayName": "case",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
+              "name": "filter",
+              "value": "={\n  \"nickname\": \"{{ $('Webhook').item.json.body.createdBy }}\",\n  \"organizations.id\": \"{{ $('Get asset summary').item.json.data[0].organizations[0].id }}\"\n}"
             }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
+          ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
       "position": [
-        496,
-        208
+        3264,
+        224
       ],
-      "id": "20e70a55-c30e-4776-b57e-88b431fb69ce",
-      "name": "Get asset summary - vehicles"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "c6gReJDAxZwjoiwY",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/c6gReJDAxZwjoiwY",
-          "cachedResultName": "Nocodb function - get asset summary"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "assetId": "={{ $json.body.assetId }}",
-            "case": "Fleet-journal"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "assetId",
-              "displayName": "assetId",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "case",
-              "displayName": "case",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        272,
-        208
-      ],
-      "id": "a9b46fa7-51fc-435b-92d2-761cfb16c48b",
-      "name": "Get asset summary - journal"
-    },
-    {
-      "parameters": {
-        "authentication": "nocoDbApiToken",
-        "operation": "getAll",
-        "projectId": "={{ $json.table.BaseId }}",
-        "table": "={{ $json.table.TableId }}",
-        "limit": 1,
-        "options": {
-          "where": "=(AssetId,like,{{ $('Webhook').item.json.body.assetId }}) "
-        }
-      },
-      "type": "n8n-nodes-base.nocoDb",
-      "typeVersion": 3,
-      "position": [
-        992,
-        208
-      ],
-      "id": "c4db0117-1f1d-42f7-a756-f57fb99d2829",
-      "name": "Get car data",
+      "id": "63d290ea-d5ed-43ac-96bd-cbb39c82e42f",
+      "name": "Get user",
       "credentials": {
-        "nocoDbApiToken": {
-          "id": "qeCZEzG9ppXPu7Mh",
-          "name": "NocoDB Token account"
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
         }
       }
     },
     {
       "parameters": {
-        "authentication": "nocoDbApiToken",
-        "operation": "getAll",
-        "projectId": "pqt495lyos0y4do",
-        "table": "mq8n0dce8y7al2g",
-        "limit": 1,
-        "options": {
-          "where": "=(FirstName,like,{{ $json.name }})~and(LastName,like,{{ $json.surname }})"
-        }
+        "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "={\"assetId\":\"{{ $('Webhook').item.json.body.assetId }}\"} "
+            }
+          ]
+        },
+        "options": {}
       },
-      "type": "n8n-nodes-base.nocoDb",
-      "typeVersion": 3,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
       "position": [
-        5200,
+        752,
+        208
+      ],
+      "id": "182afd2e-ad8c-41a0-96de-df49143d4c01",
+      "name": "Get asset summary",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nocobase.nazca40.com/api/vehiclesJournal",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3744,
         224
       ],
-      "id": "b9a4b71e-7aa8-4c6f-924c-42ee1e126e7d",
-      "name": "Get user",
+      "id": "5c9250ac-9402-4156-b50e-d69125bd956d",
+      "name": "Post journal",
       "credentials": {
-        "nocoDbApiToken": {
-          "id": "qeCZEzG9ppXPu7Mh",
-          "name": "NocoDB Token account"
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "grzegorz.bojdo@apagroup.pl",
+        "subject": "={{ $('Get asset summary').item.json.data[0].organizations[0].name }} - Nowy wpis do rejestru floty pojazdów ",
+        "bodyContent": "Dodano nowy wpis do rejestru floty pojazdów.\n\nLink do dziennika: https://knowshare.nazca40.com",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        4256,
+        224
+      ],
+      "id": "772785a7-3c9b-4752-8534-6e30f3dd5f8c",
+      "name": "Send email - GB",
+      "webhookId": "451e98b7-f0af-4ba8-bba8-8bbf4db5cedc",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "ZDgGFyPP1hNPV1lR",
+          "name": "Microsoft Outlook account"
         }
       }
     }
@@ -1221,7 +716,7 @@
       "main": [
         [
           {
-            "node": "Get asset summary - journal",
+            "node": "Get asset summary",
             "type": "main",
             "index": 0
           }
@@ -1294,7 +789,7 @@
       "main": [
         [
           {
-            "node": "Car summary to json",
+            "node": "Get user",
             "type": "main",
             "index": 0
           }
@@ -1305,18 +800,7 @@
       "main": [
         [
           {
-            "node": "Get car data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Find plates": {
-      "main": [
-        [
-          {
-            "node": "Normalize",
+            "node": "Get attachments",
             "type": "main",
             "index": 0
           }
@@ -1385,67 +869,11 @@
         ]
       ]
     },
-    "Car summary to json": {
-      "main": [
-        [
-          {
-            "node": "If name is empty",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If name is empty": {
-      "main": [
-        [
-          {
-            "node": "Find plates",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Final json",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update vehicle": {
-      "main": [
-        []
-      ]
-    },
-    "Normalize": {
-      "main": [
-        [
-          {
-            "node": "Final json",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Final json": {
       "main": [
         [
           {
-            "node": "Create feedback",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create feedback": {
-      "main": [
-        [
-          {
-            "node": "Create a row",
+            "node": "Post journal",
             "type": "main",
             "index": 0
           }
@@ -1456,40 +884,7 @@
       "main": [
         [
           {
-            "node": "Get users1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "User data": {
-      "main": [
-        [
-          {
-            "node": "Get user",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get users1": {
-      "main": [
-        [
-          {
-            "node": "Send email1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send email1": {
-      "main": [
-        [
-          {
-            "node": "Update vehicle",
+            "node": "Send email - GB",
             "type": "main",
             "index": 0
           }
@@ -1518,29 +913,18 @@
         ]
       ]
     },
-    "Create a row": {
+    "Get user": {
       "main": [
         [
           {
-            "node": "User data",
+            "node": "Final json",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get asset summary - journal": {
-      "main": [
-        [
-          {
-            "node": "Get asset summary - vehicles",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get asset summary - vehicles": {
+    "Get asset summary": {
       "main": [
         [
           {
@@ -1551,18 +935,7 @@
         ]
       ]
     },
-    "Get car data": {
-      "main": [
-        [
-          {
-            "node": "Get attachments",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get user": {
+    "Post journal": {
       "main": [
         [
           {
@@ -1588,7 +961,7 @@
       }
     ]
   },
-  "versionId": "ae3327a7-3696-4024-b4c2-e76c11571508",
+  "versionId": "0653a3d2-919b-45ac-9c20-dd68603bace5",
   "activeVersionId": null,
   "triggerCount": 1,
   "shared": [
