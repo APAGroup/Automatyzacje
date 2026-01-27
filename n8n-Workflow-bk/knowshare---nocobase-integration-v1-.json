@@ -1,0 +1,5102 @@
+{
+  "updatedAt": "2026-01-27T10:42:56.000Z",
+  "createdAt": "2026-01-23T12:27:18.180Z",
+  "id": "EGw60IW0w70woWR5",
+  "name": "Knowshare - nocobase integration V1",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=Jesteś ekspertem technicznym i specjalistą od analizy obrazów.\n\nTwoim JEDYNYM ZADANIEM jest wygenerowanie opisu załączonego obrazu.\n\n1. Opis Treści: Wygeneruj **krótki, treściwy i techniczny opis** zawartości zdjęcia w kontekście problemu.\n2. FORMAT: Zwróć **WYŁĄCZNIE SAM TEKST OPISU**. ZABRONIONE jest dodawanie wstępów, tytułów, wyjaśnień, nowych linii, formatowania (Markdown), **podwójnych cudzysłowów (\")**, ani żadnych innych znaków, które mogłyby utrudnić zapis w polu JSON. Tekst musi być pojedynczym ciągiem znaków.",
+        "inputType": "base64",
+        "binaryPropertyName": "image",
+        "options": {
+          "detail": "auto",
+          "maxTokens": 1000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2672,
+        -784
+      ],
+      "id": "bd365d05-81fe-4ec7-988e-303cbb3be07d",
+      "name": "Create Picture Summary",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3440,
+        -336
+      ],
+      "id": "79a79952-2c89-4f32-8fbb-dededc515fd2",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        -912
+      ],
+      "id": "4748f9fa-aa08-4084-92d5-3a4de59e67ce",
+      "name": "Loop parameter - chat"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        784,
+        -912
+      ],
+      "id": "6f8c905f-f120-4dc1-a49a-4b54ce58b6a1",
+      "name": "Split Out - chat"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        976,
+        -912
+      ],
+      "id": "02f79944-6d81-485a-9c38-54e594cb4d86",
+      "name": "Loop Over Items - chat",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// Bezpieczne pobieranie danych z poprzednich węzłów.\nconst webhookData = $('Webhook').first().json || {};\nconst indexData = $('Set index').first().json || {};\n\n// Zabezpieczony indeks załącznika\nconst index = Number(indexData.index) || 0; \n\n// Tablica załączników\nconst attachments = webhookData.body?.attachments || [];\nconst selectedAttachment = attachments[index] || null;\n\n// Definicje rozszerzeń plików\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'mov', 'mpeg', 'mpg', 'webm', 'wmv', 'flv', '3gp', 'avi'];\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\n\n// Klasyfikacja: 0 = unknown, 1 = image, 2 = audio (OpenAI), 3 = video (Gemini)\nlet type_ok = 0;\nlet fileName = null;\n\n// Pobieranie nazwy pliku\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (typeof selectedAttachment === 'object' && selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\n// Logika klasyfikacji\nif (fileName) {\n    const normalized = fileName.toLowerCase(); \n    const ext = normalized.split('.').pop(); // Wyciągnij samo rozszerzenie\n\n    if (ext) { // Sprawdź, czy rozszerzenie istnieje\n        if (IMAGE_EXT.includes(ext)) {\n            type_ok = 1; \n        } else if (AUDIO_EXT.includes(ext)) {\n            type_ok = 2;\n        } else if (VIDEO_EXT.includes(ext)) {\n            type_ok = 3; \n        }\n    }\n}\n\nreturn [\n    {\n        json: {\n            attachment: selectedAttachment,\n            type_ok: type_ok,\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        -768
+      ],
+      "id": "1340edb3-9af9-4ebc-bbf6-3aa5dc2b69ef",
+      "name": "Attachment - chat"
+    },
+    {
+      "parameters": {
+        "from": "MG57b1eeb171ed820e74d29ebc017e22cc",
+        "to": "={{ $json.phone }}",
+        "message": "={{ $('Notification data').first().json.message }}",
+        "options": {
+          "statusCallback": "https://apagroup.app.n8n.cloud/webhook/4732399e-f34f-47dd-9467-2063f222d057"
+        }
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        10208,
+        -32
+      ],
+      "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
+      "name": "Twilio",
+      "credentials": {
+        "twilioApi": {
+          "id": "Q2jIhsSZHhL1CrTL",
+          "name": "Twilio account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Konfiguracja \nKonfiguracja flow odbywa się za pomocą pliku json.\n\nW celu dodania nowego użytkownika do adresatów powiadomień należy go dopisać do listy 'recipients', zawierającej dane adresowe użytkowników. Następnie w celu przypisania użytkownika do powiadomień danej usługi należy jego klucz zawrzeć w liście odbiorców tej usługi. ",
+        "height": 520,
+        "width": 980,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        -48
+      ],
+      "id": "0ee7479a-e7d5-42cc-84b2-36a8e98be79d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
+        "height": 1056,
+        "width": 2528,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -1136
+      ],
+      "id": "864f8887-22b1-4b27-9b30-491fed759845",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 2 - Tworzenie opisu zbiorczego\n\nW ramach tego kroku uruchamiana jest agregacja powstałych opisów do jednego opisu podsumowującego.",
+        "height": 528,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        -608
+      ],
+      "id": "2e200e99-be3e-45d0-b35e-2f5fb9e5ce3e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3 - zgłoszenie Jira (opcjonalne)  \n",
+        "height": 1028,
+        "width": 2648
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5072,
+        -560
+      ],
+      "id": "caadd683-da29-4e1b-a65a-798ac0966085",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3a - Tworzenie zzgłoszenia z załącznikiem",
+        "height": 568,
+        "width": 1784,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5632,
+        -528
+      ],
+      "id": "5a1f01cb-cca8-4889-bbd0-9ed284b6affc",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 5 - Powiadomienie email (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia e-mail o zgłoszeniu w knowshare. ",
+        "height": 476,
+        "width": 300,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        10752,
+        -64
+      ],
+      "id": "429d4073-aa95-4492-9501-f6f169f81e31",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Podział na analizę tekstu i obrazu",
+        "height": 520,
+        "width": 500,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        -48
+      ],
+      "id": "5ad52d80-cca3-4847-aa8f-6b308ad81039",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Webhook",
+        "height": 520,
+        "width": 1508,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -48
+      ],
+      "id": "41ba012f-df46-4f71-9725-c7634069fad3",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3.1 - Tworzenie contentu\n\nW ramach tego kroku na podstawie opisu tworzone są temat zgłoszenia, jego treść, oraz realizowane jest samo zgłoszenie n. ",
+        "height": 1032,
+        "width": 1428,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        -560
+      ],
+      "id": "e168dae0-5d23-4438-81cb-15b3440c47e4",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3139722a-659b-4e66-88f2-b2153ba0c7ac",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3472,
+        176
+      ],
+      "id": "da18ae91-0020-45c1-b1a1-47166bed54c8",
+      "name": "If there are attachments"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        -784
+      ],
+      "id": "37e4369e-0798-46fc-bd51-eee34c284091",
+      "name": "Set index"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "62ec8387-d979-403a-a2cf-455d56bff842",
+              "leftValue": "={{ $json.index }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        -784
+      ],
+      "id": "a5d4670f-058c-451c-8f39-32d136631890",
+      "name": "Check index"
+    },
+    {
+      "parameters": {
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "image"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        -784
+      ],
+      "id": "9e608bc6-7644-432d-b6d7-805a96c3e58a",
+      "name": "Fetch image - chat",
+      "credentials": {
+        "s3": {
+          "id": "smwCdXvghDY8DlJz",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        -784
+      ],
+      "id": "843d79e8-3b6b-435d-91fb-ff16f1cdee9d",
+      "name": "Change mime type - chat"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Funkcja wykrywająca czy tekst zawiera znaki spoza alfabetu łacińskiego\nfunction isNonLatin(text) {\n    // Znaki spoza zakresu łacińskiego\n    const nonLatinRegex = /[^\\u0000-\\u007F\\u00A0-\\u024F]/;\n    return nonLatinRegex.test(text);\n}\n\n// Funkcja konwertująca tekst do GSM-7\nfunction toGSM7(text) {\n    if (!text) return '';\n\n    // 1. Usuń diakrytyki\n    let normalized = text.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n\n    // 2. Mapa zamian\n    const charMap = {\n        '’': \"'\", '‘': \"'\", '“': '\"', '”': '\"', '–': '-', '—': '-',\n        'ß': 'ss', 'Œ': 'OE', 'œ': 'oe', 'Æ': 'AE', 'ae': 'ae',\n        'ł': 'l', 'Ł': 'L', 'Ø': 'O', 'ø': 'o', 'Đ': 'D', 'đ': 'd'\n    };\n\n    normalized = normalized.split('').map(c => charMap[c] || c).join('');\n\n    // 3. Dozwolone znaki GSM-7\n    const gsm7Chars =\n        '@£$¥èéùìòÇ\\nØø\\rÅåΔ_ΦΓΛΩΠΨΣΘΞ ' +\n        \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\" +\n        \"0123456789\" +\n        \"!\\\"#¤%&'()*+,-./:;<=>?¡ÄÖÑÜ§¿äöñü\";\n\n    // 4. Usuń niedozwolone\n    return normalized.split('').filter(c => gsm7Chars.includes(c)).join('');\n}\n\n// Limity SMS\nconst GSM_LIMIT = 160;\nconst UCS2_LIMIT = 70;\nconst ELLIPSIS = \"...\";\nconst ELLIPSIS_LENGTH = ELLIPSIS.length;\n\n\n// Przetwarzanie itemów\nfor (const item of items) {\n    const input = item.json;\n\n    const smsPartText = $('SMS part 1').first().json.sms_firstPart || '';\n    const itemText = input.output?.[0]?.content?.[0]?.text || '';\n\n    const rawMessage = (smsPartText + itemText).trim();\n\n    // WYKRYWANIE ALFABETU\n    const nonLatin = isNonLatin(rawMessage);\n\n    let finalSmsText;\n\n    if (!nonLatin) {\n        // ============================\n        //   TRYB ŁACIŃSKI (GSM-7)\n        // ============================\n        const cleanMessage = toGSM7(rawMessage);\n\n        if (cleanMessage.length > GSM_LIMIT) {\n            finalSmsText =\n                cleanMessage.substring(0, GSM_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n        } else {\n            finalSmsText = cleanMessage;\n        }\n\n    } else {\n        // ============================\n        //  TRYB NIEŁACIŃSKI (UCS-2)\n        // ============================\n\n        if (rawMessage.length > UCS2_LIMIT) {\n            finalSmsText =\n                rawMessage.substring(0, UCS2_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n        } else {\n            finalSmsText = rawMessage;\n        }\n    }\n\n    // Zapis do item.json\n    input.finalSmsText = finalSmsText;\n    input.finalSmsLength = finalSmsText.length;\n}\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8976,
+        16
+      ],
+      "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
+      "name": "SMS Final",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Jesteś systemem do generowania krótkich, zwięzłych komunikatów SMS.\nTwoje JEDYNE zadanie to sumaryzacja, skracanie i łączenie tekstu.\n\nZASADA KLUCZOWA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Nigdy, pod żadnym pozorem, nie tłumacz treści. Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy (nawet jeśli jest to język mieszany, niepoprawny lub zawiera błędy).\n2. **KONTRA POLSKI:** Nie zmieniaj języka na polski, chyba że język wejściowy był polski.\n3. **SKRACANIE:** Połącz oba teksty, skróć je do podanego limitu znaków, zachowując sens.\n4. **FORMAT:** Zwróć tylko finalny tekst SMS. Bez cudzysłowów, wyjaśnień, ani formatowania Markdown."
+            },
+            {
+              "content": "=Tytuł: \"{{ $('Task content').item.json.task_title }}\"\nWiadomość: \"{{ $('Task content').item.json.interpretation }} {{ $('Task content').item.json.recommendation }}\"\n\nLimit znaków: {{ $json.sms_contentLimit }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        8384,
+        32
+      ],
+      "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
+      "name": "Text shortening",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const SMS_LIMIT = 155; //160\n\n// Przetwarzanie każdego elementu w danych\nfor (const item of items) {\n  const input = item.json;\n  \n  // 1. Definiowanie pól\n  const name = $('Webhook').first().json.body.createdBy || '';\n\n\n  // 2. Łączenie pól w format: \"Imię Nazwisko; Tytuł; \" (Z POLSKIMI ZNAKAMI)\n  // Używamy separatorów \"; \" (dwa znaki)\n  const firstPartRaw = `Knowshare: ${name}; `;\n  \n  // 3. Obliczenie DŁUGOŚCI tej części (na podstawie RAW stringu)\n  const firstPartLength = firstPartRaw.length;\n  \n  // 4. Wyznaczenie różnicy (maksymalnego limitu dla Treści)\n  const maxContentLength = SMS_LIMIT - firstPartLength;\n  \n  // Zapewnienie, że limit nie jest ujemny\n  const finalContentLimit = Math.max(0, maxContentLength);\n  \n  // Dodanie nowych zmiennych do obiektu JSON:\n  // - sms_firstPart: sformatowana część z polskimi znakami\n  // - sms_contentLimit: obliczony limit znaków dla treści (dla Chat GPT)\n  input.sms_firstPart = firstPartRaw;\n  input.sms_contentLimit = finalContentLimit;\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8208,
+        32
+      ],
+      "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
+      "name": "SMS part 1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "index",
+              "value": "={{$runIndex}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5936,
+        -224
+      ],
+      "id": "cc5e7cf5-02c7-4a8f-8435-c8237f42a5bd",
+      "name": "Set index - kanban"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook').item.json;\nconst index = $('Set index - kanban').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6112,
+        -224
+      ],
+      "id": "14c7af07-c1f3-45b2-9c72-abd2622859bb",
+      "name": "Attachment - kanban"
+    },
+    {
+      "parameters": {
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "image"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        6304,
+        -224
+      ],
+      "id": "a889f389-770a-4956-a5ee-3d534ef79bca",
+      "name": "Fetch image - kanban",
+      "credentials": {
+        "s3": {
+          "id": "smwCdXvghDY8DlJz",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6496,
+        -224
+      ],
+      "id": "f48ddf57-2bf1-452b-b636-313f23b8cc5d",
+      "name": "Change mime type - kanban"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "fileNames",
+              "value": "={{ $('Webhook').item.json.body.attachments }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6112,
+        -432
+      ],
+      "id": "7c138d14-b74b-476f-91f9-bf84515e1f89",
+      "name": "Set attachments - kanban"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "fileNames",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        6304,
+        -432
+      ],
+      "id": "7aa3582d-88df-4191-a303-d7450ca1d5b8",
+      "name": "Split attachments - kanban"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        6912,
+        -224
+      ],
+      "id": "c47a436d-ea9d-4144-9fe5-bf78c429485f",
+      "name": "Loop over attachments",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        7104,
+        -224
+      ],
+      "id": "ca9ae6c5-5c35-4742-8726-8b174046eb10",
+      "name": "Aggregate attachments - kanban"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Wejście z poprzedniego noda\nconst attachments = $json.data;\n\n// Bez żadnych zmian — jest już w poprawnym formacie NocoDB\nreturn [\n  {\n    attachments\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7264,
+        -224
+      ],
+      "id": "04e471bb-b277-4a9d-b2db-20dab8b2c0d0",
+      "name": "Attachments list"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
+              "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5392,
+        32
+      ],
+      "id": "9e8d2bcc-c4a5-403b-8e6b-a810b6490095",
+      "name": "If there are attachments - kanban"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 3a - Tworzenie zgłoszenia bez załącznika\n",
+        "height": 344,
+        "width": 1784,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5632,
+        64
+      ],
+      "id": "a731a65a-8926-4c19-889c-cd8cb1e4cf7c",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "self"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        8016,
+        32
+      ],
+      "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
+      "name": "Aggregate inputs"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first().json.safe_message || \"\"; \n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim(); \n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Tworzenie nowego pola 'task_description' (podsumowanie)\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 9. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4800,
+        -128
+      ],
+      "id": "938ead6b-2e11-47f5-8e44-5a61a2ec62e6",
+      "name": "Task content",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
+              "leftValue": "={{ $json.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b92055c7-b7ec-469e-967a-8011056a838c",
+              "leftValue": "={{ $json.smsNotification }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        9936,
+        208
+      ],
+      "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
+      "name": "If sms notification enabled"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+              "name": "recipients",
+              "value": "={{ $('Get asset').item.json.data[0].users }}",
+              "type": "array"
+            },
+            {
+              "id": "4df1a078-86b6-4c57-a90e-46715fc7fedb",
+              "name": "message",
+              "value": "={{ $('SMS Final').first().json.finalSmsText }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9184,
+        16
+      ],
+      "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
+      "name": "Notification data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipients",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        9392,
+        16
+      ],
+      "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
+      "name": "Split notification data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        9600,
+        192
+      ],
+      "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
+      "name": "Loop over notification data",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
+              "leftValue": "={{ $('Loop over notification data').item.json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b92055c7-b7ec-469e-967a-8011056a838c",
+              "leftValue": "={{ $('Loop over notification data').item.json.emailNotification }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        10768,
+        224
+      ],
+      "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
+      "name": "If email notification enabled"
+    },
+    {
+      "parameters": {
+        "content": "## Krok 4 - Powiadomienie sms (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia sms o zgłoszeniu w knowshare. ",
+        "height": 476,
+        "width": 300,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        9904,
+        -240
+      ],
+      "id": "60bfb28a-ed1d-449a-8138-e89ba40a1694",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Powiadomienia",
+        "height": 1004,
+        "width": 3324,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7744,
+        -528
+      ],
+      "id": "01577578-35e4-41d3-a0a7-f210861a1fdd",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
+              "leftValue": "={{ $json.data[0].carAsset }}",
+              "rightValue": "notices",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2832,
+        176
+      ],
+      "id": "e705ec63-c8fd-44dd-877d-c833617fa80d",
+      "name": "If it's not a car"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie polecenia tłumaczenia:\n   Polecenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie treści:\n  A. JEŻELI wykryjesz polecenie tłumaczenia w polu message:\n     - Wygeneruj task_title, task_description.interpretation i task_description.recommendation w języku docelowym.\n\n  B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n     - Wygeneruj task_title, task_description.interpretation i task_description.recommendation w oryginalnym języku pola message.\n\n3. Wymagane pola i limity:\n  - task_title: jedno zdanie, maksymalnie 100 znaków.\n  - task_description.interpretation: opis sytuacji na podstawie message + subject + image_description, maksymalnie 300 znaków.\n  - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 300 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON:\n\n[\n  {\n    \"task_title\": \"...\",\n    \"task_description\": {\n      \"interpretation\": \"...\",\n      \"recommendation\": \"...\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny.\n"
+            },
+            {
+              "content": "=subject: {{ $('Safe subject and message').item.json.safe_subject }}\nmessage: {{ $('Safe subject and message').item.json.safe_message }}\nimage_description: {{ $json.content.join(' | ') }}\n\nZwróć wyłącznie JSON w powyższym formacie."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        4176,
+        -112
+      ],
+      "id": "a9322be1-4de9-44a8-a965-a033bd7c4d78",
+      "name": "Create summary",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "nazca4@apagroup.pl",
+        "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+        "subject": "=Nowa wiadomość knowshare",
+        "emailFormat": "text",
+        "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        11040,
+        208
+      ],
+      "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
+      "name": "Send email",
+      "webhookId": "2e63aa1b-5409-47ac-968d-b14d710da16e",
+      "credentials": {
+        "smtp": {
+          "id": "bTsU09ZudpWPlOEp",
+          "name": "SMTP account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobierz dane wejściowe z Webhook\nconst subject = $input.first().json.body.subject || \"\";\nconst message = $input.first().json.body.message || \"\";\n\n// Funkcja do oczyszczania tekstu\nfunction sanitizeTextSafe(text) {\n    if (!text) return \"\";\n\n    // 1. Usuń wszystkie znaki kontrolne ASCII (0-31 i 127)\n    text = text.replace(/[\\x00-\\x1F\\x7F]/g, \"\");\n\n    // 2. Usuń potencjalnie niebezpieczne znaki w JSON lub kodzie\n    text = text.replace(/[`\\\\<>${}[\\]]/g, \"\");\n\n    // 3. Usuń wszystkie cudzysłowy i apostrofy (proste + typograficzne)\n    text = text.replace(/[\"'‘’“”„‚«»]/g, \"\");\n\n    // 4. Usuń nadmiarowe białe znaki (nowa linia, tab, niełamiąca spacja)\n    text = text.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\n    // 5. Zamień wielokrotne spacje na pojedynczą\n    text = text.replace(/\\s{2,}/g, \" \");\n\n    return text;\n}\n\n// Oczyszczone pola\nconst safeSubject = sanitizeTextSafe(subject);\nconst safeMessage = sanitizeTextSafe(message);\n\n// Zwrot danych do workflow\nreturn [{\n    json: {\n        safe_subject: safeSubject,\n        safe_message: safeMessage\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        192
+      ],
+      "id": "bef9cee6-f733-4a46-9d6a-44ab40eecc80",
+      "name": "Safe subject and message"
+    },
+    {
+      "parameters": {
+        "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+        "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+        "binaryPropertyName": "audio"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        -464
+      ],
+      "id": "59b37786-4402-4db5-b2ce-4ed604b5884c",
+      "name": "Download Audio",
+      "credentials": {
+        "s3": {
+          "id": "smwCdXvghDY8DlJz",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (!item.binary?.audio) continue;\n\n  const file = item.binary.audio;\n  if (!file.fileName) continue;\n\n  const name = file.fileName.toLowerCase();\n\n  if (name.endsWith('.mp3')) file.mimeType = 'audio/mpeg';\n  else if (name.endsWith('.wav')) file.mimeType = 'audio/wav';\n  else if (name.endsWith('.m4a')) file.mimeType = 'audio/mp4';\n  else if (name.endsWith('.flac')) file.mimeType = 'audio/flac';\n  else if (name.endsWith('.ogg') || name.endsWith('.oga')) file.mimeType = 'audio/ogg';\n  else if (name.endsWith('.webm')) file.mimeType = 'audio/webm';\n  else if (name.endsWith('.mp4')) file.mimeType = 'audio/mp4';\n  else if (name.endsWith('.mpeg') || name.endsWith('.mpga')) file.mimeType = 'audio/mpeg';\n  else if (name.endsWith('.aac')) file.mimeType = 'audio/aac';\n  else file.mimeType = 'application/octet-stream'; // fallback\n\n}\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2448,
+        -464
+      ],
+      "id": "7bfbe17b-ad7b-4c5e-9a42-afc83582171a",
+      "name": "Change mime type - audio"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "audio",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        -464
+      ],
+      "id": "1bcbfdfd-71ab-4a6e-bf81-7fa416dda54b",
+      "name": "Audio analyze",
+      "credentials": {
+        "openAiApi": {
+          "id": "7r6c9PgveQjC7ygm",
+          "name": "OpenAi project n8n"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "271ca89b-3769-4ebf-bb03-391a60af5ec9",
+              "name": "content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2864,
+        -480
+      ],
+      "id": "a57cd3fa-8e43-4d9b-84f9-a32a7cf3324a",
+      "name": "Prepare audio output"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "194bfdf8-66ea-4568-9c3e-b06727c1a7d1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f6ea07d3-c359-4002-a0a4-215fad595428",
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a6135f05-9ad9-4413-bb95-3dbccdb68618",
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "394c8abb-c9bc-4397-b294-40c1fe1974d2",
+                    "leftValue": "={{ $json.type_ok }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1920,
+        -800
+      ],
+      "id": "28cd8e58-67a8-40a2-a5ab-dd6b7917ed80",
+      "name": "Switch - type selection"
+    },
+    {
+      "parameters": {
+        "fromEmail": "nazca4@apagroup.pl",
+        "toEmail": "marek.rachel@apagroup.pl; grzegorz.bojdo@apagroup.pl",
+        "subject": "=Knowshare - wykryto błąd w workflow",
+        "emailFormat": "text",
+        "text": "=Wykryto błąd w workflow \"Knowshare - nocodb integration\".\n\n{{ $json.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        10752,
+        -432
+      ],
+      "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
+      "name": "Send email1",
+      "webhookId": "f68bf8d9-e4d0-4ed4-ba9a-c67bd3800a1c",
+      "credentials": {
+        "smtp": {
+          "id": "bTsU09ZudpWPlOEp",
+          "name": "SMTP account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allErrors = [];\n\nconst nodes = [\n    'Create Picture Summary - error handling',\n    'Audio analyze - error handling',\n    'Create summary - error handling',\n    'Text shortening - error handling',\n    'Twilio - error handling'\n];\n\nfor (const nodeName of nodes) {\n    try {\n        // Pobranie itemu w poprawny sposób\n        const nodeItem = $node[nodeName]?.json;\n\n        if (!nodeItem) continue;\n\n        const nodeError = nodeItem.errorOpenAI1;\n\n        if (\n            typeof nodeError === 'string' &&\n            nodeError.trim().length > 0\n        ) {\n            allErrors.push(nodeError);\n        }\n\n    } catch (err) {\n        continue;\n    }\n}\n\nreturn [{\n    json: {\n        sendEmail: allErrors.length > 0,\n        body: allErrors.join(\"\\n\\n\")\n    }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10208,
+        -416
+      ],
+      "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
+      "name": "Error raport prepare"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "07c6ac0b-42b3-4c95-8613-2beda3e55d83",
+              "leftValue": "={{ $json.sendEmail }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        10480,
+        -416
+      ],
+      "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Create Picture Summary\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        -768
+      ],
+      "id": "bdf3be25-10e5-42d2-8e5e-f3e0789ff7dd",
+      "name": "Create Picture Summary - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Audio analyze\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3056,
+        -448
+      ],
+      "id": "b40fbadf-276d-4689-8209-baba5482a64a",
+      "name": "Audio analyze - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Create summary\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4560,
+        32
+      ],
+      "id": "16c06347-06b0-4520-9d07-30539f3973e1",
+      "name": "Create summary - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Text shortening\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8752,
+        128
+      ],
+      "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
+      "name": "Text shortening - error handling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+              "name": "errorOpenAI1",
+              "value": "={{ \"Błąd w węźle \\\"Twilio\\\": \" + $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        10432,
+        160
+      ],
+      "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
+      "name": "Twilio - error handling"
+    },
+    {
+      "parameters": {
+        "content": "## Wysłanie e-mail z błędami z wybranych węzłów\nZebranie błędów, przygotowanie treści e-mail i wysłanie",
+        "height": 240,
+        "width": 880,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        9904,
+        -512
+      ],
+      "id": "e63a8159-7718-49e8-8e3c-8e42cad85dad",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "24108748-476b-4243-8dd3-647268254fb9",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        688,
+        192
+      ],
+      "id": "725c3515-fe53-4f52-9d76-b6fe991404a6",
+      "name": "Webhook",
+      "webhookId": "24108748-476b-4243-8dd3-647268254fb9",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "QmXylULo8NVgMnZB",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "={\"assetId\":\"{{ $('Webhook').item.json.body.assetId }}\"} "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2640,
+        176
+      ],
+      "id": "cf65191c-eca6-4cf4-b5f7-37686a7c7289",
+      "name": "Get asset",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f52acffe-ffab-415d-8fb0-a4d3b4a76a53",
+              "leftValue": "={{ $('Webhook').item.json.body.index }}",
+              "rightValue": "notices",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        192
+      ],
+      "id": "998e4f37-6a4c-4804-bffa-ad0edd05874d",
+      "name": "If it is a notice"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nocobase.nazca40.com/api/knowshare",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\":[{\"id\":{{ $('Upload image').first().json.data.id }}}],\n\"reporter\":[{\"id\":{{ $json.id }}}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7824,
+        -224
+      ],
+      "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
+      "name": "Post knowshare",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nocobase.nazca40.com/api/attachments:create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6688,
+        -224
+      ],
+      "id": "d25bc207-3361-4e24-8c6e-51a7d9cf511b",
+      "name": "Upload image",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
+              "leftValue": "={{ $json.nickname }}",
+              "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        7680,
+        -224
+      ],
+      "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
+              "name": "users",
+              "value": "={{ $('Get asset').item.json.data[0].users }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7408,
+        -224
+      ],
+      "id": "f92b7d9e-ac92-480e-ab93-c4c5a50ace70",
+      "name": "Get asset users"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        7552,
+        -224
+      ],
+      "id": "ea1d570c-3a42-4128-a5ab-ddfd7bac6f91",
+      "name": "Split users"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nocobase.nazca40.com/api/knowshare",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.id }}}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6672,
+        176
+      ],
+      "id": "c190f4aa-52ec-433a-9019-ed2433410d68",
+      "name": "Post knowshare - no attachments",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
+              "leftValue": "={{ $json.nickname }}",
+              "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        6528,
+        176
+      ],
+      "id": "2b44d46a-584c-45c6-9fa9-d61a6eca4eed",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
+              "name": "users",
+              "value": "={{ $('Get asset').item.json.data[0].users }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6256,
+        176
+      ],
+      "id": "c75720c6-e49f-4638-9ca5-6b64e5b17122",
+      "name": "Get asset users1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        6400,
+        176
+      ],
+      "id": "2639c494-7cb9-45a0-aa1d-e7a5add6cf44",
+      "name": "Split users1"
+    }
+  ],
+  "connections": {
+    "Create Picture Summary": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Picture Summary - error handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Create summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop parameter - chat": {
+      "main": [
+        [
+          {
+            "node": "Split Out - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out - chat": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items - chat": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - chat": {
+      "main": [
+        [
+          {
+            "node": "Switch - type selection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio": {
+      "main": [
+        [
+          {
+            "node": "If email notification enabled",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Twilio - error handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there are attachments": {
+      "main": [
+        [
+          {
+            "node": "Create summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop parameter - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set index": {
+      "main": [
+        [
+          {
+            "node": "Check index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check index": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Attachment - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch image - chat": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - chat": {
+      "main": [
+        [
+          {
+            "node": "Create Picture Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "assets params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Task content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text shortening": {
+      "main": [
+        [
+          {
+            "node": "SMS Final",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Text shortening - error handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS part 1": {
+      "main": [
+        [
+          {
+            "node": "Text shortening",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS Final": {
+      "main": [
+        [
+          {
+            "node": "Notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set index - kanban": {
+      "main": [
+        [
+          {
+            "node": "Attachment - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment - kanban": {
+      "main": [
+        [
+          {
+            "node": "Fetch image - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch image - kanban": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - kanban": {
+      "main": [
+        [
+          {
+            "node": "Upload image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set attachments - kanban": {
+      "main": [
+        [
+          {
+            "node": "Split attachments - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split attachments - kanban": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over attachments": {
+      "main": [
+        [
+          {
+            "node": "Aggregate attachments - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set index - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate attachments - kanban": {
+      "main": [
+        [
+          {
+            "node": "Attachments list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachments list": {
+      "main": [
+        [
+          {
+            "node": "Get asset users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If there are attachments - kanban": {
+      "main": [
+        [
+          {
+            "node": "Set attachments - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get asset users1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate inputs": {
+      "main": [
+        [
+          {
+            "node": "SMS part 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task content": {
+      "main": [
+        [
+          {
+            "node": "If there are attachments - kanban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If sms notification enabled": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If email notification enabled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notification data": {
+      "main": [
+        [
+          {
+            "node": "Split notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split notification data": {
+      "main": [
+        [
+          {
+            "node": "Loop over notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over notification data": {
+      "main": [
+        [
+          {
+            "node": "Error raport prepare",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If sms notification enabled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If email notification enabled": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop over notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If it's not a car": {
+      "main": [
+        [
+          {
+            "node": "If there are attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create summary": {
+      "main": [
+        [
+          {
+            "node": "Task content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create summary - error handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Loop over notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safe subject and message": {
+      "main": [
+        [
+          {
+            "node": "If it is a notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio": {
+      "main": [
+        [
+          {
+            "node": "Change mime type - audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change mime type - audio": {
+      "main": [
+        [
+          {
+            "node": "Audio analyze",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio analyze": {
+      "main": [
+        [
+          {
+            "node": "Prepare audio output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audio analyze - error handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - type selection": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch image - chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare audio output": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error raport prepare": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Picture Summary - error handling": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio analyze - error handling": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items - chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create summary - error handling": {
+      "main": [
+        [
+          {
+            "node": "Task content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text shortening - error handling": {
+      "main": [
+        [
+          {
+            "node": "SMS Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio - error handling": {
+      "main": [
+        [
+          {
+            "node": "If email notification enabled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Safe subject and message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get asset": {
+      "main": [
+        [
+          {
+            "node": "If it's not a car",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If it is a notice": {
+      "main": [
+        [
+          {
+            "node": "Get asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Post knowshare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get asset users": {
+      "main": [
+        [
+          {
+            "node": "Split users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split users": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post knowshare": {
+      "main": [
+        [
+          {
+            "node": "Aggregate inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post knowshare - no attachments": {
+      "main": [
+        [
+          {
+            "node": "Aggregate inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get asset users1": {
+      "main": [
+        [
+          {
+            "node": "Split users1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split users1": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Post knowshare - no attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "apagroup.app.n8n.cloud",
+            "content-length": "381",
+            "accept-encoding": "gzip, br",
+            "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "51.83.252.104",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PL",
+            "cf-ray": "9c47531f37f56e97-WAW",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "date": "Tue, 27 Jan 2026 09:46:44 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.198.34",
+            "x-forwarded-host": "apagroup.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-jgqnt",
+            "x-is-trusted": "yes",
+            "x-real-ip": "51.83.252.104"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "index": "notices",
+            "createdAt": "2026-01-27T09:46:44.613841Z",
+            "assetId": "08de5d80-810e-4e7e-8399-c21690b71259",
+            "subject": "Test awaria",
+            "message": "Test 2v",
+            "type": 0,
+            "createdBy": "Grzegorz Bojdo",
+            "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
+            "attachments": [
+              "dceea1de-ea3a-4257-9ea6-71d8187475eb1327467569862980007.jpg",
+              "ea04c528-d854-437f-8a74-f1bffe2f7bf9449758796712864668.jpg"
+            ]
+          },
+          "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "a7bdd088-abea-41c6-9cb5-23befc1f2de8",
+  "activeVersionId": "a7bdd088-abea-41c6-9cb5-23befc1f2de8",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-01-23T12:27:18.184Z",
+      "createdAt": "2026-01-23T12:27:18.184Z",
+      "role": "workflow:owner",
+      "workflowId": "EGw60IW0w70woWR5",
+      "projectId": "98BhLNTRDdyyDRlO"
+    },
+    {
+      "updatedAt": "2026-01-27T10:27:03.032Z",
+      "createdAt": "2026-01-27T10:27:03.032Z",
+      "role": "workflow:editor",
+      "workflowId": "EGw60IW0w70woWR5",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-01-27T10:42:56.650Z",
+    "createdAt": "2026-01-27T10:42:56.650Z",
+    "versionId": "a7bdd088-abea-41c6-9cb5-23befc1f2de8",
+    "workflowId": "EGw60IW0w70woWR5",
+    "nodes": [
+      {
+        "parameters": {
+          "resource": "image",
+          "operation": "analyze",
+          "modelId": {
+            "__rl": true,
+            "value": "chatgpt-4o-latest",
+            "mode": "list",
+            "cachedResultName": "CHATGPT-4O-LATEST"
+          },
+          "text": "=Jesteś ekspertem technicznym i specjalistą od analizy obrazów.\n\nTwoim JEDYNYM ZADANIEM jest wygenerowanie opisu załączonego obrazu.\n\n1. Opis Treści: Wygeneruj **krótki, treściwy i techniczny opis** zawartości zdjęcia w kontekście problemu.\n2. FORMAT: Zwróć **WYŁĄCZNIE SAM TEKST OPISU**. ZABRONIONE jest dodawanie wstępów, tytułów, wyjaśnień, nowych linii, formatowania (Markdown), **podwójnych cudzysłowów (\")**, ani żadnych innych znaków, które mogłyby utrudnić zapis w polu JSON. Tekst musi być pojedynczym ciągiem znaków.",
+          "inputType": "base64",
+          "binaryPropertyName": "image",
+          "options": {
+            "detail": "auto",
+            "maxTokens": 1000
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.8,
+        "position": [
+          2672,
+          -784
+        ],
+        "id": "bd365d05-81fe-4ec7-988e-303cbb3be07d",
+        "name": "Create Picture Summary",
+        "retryOnFail": false,
+        "maxTries": 2,
+        "credentials": {
+          "openAiApi": {
+            "id": "7r6c9PgveQjC7ygm",
+            "name": "OpenAi project n8n"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "fieldsToAggregate": {
+            "fieldToAggregate": [
+              {
+                "fieldToAggregate": "content"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          3440,
+          -336
+        ],
+        "id": "79a79952-2c89-4f32-8fbb-dededc515fd2",
+        "name": "Aggregate"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"fileNames\":{{ $('Webhook').item.json.body.attachments }}\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          624,
+          -912
+        ],
+        "id": "4748f9fa-aa08-4084-92d5-3a4de59e67ce",
+        "name": "Loop parameter - chat"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "fileNames",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          784,
+          -912
+        ],
+        "id": "6f8c905f-f120-4dc1-a49a-4b54ce58b6a1",
+        "name": "Split Out - chat"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          976,
+          -912
+        ],
+        "id": "02f79944-6d81-485a-9c38-54e594cb4d86",
+        "name": "Loop Over Items - chat",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "jsCode": "// Bezpieczne pobieranie danych z poprzednich węzłów.\nconst webhookData = $('Webhook').first().json || {};\nconst indexData = $('Set index').first().json || {};\n\n// Zabezpieczony indeks załącznika\nconst index = Number(indexData.index) || 0; \n\n// Tablica załączników\nconst attachments = webhookData.body?.attachments || [];\nconst selectedAttachment = attachments[index] || null;\n\n// Definicje rozszerzeń plików\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'mov', 'mpeg', 'mpg', 'webm', 'wmv', 'flv', '3gp', 'avi'];\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\n\n// Klasyfikacja: 0 = unknown, 1 = image, 2 = audio (OpenAI), 3 = video (Gemini)\nlet type_ok = 0;\nlet fileName = null;\n\n// Pobieranie nazwy pliku\nif (typeof selectedAttachment === 'string') {\n    fileName = selectedAttachment;\n} else if (typeof selectedAttachment === 'object' && selectedAttachment?.filename) {\n    fileName = selectedAttachment.filename;\n}\n\n// Logika klasyfikacji\nif (fileName) {\n    const normalized = fileName.toLowerCase(); \n    const ext = normalized.split('.').pop(); // Wyciągnij samo rozszerzenie\n\n    if (ext) { // Sprawdź, czy rozszerzenie istnieje\n        if (IMAGE_EXT.includes(ext)) {\n            type_ok = 1; \n        } else if (AUDIO_EXT.includes(ext)) {\n            type_ok = 2;\n        } else if (VIDEO_EXT.includes(ext)) {\n            type_ok = 3; \n        }\n    }\n}\n\nreturn [\n    {\n        json: {\n            attachment: selectedAttachment,\n            type_ok: type_ok,\n        }\n    }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1680,
+          -768
+        ],
+        "id": "1340edb3-9af9-4ebc-bbf6-3aa5dc2b69ef",
+        "name": "Attachment - chat"
+      },
+      {
+        "parameters": {
+          "from": "MG57b1eeb171ed820e74d29ebc017e22cc",
+          "to": "={{ $json.phone }}",
+          "message": "={{ $('Notification data').first().json.message }}",
+          "options": {
+            "statusCallback": "https://apagroup.app.n8n.cloud/webhook/4732399e-f34f-47dd-9467-2063f222d057"
+          }
+        },
+        "type": "n8n-nodes-base.twilio",
+        "typeVersion": 1,
+        "position": [
+          10208,
+          -32
+        ],
+        "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
+        "name": "Twilio",
+        "credentials": {
+          "twilioApi": {
+            "id": "Q2jIhsSZHhL1CrTL",
+            "name": "Twilio account"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "content": "## Konfiguracja \nKonfiguracja flow odbywa się za pomocą pliku json.\n\nW celu dodania nowego użytkownika do adresatów powiadomień należy go dopisać do listy 'recipients', zawierającej dane adresowe użytkowników. Następnie w celu przypisania użytkownika do powiadomień danej usługi należy jego klucz zawrzeć w liście odbiorców tej usługi. ",
+          "height": 520,
+          "width": 980,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2048,
+          -48
+        ],
+        "id": "0ee7479a-e7d5-42cc-84b2-36a8e98be79d",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 1 - Analiza obrazu\n\nW ramach tego kroku urachamiana jest pętla analizująca obrazy załączone w wiadomości knowshare. Pętla ograniczona jest obecnie do 2 iteracji. Jako wyjście przekazywane są opisy załączników.",
+          "height": 1056,
+          "width": 2528,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          496,
+          -1136
+        ],
+        "id": "864f8887-22b1-4b27-9b30-491fed759845",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 2 - Tworzenie opisu zbiorczego\n\nW ramach tego kroku uruchamiana jest agregacja powstałych opisów do jednego opisu podsumowującego.",
+          "height": 528,
+          "width": 500,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3056,
+          -608
+        ],
+        "id": "2e200e99-be3e-45d0-b35e-2f5fb9e5ce3e",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 3 - zgłoszenie Jira (opcjonalne)  \n",
+          "height": 1028,
+          "width": 2648
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          5072,
+          -560
+        ],
+        "id": "caadd683-da29-4e1b-a65a-798ac0966085",
+        "name": "Sticky Note3"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 3a - Tworzenie zzgłoszenia z załącznikiem",
+          "height": 568,
+          "width": 1784,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          5632,
+          -528
+        ],
+        "id": "5a1f01cb-cca8-4889-bbd0-9ed284b6affc",
+        "name": "Sticky Note7"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 5 - Powiadomienie email (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia e-mail o zgłoszeniu w knowshare. ",
+          "height": 476,
+          "width": 300,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          10752,
+          -64
+        ],
+        "id": "429d4073-aa95-4492-9501-f6f169f81e31",
+        "name": "Sticky Note9"
+      },
+      {
+        "parameters": {
+          "content": "## Podział na analizę tekstu i obrazu",
+          "height": 520,
+          "width": 500,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3056,
+          -48
+        ],
+        "id": "5ad52d80-cca3-4847-aa8f-6b308ad81039",
+        "name": "Sticky Note12"
+      },
+      {
+        "parameters": {
+          "content": "## Webhook",
+          "height": 520,
+          "width": 1508,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          496,
+          -48
+        ],
+        "id": "41ba012f-df46-4f71-9725-c7634069fad3",
+        "name": "Sticky Note13"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 3.1 - Tworzenie contentu\n\nW ramach tego kroku na podstawie opisu tworzone są temat zgłoszenia, jego treść, oraz realizowane jest samo zgłoszenie n. ",
+          "height": 1032,
+          "width": 1428,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3600,
+          -560
+        ],
+        "id": "e168dae0-5d23-4438-81cb-15b3440c47e4",
+        "name": "Sticky Note15"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
+                "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "array",
+                  "operation": "empty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "3139722a-659b-4e66-88f2-b2153ba0c7ac",
+                "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "array",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "or"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          3472,
+          176
+        ],
+        "id": "da18ae91-0020-45c1-b1a1-47166bed54c8",
+        "name": "If there are attachments"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+                "name": "index",
+                "value": "={{$runIndex}}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1312,
+          -784
+        ],
+        "id": "37e4369e-0798-46fc-bd51-eee34c284091",
+        "name": "Set index"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "62ec8387-d979-403a-a2cf-455d56bff842",
+                "leftValue": "={{ $json.index }}",
+                "rightValue": 2,
+                "operator": {
+                  "type": "number",
+                  "operation": "gte"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1456,
+          -784
+        ],
+        "id": "a5d4670f-058c-451c-8f39-32d136631890",
+        "name": "Check index"
+      },
+      {
+        "parameters": {
+          "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+          "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+          "binaryPropertyName": "image"
+        },
+        "type": "n8n-nodes-base.s3",
+        "typeVersion": 1,
+        "position": [
+          2256,
+          -784
+        ],
+        "id": "9e608bc6-7644-432d-b6d7-805a96c3e58a",
+        "name": "Fetch image - chat",
+        "credentials": {
+          "s3": {
+            "id": "smwCdXvghDY8DlJz",
+            "name": "S3 account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2480,
+          -784
+        ],
+        "id": "843d79e8-3b6b-435d-91fb-ff16f1cdee9d",
+        "name": "Change mime type - chat"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Funkcja wykrywająca czy tekst zawiera znaki spoza alfabetu łacińskiego\nfunction isNonLatin(text) {\n    // Znaki spoza zakresu łacińskiego\n    const nonLatinRegex = /[^\\u0000-\\u007F\\u00A0-\\u024F]/;\n    return nonLatinRegex.test(text);\n}\n\n// Funkcja konwertująca tekst do GSM-7\nfunction toGSM7(text) {\n    if (!text) return '';\n\n    // 1. Usuń diakrytyki\n    let normalized = text.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n\n    // 2. Mapa zamian\n    const charMap = {\n        '’': \"'\", '‘': \"'\", '“': '\"', '”': '\"', '–': '-', '—': '-',\n        'ß': 'ss', 'Œ': 'OE', 'œ': 'oe', 'Æ': 'AE', 'ae': 'ae',\n        'ł': 'l', 'Ł': 'L', 'Ø': 'O', 'ø': 'o', 'Đ': 'D', 'đ': 'd'\n    };\n\n    normalized = normalized.split('').map(c => charMap[c] || c).join('');\n\n    // 3. Dozwolone znaki GSM-7\n    const gsm7Chars =\n        '@£$¥èéùìòÇ\\nØø\\rÅåΔ_ΦΓΛΩΠΨΣΘΞ ' +\n        \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\" +\n        \"0123456789\" +\n        \"!\\\"#¤%&'()*+,-./:;<=>?¡ÄÖÑÜ§¿äöñü\";\n\n    // 4. Usuń niedozwolone\n    return normalized.split('').filter(c => gsm7Chars.includes(c)).join('');\n}\n\n// Limity SMS\nconst GSM_LIMIT = 160;\nconst UCS2_LIMIT = 70;\nconst ELLIPSIS = \"...\";\nconst ELLIPSIS_LENGTH = ELLIPSIS.length;\n\n\n// Przetwarzanie itemów\nfor (const item of items) {\n    const input = item.json;\n\n    const smsPartText = $('SMS part 1').first().json.sms_firstPart || '';\n    const itemText = input.output?.[0]?.content?.[0]?.text || '';\n\n    const rawMessage = (smsPartText + itemText).trim();\n\n    // WYKRYWANIE ALFABETU\n    const nonLatin = isNonLatin(rawMessage);\n\n    let finalSmsText;\n\n    if (!nonLatin) {\n        // ============================\n        //   TRYB ŁACIŃSKI (GSM-7)\n        // ============================\n        const cleanMessage = toGSM7(rawMessage);\n\n        if (cleanMessage.length > GSM_LIMIT) {\n            finalSmsText =\n                cleanMessage.substring(0, GSM_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n        } else {\n            finalSmsText = cleanMessage;\n        }\n\n    } else {\n        // ============================\n        //  TRYB NIEŁACIŃSKI (UCS-2)\n        // ============================\n\n        if (rawMessage.length > UCS2_LIMIT) {\n            finalSmsText =\n                rawMessage.substring(0, UCS2_LIMIT - ELLIPSIS_LENGTH) + ELLIPSIS;\n        } else {\n            finalSmsText = rawMessage;\n        }\n    }\n\n    // Zapis do item.json\n    input.finalSmsText = finalSmsText;\n    input.finalSmsLength = finalSmsText.length;\n}\n\nreturn items;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8976,
+          16
+        ],
+        "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
+        "name": "SMS Final",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4O-MINI"
+          },
+          "responses": {
+            "values": [
+              {
+                "role": "system",
+                "content": "=Jesteś systemem do generowania krótkich, zwięzłych komunikatów SMS.\nTwoje JEDYNE zadanie to sumaryzacja, skracanie i łączenie tekstu.\n\nZASADA KLUCZOWA (NON-NEGOTIABLE):\n1. **ZAKAZ TŁUMACZENIA:** Nigdy, pod żadnym pozorem, nie tłumacz treści. Musisz wykryć i ZACHOWAĆ oryginalny język wejściowy (nawet jeśli jest to język mieszany, niepoprawny lub zawiera błędy).\n2. **KONTRA POLSKI:** Nie zmieniaj języka na polski, chyba że język wejściowy był polski.\n3. **SKRACANIE:** Połącz oba teksty, skróć je do podanego limitu znaków, zachowując sens.\n4. **FORMAT:** Zwróć tylko finalny tekst SMS. Bez cudzysłowów, wyjaśnień, ani formatowania Markdown."
+              },
+              {
+                "content": "=Tytuł: \"{{ $('Task content').item.json.task_title }}\"\nWiadomość: \"{{ $('Task content').item.json.interpretation }} {{ $('Task content').item.json.recommendation }}\"\n\nLimit znaków: {{ $json.sms_contentLimit }}"
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2,
+        "position": [
+          8384,
+          32
+        ],
+        "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
+        "name": "Text shortening",
+        "credentials": {
+          "openAiApi": {
+            "id": "7r6c9PgveQjC7ygm",
+            "name": "OpenAi project n8n"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const SMS_LIMIT = 155; //160\n\n// Przetwarzanie każdego elementu w danych\nfor (const item of items) {\n  const input = item.json;\n  \n  // 1. Definiowanie pól\n  const name = $('Webhook').first().json.body.createdBy || '';\n\n\n  // 2. Łączenie pól w format: \"Imię Nazwisko; Tytuł; \" (Z POLSKIMI ZNAKAMI)\n  // Używamy separatorów \"; \" (dwa znaki)\n  const firstPartRaw = `Knowshare: ${name}; `;\n  \n  // 3. Obliczenie DŁUGOŚCI tej części (na podstawie RAW stringu)\n  const firstPartLength = firstPartRaw.length;\n  \n  // 4. Wyznaczenie różnicy (maksymalnego limitu dla Treści)\n  const maxContentLength = SMS_LIMIT - firstPartLength;\n  \n  // Zapewnienie, że limit nie jest ujemny\n  const finalContentLimit = Math.max(0, maxContentLength);\n  \n  // Dodanie nowych zmiennych do obiektu JSON:\n  // - sms_firstPart: sformatowana część z polskimi znakami\n  // - sms_contentLimit: obliczony limit znaków dla treści (dla Chat GPT)\n  input.sms_firstPart = firstPartRaw;\n  input.sms_contentLimit = finalContentLimit;\n}\n\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8208,
+          32
+        ],
+        "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
+        "name": "SMS part 1",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+                "name": "index",
+                "value": "={{$runIndex}}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          5936,
+          -224
+        ],
+        "id": "cc5e7cf5-02c7-4a8f-8435-c8237f42a5bd",
+        "name": "Set index - kanban"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Pobierz dane z node Webhook i node Set index - jira\nconst webhook = $('Webhook').item.json;\nconst index = $('Set index - kanban').item.json.index;\n\n// Wyciągnij tablicę attachments z Webhook body\nconst attachments = webhook?.body?.attachments || [];\n\n// Jeśli index jest poprawny – wybierz odpowiedni załącznik\nconst selectedAttachment = attachments[index] || null;\n\nreturn [\n  {\n    json: {\n      attachment: selectedAttachment\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          6112,
+          -224
+        ],
+        "id": "14c7af07-c1f3-45b2-9c72-abd2622859bb",
+        "name": "Attachment - kanban"
+      },
+      {
+        "parameters": {
+          "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+          "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+          "binaryPropertyName": "image"
+        },
+        "type": "n8n-nodes-base.s3",
+        "typeVersion": 1,
+        "position": [
+          6304,
+          -224
+        ],
+        "id": "a889f389-770a-4956-a5ee-3d534ef79bca",
+        "name": "Fetch image - kanban",
+        "credentials": {
+          "s3": {
+            "id": "smwCdXvghDY8DlJz",
+            "name": "S3 account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "for (const item of items) {\n  if (item.binary && item.binary.image) {\n    item.binary.image.mimeType = 'image/jpeg';\n  }\n}\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          6496,
+          -224
+        ],
+        "id": "f48ddf57-2bf1-452b-b636-313f23b8cc5d",
+        "name": "Change mime type - kanban"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+                "name": "fileNames",
+                "value": "={{ $('Webhook').item.json.body.attachments }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          6112,
+          -432
+        ],
+        "id": "7c138d14-b74b-476f-91f9-bf84515e1f89",
+        "name": "Set attachments - kanban"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "fileNames",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          6304,
+          -432
+        ],
+        "id": "7aa3582d-88df-4191-a303-d7450ca1d5b8",
+        "name": "Split attachments - kanban"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          6912,
+          -224
+        ],
+        "id": "c47a436d-ea9d-4144-9fe5-bf78c429485f",
+        "name": "Loop over attachments",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          7104,
+          -224
+        ],
+        "id": "ca9ae6c5-5c35-4742-8726-8b174046eb10",
+        "name": "Aggregate attachments - kanban"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Wejście z poprzedniego noda\nconst attachments = $json.data;\n\n// Bez żadnych zmian — jest już w poprawnym formacie NocoDB\nreturn [\n  {\n    attachments\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7264,
+          -224
+        ],
+        "id": "04e471bb-b277-4a9d-b2db-20dab8b2c0d0",
+        "name": "Attachments list"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "bf08c136-8231-40c2-adad-bb5ced48812e",
+                "leftValue": "={{ $('Webhook').item.json.body.attachments }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "array",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          5392,
+          32
+        ],
+        "id": "9e8d2bcc-c4a5-403b-8e6b-a810b6490095",
+        "name": "If there are attachments - kanban"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 3a - Tworzenie zgłoszenia bez załącznika\n",
+          "height": 344,
+          "width": 1784,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          5632,
+          64
+        ],
+        "id": "a731a65a-8926-4c19-889c-cd8cb1e4cf7c",
+        "name": "Sticky Note8"
+      },
+      {
+        "parameters": {
+          "fieldsToAggregate": {
+            "fieldToAggregate": [
+              {
+                "fieldToAggregate": "self"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          8016,
+          32
+        ],
+        "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
+        "name": "Aggregate inputs"
+      },
+      {
+        "parameters": {
+          "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first().json.safe_message || \"\"; \n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim(); \n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Tworzenie nowego pola 'task_description' (podsumowanie)\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 9. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription\n    }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4800,
+          -128
+        ],
+        "id": "938ead6b-2e11-47f5-8e44-5a61a2ec62e6",
+        "name": "Task content",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
+                "leftValue": "={{ $json.phone }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "b92055c7-b7ec-469e-967a-8011056a838c",
+                "leftValue": "={{ $json.smsNotification }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          9936,
+          208
+        ],
+        "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
+        "name": "If sms notification enabled"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
+                "name": "recipients",
+                "value": "={{ $('Get asset').item.json.data[0].users }}",
+                "type": "array"
+              },
+              {
+                "id": "4df1a078-86b6-4c57-a90e-46715fc7fedb",
+                "name": "message",
+                "value": "={{ $('SMS Final').first().json.finalSmsText }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          9184,
+          16
+        ],
+        "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
+        "name": "Notification data"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "recipients",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          9392,
+          16
+        ],
+        "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
+        "name": "Split notification data"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          9600,
+          192
+        ],
+        "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
+        "name": "Loop over notification data",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
+                "leftValue": "={{ $('Loop over notification data').item.json.email }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "b92055c7-b7ec-469e-967a-8011056a838c",
+                "leftValue": "={{ $('Loop over notification data').item.json.emailNotification }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          10768,
+          224
+        ],
+        "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
+        "name": "If email notification enabled"
+      },
+      {
+        "parameters": {
+          "content": "## Krok 4 - Powiadomienie sms (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia sms o zgłoszeniu w knowshare. ",
+          "height": 476,
+          "width": 300,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          9904,
+          -240
+        ],
+        "id": "60bfb28a-ed1d-449a-8138-e89ba40a1694",
+        "name": "Sticky Note11"
+      },
+      {
+        "parameters": {
+          "content": "## Powiadomienia",
+          "height": 1004,
+          "width": 3324,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          7744,
+          -528
+        ],
+        "id": "01577578-35e4-41d3-a0a7-f210861a1fdd",
+        "name": "Sticky Note14"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
+                "leftValue": "={{ $json.data[0].carAsset }}",
+                "rightValue": "notices",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "false",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2832,
+          176
+        ],
+        "id": "e705ec63-c8fd-44dd-877d-c833617fa80d",
+        "name": "If it's not a car"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o",
+            "mode": "list",
+            "cachedResultName": "GPT-4O"
+          },
+          "responses": {
+            "values": [
+              {
+                "role": "system",
+                "content": "=Jesteś modułem AI generującym tytuły i opisy zgłoszeń (Trello/Jira).\n\nWejście:\n- message: oryginalna treść zgłoszenia\n- subject: temat zgłoszenia\n- image_description: opis obrazu (opcjonalny)\n\nZasady Generowania Treści:\n1. Wykrywanie polecenia tłumaczenia:\n   Polecenia mogą zawierać słowa/zwroty: \"przetłumacz\", \"przetłumacz na\", \"translate\", \"translate to\", \"zamień język\", \"zmień język\", \"przełóż na\", \"na język\", \"translate into\".\n\n2. Generowanie treści:\n  A. JEŻELI wykryjesz polecenie tłumaczenia w polu message:\n     - Wygeneruj task_title, task_description.interpretation i task_description.recommendation w języku docelowym.\n\n  B. JEŻELI NIE wykryjesz polecenia tłumaczenia:\n     - Wygeneruj task_title, task_description.interpretation i task_description.recommendation w oryginalnym języku pola message.\n\n3. Wymagane pola i limity:\n  - task_title: jedno zdanie, maksymalnie 100 znaków.\n  - task_description.interpretation: opis sytuacji na podstawie message + subject + image_description, maksymalnie 300 znaków.\n  - task_description.recommendation: jedna konkretna rekomendacja, maksymalnie 300 znaków.\n\n4. Zawsze zwracaj wynik wyłącznie w formacie JSON:\n\n[\n  {\n    \"task_title\": \"...\",\n    \"task_description\": {\n      \"interpretation\": \"...\",\n      \"recommendation\": \"...\"\n    }\n  }\n]\n\n5. Nie dodawaj nowych linii ani dodatkowego tekstu. JSON musi być poprawny i bezpieczny.\n"
+              },
+              {
+                "content": "=subject: {{ $('Safe subject and message').item.json.safe_subject }}\nmessage: {{ $('Safe subject and message').item.json.safe_message }}\nimage_description: {{ $json.content.join(' | ') }}\n\nZwróć wyłącznie JSON w powyższym formacie."
+              }
+            ]
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2,
+        "position": [
+          4176,
+          -112
+        ],
+        "id": "a9322be1-4de9-44a8-a965-a033bd7c4d78",
+        "name": "Create summary",
+        "credentials": {
+          "openAiApi": {
+            "id": "7r6c9PgveQjC7ygm",
+            "name": "OpenAi project n8n"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "fromEmail": "nazca4@apagroup.pl",
+          "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+          "subject": "=Nowa wiadomość knowshare",
+          "emailFormat": "text",
+          "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          11040,
+          208
+        ],
+        "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
+        "name": "Send email",
+        "webhookId": "2e63aa1b-5409-47ac-968d-b14d710da16e",
+        "credentials": {
+          "smtp": {
+            "id": "bTsU09ZudpWPlOEp",
+            "name": "SMTP account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Pobierz dane wejściowe z Webhook\nconst subject = $input.first().json.body.subject || \"\";\nconst message = $input.first().json.body.message || \"\";\n\n// Funkcja do oczyszczania tekstu\nfunction sanitizeTextSafe(text) {\n    if (!text) return \"\";\n\n    // 1. Usuń wszystkie znaki kontrolne ASCII (0-31 i 127)\n    text = text.replace(/[\\x00-\\x1F\\x7F]/g, \"\");\n\n    // 2. Usuń potencjalnie niebezpieczne znaki w JSON lub kodzie\n    text = text.replace(/[`\\\\<>${}[\\]]/g, \"\");\n\n    // 3. Usuń wszystkie cudzysłowy i apostrofy (proste + typograficzne)\n    text = text.replace(/[\"'‘’“”„‚«»]/g, \"\");\n\n    // 4. Usuń nadmiarowe białe znaki (nowa linia, tab, niełamiąca spacja)\n    text = text.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\n    // 5. Zamień wielokrotne spacje na pojedynczą\n    text = text.replace(/\\s{2,}/g, \" \");\n\n    return text;\n}\n\n// Oczyszczone pola\nconst safeSubject = sanitizeTextSafe(subject);\nconst safeMessage = sanitizeTextSafe(message);\n\n// Zwrot danych do workflow\nreturn [{\n    json: {\n        safe_subject: safeSubject,\n        safe_message: safeMessage\n    }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1008,
+          192
+        ],
+        "id": "bef9cee6-f733-4a46-9d6a-44ab40eecc80",
+        "name": "Safe subject and message"
+      },
+      {
+        "parameters": {
+          "bucketName": "={{ $('Webhook').item.json.body.tenantId }}",
+          "fileKey": "=cmms/{{ $('Webhook').item.json.body.assetId }}/{{ $json.attachment }}",
+          "binaryPropertyName": "audio"
+        },
+        "type": "n8n-nodes-base.s3",
+        "typeVersion": 1,
+        "position": [
+          2256,
+          -464
+        ],
+        "id": "59b37786-4402-4db5-b2ce-4ed604b5884c",
+        "name": "Download Audio",
+        "credentials": {
+          "s3": {
+            "id": "smwCdXvghDY8DlJz",
+            "name": "S3 account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "for (const item of items) {\n  if (!item.binary?.audio) continue;\n\n  const file = item.binary.audio;\n  if (!file.fileName) continue;\n\n  const name = file.fileName.toLowerCase();\n\n  if (name.endsWith('.mp3')) file.mimeType = 'audio/mpeg';\n  else if (name.endsWith('.wav')) file.mimeType = 'audio/wav';\n  else if (name.endsWith('.m4a')) file.mimeType = 'audio/mp4';\n  else if (name.endsWith('.flac')) file.mimeType = 'audio/flac';\n  else if (name.endsWith('.ogg') || name.endsWith('.oga')) file.mimeType = 'audio/ogg';\n  else if (name.endsWith('.webm')) file.mimeType = 'audio/webm';\n  else if (name.endsWith('.mp4')) file.mimeType = 'audio/mp4';\n  else if (name.endsWith('.mpeg') || name.endsWith('.mpga')) file.mimeType = 'audio/mpeg';\n  else if (name.endsWith('.aac')) file.mimeType = 'audio/aac';\n  else file.mimeType = 'application/octet-stream'; // fallback\n\n}\n\nreturn items;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2448,
+          -464
+        ],
+        "id": "7bfbe17b-ad7b-4c5e-9a42-afc83582171a",
+        "name": "Change mime type - audio"
+      },
+      {
+        "parameters": {
+          "resource": "audio",
+          "operation": "transcribe",
+          "binaryPropertyName": "audio",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2,
+        "position": [
+          2640,
+          -464
+        ],
+        "id": "1bcbfdfd-71ab-4a6e-bf81-7fa416dda54b",
+        "name": "Audio analyze",
+        "credentials": {
+          "openAiApi": {
+            "id": "7r6c9PgveQjC7ygm",
+            "name": "OpenAi project n8n"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "271ca89b-3769-4ebf-bb03-391a60af5ec9",
+                "name": "content",
+                "value": "={{ $json.text }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2864,
+          -480
+        ],
+        "id": "a57cd3fa-8e43-4d9b-84f9-a32a7cf3324a",
+        "name": "Prepare audio output"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.type_ok }}",
+                      "rightValue": 0,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      },
+                      "id": "194bfdf8-66ea-4568-9c3e-b06727c1a7d1"
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "f6ea07d3-c359-4002-a0a4-215fad595428",
+                      "leftValue": "={{ $json.type_ok }}",
+                      "rightValue": 1,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "a6135f05-9ad9-4413-bb95-3dbccdb68618",
+                      "leftValue": "={{ $json.type_ok }}",
+                      "rightValue": 2,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "394c8abb-c9bc-4397-b294-40c1fe1974d2",
+                      "leftValue": "={{ $json.type_ok }}",
+                      "rightValue": 3,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.3,
+        "position": [
+          1920,
+          -800
+        ],
+        "id": "28cd8e58-67a8-40a2-a5ab-dd6b7917ed80",
+        "name": "Switch - type selection"
+      },
+      {
+        "parameters": {
+          "fromEmail": "nazca4@apagroup.pl",
+          "toEmail": "marek.rachel@apagroup.pl; grzegorz.bojdo@apagroup.pl",
+          "subject": "=Knowshare - wykryto błąd w workflow",
+          "emailFormat": "text",
+          "text": "=Wykryto błąd w workflow \"Knowshare - nocodb integration\".\n\n{{ $json.body }}",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          10752,
+          -432
+        ],
+        "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
+        "name": "Send email1",
+        "webhookId": "f68bf8d9-e4d0-4ed4-ba9a-c67bd3800a1c",
+        "credentials": {
+          "smtp": {
+            "id": "bTsU09ZudpWPlOEp",
+            "name": "SMTP account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const allErrors = [];\n\nconst nodes = [\n    'Create Picture Summary - error handling',\n    'Audio analyze - error handling',\n    'Create summary - error handling',\n    'Text shortening - error handling',\n    'Twilio - error handling'\n];\n\nfor (const nodeName of nodes) {\n    try {\n        // Pobranie itemu w poprawny sposób\n        const nodeItem = $node[nodeName]?.json;\n\n        if (!nodeItem) continue;\n\n        const nodeError = nodeItem.errorOpenAI1;\n\n        if (\n            typeof nodeError === 'string' &&\n            nodeError.trim().length > 0\n        ) {\n            allErrors.push(nodeError);\n        }\n\n    } catch (err) {\n        continue;\n    }\n}\n\nreturn [{\n    json: {\n        sendEmail: allErrors.length > 0,\n        body: allErrors.join(\"\\n\\n\")\n    }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          10208,
+          -416
+        ],
+        "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
+        "name": "Error raport prepare"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "07c6ac0b-42b3-4c95-8613-2beda3e55d83",
+                "leftValue": "={{ $json.sendEmail }}",
+                "rightValue": false,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          10480,
+          -416
+        ],
+        "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+                "name": "errorOpenAI1",
+                "value": "={{ \"Błąd w węźle \\\"Create Picture Summary\\\": \" + $json.error }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2928,
+          -768
+        ],
+        "id": "bdf3be25-10e5-42d2-8e5e-f3e0789ff7dd",
+        "name": "Create Picture Summary - error handling"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+                "name": "errorOpenAI1",
+                "value": "={{ \"Błąd w węźle \\\"Audio analyze\\\": \" + $json.error }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3056,
+          -448
+        ],
+        "id": "b40fbadf-276d-4689-8209-baba5482a64a",
+        "name": "Audio analyze - error handling"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+                "name": "errorOpenAI1",
+                "value": "={{ \"Błąd w węźle \\\"Create summary\\\": \" + $json.error }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          4560,
+          32
+        ],
+        "id": "16c06347-06b0-4520-9d07-30539f3973e1",
+        "name": "Create summary - error handling"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+                "name": "errorOpenAI1",
+                "value": "={{ \"Błąd w węźle \\\"Text shortening\\\": \" + $json.error }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          8752,
+          128
+        ],
+        "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
+        "name": "Text shortening - error handling"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "02c7be48-65a1-41a2-88cb-9b57c3555238",
+                "name": "errorOpenAI1",
+                "value": "={{ \"Błąd w węźle \\\"Twilio\\\": \" + $json.error }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          10432,
+          160
+        ],
+        "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
+        "name": "Twilio - error handling"
+      },
+      {
+        "parameters": {
+          "content": "## Wysłanie e-mail z błędami z wybranych węzłów\nZebranie błędów, przygotowanie treści e-mail i wysłanie",
+          "height": 240,
+          "width": 880,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          9904,
+          -512
+        ],
+        "id": "e63a8159-7718-49e8-8e3c-8e42cad85dad",
+        "name": "Sticky Note4"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "24108748-476b-4243-8dd3-647268254fb9",
+          "authentication": "basicAuth",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          688,
+          192
+        ],
+        "id": "725c3515-fe53-4f52-9d76-b6fe991404a6",
+        "name": "Webhook",
+        "webhookId": "24108748-476b-4243-8dd3-647268254fb9",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "QmXylULo8NVgMnZB",
+            "name": "Unnamed credential"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "filter",
+                "value": "={\"assetId\":\"{{ $('Webhook').item.json.body.assetId }}\"} "
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          2640,
+          176
+        ],
+        "id": "cf65191c-eca6-4cf4-b5f7-37686a7c7289",
+        "name": "Get asset",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "f52acffe-ffab-415d-8fb0-a4d3b4a76a53",
+                "leftValue": "={{ $('Webhook').item.json.body.index }}",
+                "rightValue": "notices",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1312,
+          192
+        ],
+        "id": "998e4f37-6a4c-4804-bffa-ad0edd05874d",
+        "name": "If it is a notice"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://nocobase.nazca40.com/api/knowshare",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\":[{\"id\":{{ $('Upload image').first().json.data.id }}}],\n\"reporter\":[{\"id\":{{ $json.id }}}]\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          7824,
+          -224
+        ],
+        "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
+        "name": "Post knowshare",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://nocobase.nazca40.com/api/attachments:create",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "parameterType": "formBinaryData",
+                "name": "file",
+                "inputDataFieldName": "image"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          6688,
+          -224
+        ],
+        "id": "d25bc207-3361-4e24-8c6e-51a7d9cf511b",
+        "name": "Upload image",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
+                "leftValue": "={{ $json.nickname }}",
+                "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.2,
+        "position": [
+          7680,
+          -224
+        ],
+        "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
+        "name": "Filter"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
+                "name": "users",
+                "value": "={{ $('Get asset').item.json.data[0].users }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          7408,
+          -224
+        ],
+        "id": "f92b7d9e-ac92-480e-ab93-c4c5a50ace70",
+        "name": "Get asset users"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "users",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          7552,
+          -224
+        ],
+        "id": "ea1d570c-3a42-4128-a5ab-ddfd7bac6f91",
+        "name": "Split users"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://nocobase.nazca40.com/api/knowshare",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.id }}}]\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          6672,
+          176
+        ],
+        "id": "c190f4aa-52ec-433a-9019-ed2433410d68",
+        "name": "Post knowshare - no attachments",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
+                "leftValue": "={{ $json.nickname }}",
+                "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.2,
+        "position": [
+          6528,
+          176
+        ],
+        "id": "2b44d46a-584c-45c6-9fa9-d61a6eca4eed",
+        "name": "Filter1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
+                "name": "users",
+                "value": "={{ $('Get asset').item.json.data[0].users }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          6256,
+          176
+        ],
+        "id": "c75720c6-e49f-4638-9ca5-6b64e5b17122",
+        "name": "Get asset users1"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "users",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          6400,
+          176
+        ],
+        "id": "2639c494-7cb9-45a0-aa1d-e7a5add6cf44",
+        "name": "Split users1"
+      }
+    ],
+    "connections": {
+      "Create Picture Summary": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create Picture Summary - error handling",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate": {
+        "main": [
+          [
+            {
+              "node": "Create summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop parameter - chat": {
+        "main": [
+          [
+            {
+              "node": "Split Out - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Out - chat": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items - chat": {
+        "main": [
+          [
+            {
+              "node": "Aggregate",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set index",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Attachment - chat": {
+        "main": [
+          [
+            {
+              "node": "Switch - type selection",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Twilio": {
+        "main": [
+          [
+            {
+              "node": "If email notification enabled",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Twilio - error handling",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If there are attachments": {
+        "main": [
+          [
+            {
+              "node": "Create summary",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Loop parameter - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set index": {
+        "main": [
+          [
+            {
+              "node": "Check index",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check index": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Attachment - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch image - chat": {
+        "main": [
+          [
+            {
+              "node": "Change mime type - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Change mime type - chat": {
+        "main": [
+          [
+            {
+              "node": "Create Picture Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "assets params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript2": {
+        "main": [
+          [
+            {
+              "node": "Task content",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Text shortening": {
+        "main": [
+          [
+            {
+              "node": "SMS Final",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Text shortening - error handling",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SMS part 1": {
+        "main": [
+          [
+            {
+              "node": "Text shortening",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SMS Final": {
+        "main": [
+          [
+            {
+              "node": "Notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set index - kanban": {
+        "main": [
+          [
+            {
+              "node": "Attachment - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Attachment - kanban": {
+        "main": [
+          [
+            {
+              "node": "Fetch image - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch image - kanban": {
+        "main": [
+          [
+            {
+              "node": "Change mime type - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Change mime type - kanban": {
+        "main": [
+          [
+            {
+              "node": "Upload image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set attachments - kanban": {
+        "main": [
+          [
+            {
+              "node": "Split attachments - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split attachments - kanban": {
+        "main": [
+          [
+            {
+              "node": "Loop over attachments",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop over attachments": {
+        "main": [
+          [
+            {
+              "node": "Aggregate attachments - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set index - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate attachments - kanban": {
+        "main": [
+          [
+            {
+              "node": "Attachments list",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Attachments list": {
+        "main": [
+          [
+            {
+              "node": "Get asset users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If there are attachments - kanban": {
+        "main": [
+          [
+            {
+              "node": "Set attachments - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get asset users1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate inputs": {
+        "main": [
+          [
+            {
+              "node": "SMS part 1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Task content": {
+        "main": [
+          [
+            {
+              "node": "If there are attachments - kanban",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If sms notification enabled": {
+        "main": [
+          [
+            {
+              "node": "Twilio",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "If email notification enabled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Notification data": {
+        "main": [
+          [
+            {
+              "node": "Split notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split notification data": {
+        "main": [
+          [
+            {
+              "node": "Loop over notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop over notification data": {
+        "main": [
+          [
+            {
+              "node": "Error raport prepare",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "If sms notification enabled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If email notification enabled": {
+        "main": [
+          [
+            {
+              "node": "Send email",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Loop over notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If it's not a car": {
+        "main": [
+          [
+            {
+              "node": "If there are attachments",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create summary": {
+        "main": [
+          [
+            {
+              "node": "Task content",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create summary - error handling",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send email": {
+        "main": [
+          [
+            {
+              "node": "Loop over notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Safe subject and message": {
+        "main": [
+          [
+            {
+              "node": "If it is a notice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download Audio": {
+        "main": [
+          [
+            {
+              "node": "Change mime type - audio",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Change mime type - audio": {
+        "main": [
+          [
+            {
+              "node": "Audio analyze",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Audio analyze": {
+        "main": [
+          [
+            {
+              "node": "Prepare audio output",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Audio analyze - error handling",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch - type selection": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Fetch image - chat",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Download Audio",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare audio output": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error raport prepare": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Send email1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Picture Summary - error handling": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Audio analyze - error handling": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items - chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create summary - error handling": {
+        "main": [
+          [
+            {
+              "node": "Task content",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Text shortening - error handling": {
+        "main": [
+          [
+            {
+              "node": "SMS Final",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Twilio - error handling": {
+        "main": [
+          [
+            {
+              "node": "If email notification enabled",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Safe subject and message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get asset": {
+        "main": [
+          [
+            {
+              "node": "If it's not a car",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If it is a notice": {
+        "main": [
+          [
+            {
+              "node": "Get asset",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Upload image": {
+        "main": [
+          [
+            {
+              "node": "Loop over attachments",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter": {
+        "main": [
+          [
+            {
+              "node": "Post knowshare",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get asset users": {
+        "main": [
+          [
+            {
+              "node": "Split users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split users": {
+        "main": [
+          [
+            {
+              "node": "Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post knowshare": {
+        "main": [
+          [
+            {
+              "node": "Aggregate inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Post knowshare - no attachments": {
+        "main": [
+          [
+            {
+              "node": "Aggregate inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get asset users1": {
+        "main": [
+          [
+            {
+              "node": "Split users1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split users1": {
+        "main": [
+          [
+            {
+              "node": "Filter1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter1": {
+        "main": [
+          [
+            {
+              "node": "Post knowshare - no attachments",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "APA DS Team",
+    "name": null,
+    "description": null
+  },
+  "tags": []
+}
