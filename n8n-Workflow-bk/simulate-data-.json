@@ -1,0 +1,131 @@
+{
+  "updatedAt": "2026-01-28T13:56:34.000Z",
+  "createdAt": "2026-01-28T09:29:35.461Z",
+  "id": "gcJzU1zN4qjSHqy8",
+  "name": "simulate data",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -32
+      ],
+      "id": "8ab8a66a-b7e9-4d6b-85d7-fc0082631be1",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dzisiejsza data w formacie ISO\nconst teraz = $now; \nconst zaTydzien = $now.plus({ days: 7 }).toFormat('dd-MM-yyyy');\n\nreturn {\n  json: { data: zaTydzien }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "5538f626-bf41-484f-aaaf-7fa0f5d8a491",
+      "name": "Build Payload"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9535a788-9c1c-4a20-ae3f-780f0d966fb1",
+              "name": "cena",
+              "value": 200,
+              "type": "number"
+            },
+            {
+              "id": "e47319db-ab9e-4492-a370-62a047abe54c",
+              "name": "ilosc",
+              "value": 20,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "f8fe700a-7470-430a-ba10-6681b3538dda",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pobranie konkretnego pola\nconst cena = $input.item.json.cena;\nconst ilosc = $input.item.json.ilosc;\n\n// Prosta kalkulacja\nconst suma = cena * ilosc;\n\n// Zwrócenie nowego wyniku\nreturn {\n  json: {\n    total: suma,\n    status: suma > 100 ? 'wysoki' : 'niski'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "abacc133-4a14-49cb-a1b1-306411cd959f",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Build Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Payload": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "5e0b6e85-1f93-4773-b959-5d0e3d0f8ce7",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T09:29:35.463Z",
+      "createdAt": "2026-01-28T09:29:35.463Z",
+      "role": "workflow:owner",
+      "workflowId": "gcJzU1zN4qjSHqy8",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
