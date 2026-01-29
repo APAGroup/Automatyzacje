@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-28T11:35:38.000Z",
+  "updatedAt": "2026-01-29T09:16:17.000Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -194,7 +194,7 @@
     {
       "parameters": {
         "content": "## Krok 3 - zgłoszenie Jira (opcjonalne)  \n",
-        "height": 1028,
+        "height": 1044,
         "width": 3336
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -1493,13 +1493,13 @@
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Filter').item.json.id }}}]\n}",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Filter').item.json.id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8192,
+        8256,
         -224
       ],
       "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -1720,11 +1720,25 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7936,
+        7872,
         -224
       ],
       "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
       "name": "Prepare attachements",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const DEFAULT_IMAGE_ID = 397;\n\n// Pobieramy dane z węzła \"Attachments list\"\nconst nodeData = $('Attachments list').item.json;\nconst attachments = nodeData.attachments || [];\n\n// Szukamy pierwszego obrazka\nconst image = attachments.find(a =>\n  a?.data?.mimetype?.startsWith('image/')\n);\n\n// Zwracamy ID w obiekcie (tak wymaga n8n)\nreturn [\n  {\n    json: {\n      mainImage: image ? image.data.id : DEFAULT_IMAGE_ID\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8048,
+        -224
+      ],
+      "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
+      "name": "Prepare main image",
       "onError": "continueRegularOutput"
     }
   ],
@@ -2527,6 +2541,17 @@
       "main": [
         [
           {
+            "node": "Prepare main image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare main image": {
+      "main": [
+        [
+          {
             "node": "Post knowshare",
             "type": "main",
             "index": 0
@@ -2590,8 +2615,8 @@
       }
     ]
   },
-  "versionId": "13fc1ee5-9d0f-4b26-bf90-5aef779533af",
-  "activeVersionId": "13fc1ee5-9d0f-4b26-bf90-5aef779533af",
+  "versionId": "780b4054-7628-4fd3-bc17-9120000f7ced",
+  "activeVersionId": "780b4054-7628-4fd3-bc17-9120000f7ced",
   "triggerCount": 1,
   "shared": [
     {
@@ -2610,9 +2635,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-01-28T11:35:38.726Z",
-    "createdAt": "2026-01-28T11:35:38.726Z",
-    "versionId": "13fc1ee5-9d0f-4b26-bf90-5aef779533af",
+    "updatedAt": "2026-01-29T09:16:17.637Z",
+    "createdAt": "2026-01-29T09:16:17.637Z",
+    "versionId": "780b4054-7628-4fd3-bc17-9120000f7ced",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -2803,7 +2828,7 @@
       {
         "parameters": {
           "content": "## Krok 3 - zgłoszenie Jira (opcjonalne)  \n",
-          "height": 1028,
+          "height": 1044,
           "width": 3336
         },
         "type": "n8n-nodes-base.stickyNote",
@@ -4102,13 +4127,13 @@
           "genericAuthType": "httpBearerAuth",
           "sendBody": true,
           "specifyBody": "json",
-          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Filter').item.json.id }}}]\n}",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Filter').item.json.id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
           "options": {}
         },
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          8192,
+          8256,
           -224
         ],
         "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -4329,11 +4354,25 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7936,
+          7872,
           -224
         ],
         "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
         "name": "Prepare attachements",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const DEFAULT_IMAGE_ID = 397;\n\n// Pobieramy dane z węzła \"Attachments list\"\nconst nodeData = $('Attachments list').item.json;\nconst attachments = nodeData.attachments || [];\n\n// Szukamy pierwszego obrazka\nconst image = attachments.find(a =>\n  a?.data?.mimetype?.startsWith('image/')\n);\n\n// Zwracamy ID w obiekcie (tak wymaga n8n)\nreturn [\n  {\n    json: {\n      mainImage: image ? image.data.id : DEFAULT_IMAGE_ID\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8048,
+          -224
+        ],
+        "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
+        "name": "Prepare main image",
         "onError": "continueRegularOutput"
       }
     ],
@@ -5133,6 +5172,17 @@
         ]
       },
       "Prepare attachements": {
+        "main": [
+          [
+            {
+              "node": "Prepare main image",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare main image": {
         "main": [
           [
             {
