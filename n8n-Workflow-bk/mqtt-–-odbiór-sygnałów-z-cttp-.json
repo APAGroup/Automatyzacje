@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2026-01-30T08:08:00.000Z",
+  "createdAt": "2026-01-30T07:47:32.707Z",
+  "id": "eCE0xsDhNQqyj7Wf",
+  "name": "MQTT – odbiór sygnałów z CTTP",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0217a27f-c53b-4d91-8e51-885cadd3da66",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-30T07:47:32.710Z",
+      "createdAt": "2026-01-30T07:47:32.710Z",
+      "role": "workflow:owner",
+      "workflowId": "eCE0xsDhNQqyj7Wf",
+      "projectId": "CjfG3RcAlbeZbF4G"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
