@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-29T09:16:17.000Z",
+  "updatedAt": "2026-02-03T13:00:14.251Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -1577,7 +1577,9 @@
         -224
       ],
       "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
-      "name": "Filter"
+      "name": "Filter",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1674,7 +1676,9 @@
         176
       ],
       "id": "2b44d46a-584c-45c6-9fa9-d61a6eca4eed",
-      "name": "Filter1"
+      "name": "Filter1",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -2573,23 +2577,23 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "381",
+            "content-length": "368",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9c47531f37f56e97-WAW",
+            "cf-ray": "9c820ab396d6eed2-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Tue, 27 Jan 2026 09:46:44 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.64.198.34",
+            "date": "Tue, 03 Feb 2026 12:48:18 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.68.159.218",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-jgqnt",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-sfczw",
             "x-is-trusted": "yes",
             "x-real-ip": "51.83.252.104"
           },
@@ -2597,26 +2601,28 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-01-27T09:46:44.613841Z",
-            "assetId": "08de5d80-810e-4e7e-8399-c21690b71259",
-            "subject": "Test awaria",
-            "message": "Test 2v",
+            "createdAt": "2026-02-03T12:48:17.4109345Z",
+            "assetId": "08de6254-f1c1-4016-88c0-4efaddae2202",
+            "subject": "Głośna praca serwera",
+            "message": "Serwer głośno działa. Prośba o sprawdzenie",
             "type": 0,
-            "createdBy": "Grzegorz Bojdo",
+            "createdBy": "Admin Admin",
             "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
             "attachments": [
-              "dceea1de-ea3a-4257-9ea6-71d8187475eb1327467569862980007.jpg",
-              "ea04c528-d854-437f-8a74-f1bffe2f7bf9449758796712864668.jpg"
+              "31767b2e-88a0-41f4-aec3-0bca7fc1e4b08464910300658334814.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
           "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
         }
       }
     ]
   },
-  "versionId": "780b4054-7628-4fd3-bc17-9120000f7ced",
-  "activeVersionId": "780b4054-7628-4fd3-bc17-9120000f7ced",
+  "versionId": "73a25ed9-621a-4d24-badf-16dabe24f865",
+  "activeVersionId": "73a25ed9-621a-4d24-badf-16dabe24f865",
   "triggerCount": 1,
   "shared": [
     {
@@ -2635,9 +2641,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-01-29T09:16:17.637Z",
-    "createdAt": "2026-01-29T09:16:17.637Z",
-    "versionId": "780b4054-7628-4fd3-bc17-9120000f7ced",
+    "updatedAt": "2026-02-03T13:00:14.253Z",
+    "createdAt": "2026-02-03T13:00:14.253Z",
+    "versionId": "73a25ed9-621a-4d24-badf-16dabe24f865",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -4211,7 +4217,9 @@
           -224
         ],
         "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
-        "name": "Filter"
+        "name": "Filter",
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
       },
       {
         "parameters": {
@@ -4308,7 +4316,9 @@
           176
         ],
         "id": "2b44d46a-584c-45c6-9fa9-d61a6eca4eed",
-        "name": "Filter1"
+        "name": "Filter1",
+        "alwaysOutputData": true,
+        "onError": "continueRegularOutput"
       },
       {
         "parameters": {
@@ -5194,7 +5204,7 @@
         ]
       }
     },
-    "authors": "Marek Rachel",
+    "authors": "APA DS Team",
     "name": null,
     "description": null
   },
