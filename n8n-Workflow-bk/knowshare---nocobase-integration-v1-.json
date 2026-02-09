@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-03T13:00:14.251Z",
+  "updatedAt": "2026-02-09T12:17:03.513Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -130,7 +130,7 @@
       "type": "n8n-nodes-base.twilio",
       "typeVersion": 1,
       "position": [
-        10976,
+        11184,
         -64
       ],
       "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
@@ -427,7 +427,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9744,
+        9952,
         -16
       ],
       "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -459,7 +459,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        9152,
+        9360,
         0
       ],
       "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -479,7 +479,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8976,
+        9184,
         0
       ],
       "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -698,7 +698,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        8784,
+        8992,
         0
       ],
       "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -756,7 +756,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        10704,
+        10912,
         176
       ],
       "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
@@ -785,7 +785,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        9952,
+        10160,
         -16
       ],
       "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -799,7 +799,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        10160,
+        10368,
         -16
       ],
       "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
@@ -812,7 +812,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        10368,
+        10576,
         160
       ],
       "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
@@ -857,7 +857,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11536,
+        11744,
         192
       ],
       "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
@@ -905,6 +905,16 @@
             "version": 2
           },
           "conditions": [
+            {
+              "id": "12b4257d-5980-4e27-a4b3-bbd3222e6fab",
+              "leftValue": "={{ $json.data[0] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
             {
               "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
               "leftValue": "={{ $json.data[0].carAsset }}",
@@ -973,7 +983,7 @@
         "toEmail": "={{ $('Loop over notification data').item.json.email }}",
         "subject": "=Nowa wiadomość knowshare",
         "emailFormat": "text",
-        "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+        "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset').item.json.data[0].name }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
         "options": {
           "appendAttribution": false
         }
@@ -981,7 +991,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        11808,
+        12016,
         176
       ],
       "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -1206,7 +1216,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        11520,
+        11728,
         -464
       ],
       "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
@@ -1226,7 +1236,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        10976,
+        11184,
         -448
       ],
       "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
@@ -1260,7 +1270,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11248,
+        11456,
         -448
       ],
       "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
@@ -1352,7 +1362,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        9520,
+        9728,
         96
       ],
       "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -1375,7 +1385,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        11200,
+        11408,
         128
       ],
       "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
@@ -1499,7 +1509,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8256,
+        8288,
         -224
       ],
       "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -1573,7 +1583,7 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        7696,
+        7728,
         -224
       ],
       "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
@@ -1583,36 +1593,13 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
-              "name": "users",
-              "value": "={{ $('Get asset').item.json.data[0].users }}",
-              "type": "array"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        7408,
-        -224
-      ],
-      "id": "f92b7d9e-ac92-480e-ab93-c4c5a50ace70",
-      "name": "Get asset users"
-    },
-    {
-      "parameters": {
         "fieldToSplitOut": "users",
         "options": {}
       },
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        7552,
+        7584,
         -224
       ],
       "id": "ea1d570c-3a42-4128-a5ab-ddfd7bac6f91",
@@ -1632,7 +1619,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6672,
+        6704,
         176
       ],
       "id": "c190f4aa-52ec-433a-9019-ed2433410d68",
@@ -1682,49 +1669,12 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
-              "name": "users",
-              "value": "={{ $('Get asset').item.json.data[0].users }}",
-              "type": "array"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        6256,
-        176
-      ],
-      "id": "c75720c6-e49f-4638-9ca5-6b64e5b17122",
-      "name": "Get asset users1"
-    },
-    {
-      "parameters": {
-        "fieldToSplitOut": "users",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [
-        6400,
-        176
-      ],
-      "id": "2639c494-7cb9-45a0-aa1d-e7a5add6cf44",
-      "name": "Split users1"
-    },
-    {
-      "parameters": {
         "jsCode": "// Pobieramy dane bezpośrednio z konkretnego węzła po jego nazwie\nconst nodeData = $('Attachments list').item.json;\n\n// Sprawdzamy, czy pole attachments istnieje\nconst attachments = nodeData.attachments || [];\n\n// Mapujemy dane\nconst formattedAttachments = Array.isArray(attachments) \n  ? attachments.map(attachment => {\n      return {\n        id: attachment.data?.id\n      };\n    })\n  : [];\n\nreturn {\n  attachments: formattedAttachments\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7872,
+        7904,
         -224
       ],
       "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -1738,12 +1688,103 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8048,
+        8080,
         -224
       ],
       "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
       "name": "Prepare main image",
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://nocobase.nazca40.com/api/users?appends=organizations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "={ \"organizations\":[{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}}] }"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7952,
+        -48
+      ],
+      "id": "f5d54c79-ad97-46ef-a9d5-81dcaa5f7673",
+      "name": "Get org users",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        6368,
+        176
+      ],
+      "id": "bcc80713-97c8-4a4d-af38-74a847bf1369",
+      "name": "Split users2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
+              "name": "users",
+              "value": "={{ $('Get asset').item.json.data[0].users }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7424,
+        -224
+      ],
+      "id": "3170f427-a702-406a-8307-2942a1c67763",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
+              "name": "users",
+              "value": "={{ $('Get asset').item.json.data[0].users }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6176,
+        176
+      ],
+      "id": "703a9ba1-ee56-4a61-94f9-45319b5f43ef",
+      "name": "Edit Fields1"
     }
   ],
   "connections": {
@@ -2075,7 +2116,7 @@
       "main": [
         [
           {
-            "node": "Get asset users",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -2093,7 +2134,7 @@
         ],
         [
           {
-            "node": "Get asset users1",
+            "node": "Edit Fields1",
             "type": "main",
             "index": 0
           }
@@ -2464,17 +2505,6 @@
         ]
       ]
     },
-    "Get asset users": {
-      "main": [
-        [
-          {
-            "node": "Split users",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Split users": {
       "main": [
         [
@@ -2502,28 +2532,6 @@
         [
           {
             "node": "Aggregate inputs",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get asset users1": {
-      "main": [
-        [
-          {
-            "node": "Split users1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Split users1": {
-      "main": [
-        [
-          {
-            "node": "Filter1",
             "type": "main",
             "index": 0
           }
@@ -2562,6 +2570,44 @@
           }
         ]
       ]
+    },
+    "Get org users": {
+      "main": [
+        []
+      ]
+    },
+    "Split users2": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split users2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2577,19 +2623,19 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "368",
+            "content-length": "345",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9c820ab396d6eed2-WAW",
+            "cf-ray": "9cb34a48b70eeecf-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Tue, 03 Feb 2026 12:48:18 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.68.159.218",
+            "date": "Mon, 09 Feb 2026 12:15:05 GMT",
+            "x-forwarded-for": "51.83.252.104, 162.158.172.182",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
@@ -2601,15 +2647,15 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-02-03T12:48:17.4109345Z",
+            "createdAt": "2026-02-09T12:15:04.4557434Z",
             "assetId": "08de6254-f1c1-4016-88c0-4efaddae2202",
-            "subject": "Głośna praca serwera",
-            "message": "Serwer głośno działa. Prośba o sprawdzenie",
+            "subject": "Mysz nie działa",
+            "message": "Konieczna wymiana myszy",
             "type": 0,
-            "createdBy": "Admin Admin",
+            "createdBy": "Michał Kobielski",
             "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
             "attachments": [
-              "31767b2e-88a0-41f4-aec3-0bca7fc1e4b08464910300658334814.jpg"
+              "89412814-a4b5-4f34-a92e-38187ea541d06993686214337741947.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2621,8 +2667,8 @@
       }
     ]
   },
-  "versionId": "73a25ed9-621a-4d24-badf-16dabe24f865",
-  "activeVersionId": "73a25ed9-621a-4d24-badf-16dabe24f865",
+  "versionId": "c377448e-0cf3-438c-8bc6-f1eaed89d63e",
+  "activeVersionId": "c377448e-0cf3-438c-8bc6-f1eaed89d63e",
   "triggerCount": 1,
   "shared": [
     {
@@ -2641,9 +2687,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-02-03T13:00:14.253Z",
-    "createdAt": "2026-02-03T13:00:14.253Z",
-    "versionId": "73a25ed9-621a-4d24-badf-16dabe24f865",
+    "updatedAt": "2026-02-09T12:17:03.515Z",
+    "createdAt": "2026-02-09T12:17:03.515Z",
+    "versionId": "c377448e-0cf3-438c-8bc6-f1eaed89d63e",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -2770,7 +2816,7 @@
         "type": "n8n-nodes-base.twilio",
         "typeVersion": 1,
         "position": [
-          10976,
+          11184,
           -64
         ],
         "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
@@ -3067,7 +3113,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          9744,
+          9952,
           -16
         ],
         "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -3099,7 +3145,7 @@
         "type": "@n8n/n8n-nodes-langchain.openAi",
         "typeVersion": 2,
         "position": [
-          9152,
+          9360,
           0
         ],
         "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -3119,7 +3165,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          8976,
+          9184,
           0
         ],
         "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -3338,7 +3384,7 @@
         "type": "n8n-nodes-base.aggregate",
         "typeVersion": 1,
         "position": [
-          8784,
+          8992,
           0
         ],
         "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -3396,7 +3442,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          10704,
+          10912,
           176
         ],
         "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
@@ -3425,7 +3471,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          9952,
+          10160,
           -16
         ],
         "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -3439,7 +3485,7 @@
         "type": "n8n-nodes-base.splitOut",
         "typeVersion": 1,
         "position": [
-          10160,
+          10368,
           -16
         ],
         "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
@@ -3452,7 +3498,7 @@
         "type": "n8n-nodes-base.splitInBatches",
         "typeVersion": 3,
         "position": [
-          10368,
+          10576,
           160
         ],
         "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
@@ -3497,7 +3543,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          11536,
+          11744,
           192
         ],
         "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
@@ -3545,6 +3591,16 @@
               "version": 2
             },
             "conditions": [
+              {
+                "id": "12b4257d-5980-4e27-a4b3-bbd3222e6fab",
+                "leftValue": "={{ $json.data[0] }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "object",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              },
               {
                 "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
                 "leftValue": "={{ $json.data[0].carAsset }}",
@@ -3613,7 +3669,7 @@
           "toEmail": "={{ $('Loop over notification data').item.json.email }}",
           "subject": "=Nowa wiadomość knowshare",
           "emailFormat": "text",
-          "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset summary').item.json.asset.assetName }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+          "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset').item.json.data[0].name }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
           "options": {
             "appendAttribution": false
           }
@@ -3621,7 +3677,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          11808,
+          12016,
           176
         ],
         "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -3846,7 +3902,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          11520,
+          11728,
           -464
         ],
         "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
@@ -3866,7 +3922,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          10976,
+          11184,
           -448
         ],
         "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
@@ -3900,7 +3956,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          11248,
+          11456,
           -448
         ],
         "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
@@ -3992,7 +4048,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          9520,
+          9728,
           96
         ],
         "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -4015,7 +4071,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          11200,
+          11408,
           128
         ],
         "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
@@ -4139,7 +4195,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          8256,
+          8288,
           -224
         ],
         "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -4213,7 +4269,7 @@
         "type": "n8n-nodes-base.filter",
         "typeVersion": 2.2,
         "position": [
-          7696,
+          7728,
           -224
         ],
         "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
@@ -4223,36 +4279,13 @@
       },
       {
         "parameters": {
-          "assignments": {
-            "assignments": [
-              {
-                "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
-                "name": "users",
-                "value": "={{ $('Get asset').item.json.data[0].users }}",
-                "type": "array"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          7408,
-          -224
-        ],
-        "id": "f92b7d9e-ac92-480e-ab93-c4c5a50ace70",
-        "name": "Get asset users"
-      },
-      {
-        "parameters": {
           "fieldToSplitOut": "users",
           "options": {}
         },
         "type": "n8n-nodes-base.splitOut",
         "typeVersion": 1,
         "position": [
-          7552,
+          7584,
           -224
         ],
         "id": "ea1d570c-3a42-4128-a5ab-ddfd7bac6f91",
@@ -4272,7 +4305,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          6672,
+          6704,
           176
         ],
         "id": "c190f4aa-52ec-433a-9019-ed2433410d68",
@@ -4322,49 +4355,12 @@
       },
       {
         "parameters": {
-          "assignments": {
-            "assignments": [
-              {
-                "id": "85fa801b-250d-454f-abe3-342f2673cfd5",
-                "name": "users",
-                "value": "={{ $('Get asset').item.json.data[0].users }}",
-                "type": "array"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          6256,
-          176
-        ],
-        "id": "c75720c6-e49f-4638-9ca5-6b64e5b17122",
-        "name": "Get asset users1"
-      },
-      {
-        "parameters": {
-          "fieldToSplitOut": "users",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.splitOut",
-        "typeVersion": 1,
-        "position": [
-          6400,
-          176
-        ],
-        "id": "2639c494-7cb9-45a0-aa1d-e7a5add6cf44",
-        "name": "Split users1"
-      },
-      {
-        "parameters": {
           "jsCode": "// Pobieramy dane bezpośrednio z konkretnego węzła po jego nazwie\nconst nodeData = $('Attachments list').item.json;\n\n// Sprawdzamy, czy pole attachments istnieje\nconst attachments = nodeData.attachments || [];\n\n// Mapujemy dane\nconst formattedAttachments = Array.isArray(attachments) \n  ? attachments.map(attachment => {\n      return {\n        id: attachment.data?.id\n      };\n    })\n  : [];\n\nreturn {\n  attachments: formattedAttachments\n};"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7872,
+          7904,
           -224
         ],
         "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -4378,12 +4374,103 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          8048,
+          8080,
           -224
         ],
         "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
         "name": "Prepare main image",
         "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "url": "https://nocobase.nazca40.com/api/users?appends=organizations",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "filter",
+                "value": "={ \"organizations\":[{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}}] }"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          7952,
+          -48
+        ],
+        "id": "f5d54c79-ad97-46ef-a9d5-81dcaa5f7673",
+        "name": "Get org users",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "users",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          6368,
+          176
+        ],
+        "id": "bcc80713-97c8-4a4d-af38-74a847bf1369",
+        "name": "Split users2"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
+                "name": "users",
+                "value": "={{ $('Get asset').item.json.data[0].users }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          7424,
+          -224
+        ],
+        "id": "3170f427-a702-406a-8307-2942a1c67763",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
+                "name": "users",
+                "value": "={{ $('Get asset').item.json.data[0].users }}",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          6176,
+          176
+        ],
+        "id": "703a9ba1-ee56-4a61-94f9-45319b5f43ef",
+        "name": "Edit Fields1"
       }
     ],
     "connections": {
@@ -4715,7 +4802,7 @@
         "main": [
           [
             {
-              "node": "Get asset users",
+              "node": "Edit Fields",
               "type": "main",
               "index": 0
             }
@@ -4733,7 +4820,7 @@
           ],
           [
             {
-              "node": "Get asset users1",
+              "node": "Edit Fields1",
               "type": "main",
               "index": 0
             }
@@ -5104,17 +5191,6 @@
           ]
         ]
       },
-      "Get asset users": {
-        "main": [
-          [
-            {
-              "node": "Split users",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Split users": {
         "main": [
           [
@@ -5148,28 +5224,6 @@
           ]
         ]
       },
-      "Get asset users1": {
-        "main": [
-          [
-            {
-              "node": "Split users1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Split users1": {
-        "main": [
-          [
-            {
-              "node": "Filter1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Filter1": {
         "main": [
           [
@@ -5197,6 +5251,44 @@
           [
             {
               "node": "Post knowshare",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get org users": {
+        "main": [
+          []
+        ]
+      },
+      "Split users2": {
+        "main": [
+          [
+            {
+              "node": "Filter1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Split users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Split users2",
               "type": "main",
               "index": 0
             }
