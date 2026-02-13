@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-09T12:17:03.513Z",
+  "updatedAt": "2026-02-13T12:14:49.327Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -210,7 +210,7 @@
       "parameters": {
         "content": "## Krok 3a - Tworzenie zzgłoszenia z załącznikiem",
         "height": 568,
-        "width": 1784,
+        "width": 2568,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -672,7 +672,7 @@
       "parameters": {
         "content": "## Krok 3a - Tworzenie zgłoszenia bez załącznika\n",
         "height": 344,
-        "width": 1784,
+        "width": 2568,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -1503,13 +1503,13 @@
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Filter').item.json.id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Get org users - attachment').item.json.data[0].id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8288,
+        8000,
         -224
       ],
       "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -1557,69 +1557,19 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
-              "leftValue": "={{ $json.nickname }}",
-              "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "looseTypeValidation": true,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.filter",
-      "typeVersion": 2.2,
-      "position": [
-        7728,
-        -224
-      ],
-      "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
-      "name": "Filter",
-      "alwaysOutputData": true,
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "fieldToSplitOut": "users",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [
-        7584,
-        -224
-      ],
-      "id": "ea1d570c-3a42-4128-a5ab-ddfd7bac6f91",
-      "name": "Split users"
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "https://nocobase.nazca40.com/api/knowshare",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.id }}}]\n}",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.data[0].id }}}]\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6704,
+        6208,
         176
       ],
       "id": "c190f4aa-52ec-433a-9019-ed2433410d68",
@@ -1633,48 +1583,12 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
-              "leftValue": "={{ $json.nickname }}",
-              "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "looseTypeValidation": true,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.filter",
-      "typeVersion": 2.2,
-      "position": [
-        6528,
-        176
-      ],
-      "id": "2b44d46a-584c-45c6-9fa9-d61a6eca4eed",
-      "name": "Filter1",
-      "alwaysOutputData": true,
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
         "jsCode": "// Pobieramy dane bezpośrednio z konkretnego węzła po jego nazwie\nconst nodeData = $('Attachments list').item.json;\n\n// Sprawdzamy, czy pole attachments istnieje\nconst attachments = nodeData.attachments || [];\n\n// Mapujemy dane\nconst formattedAttachments = Array.isArray(attachments) \n  ? attachments.map(attachment => {\n      return {\n        id: attachment.data?.id\n      };\n    })\n  : [];\n\nreturn {\n  attachments: formattedAttachments\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7904,
+        7616,
         -224
       ],
       "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -1688,7 +1602,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8080,
+        7792,
         -224
       ],
       "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
@@ -1697,15 +1611,19 @@
     },
     {
       "parameters": {
-        "url": "https://nocobase.nazca40.com/api/users?appends=organizations",
+        "url": "https://nocobase.nazca40.com/api/users",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
             {
+              "name": "appends",
+              "value": "organizations"
+            },
+            {
               "name": "filter",
-              "value": "={ \"organizations\":[{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}}] }"
+              "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"nickname\":\"{{ $('Webhook').item.json.body.createdBy }}\"}"
             }
           ]
         },
@@ -1714,8 +1632,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7952,
-        -48
+        5984,
+        176
       ],
       "id": "f5d54c79-ad97-46ef-a9d5-81dcaa5f7673",
       "name": "Get org users",
@@ -1728,63 +1646,38 @@
     },
     {
       "parameters": {
-        "fieldToSplitOut": "users",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [
-        6368,
-        176
-      ],
-      "id": "bcc80713-97c8-4a4d-af38-74a847bf1369",
-      "name": "Split users2"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
+        "url": "https://nocobase.nazca40.com/api/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
             {
-              "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
-              "name": "users",
-              "value": "={{ $('Get asset').item.json.data[0].users }}",
-              "type": "array"
+              "name": "appends",
+              "value": "organizations"
+            },
+            {
+              "name": "filter",
+              "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"nickname\":\"{{ $('Webhook').item.json.body.createdBy }}\"}"
             }
           ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
       "position": [
-        7424,
+        7440,
         -224
       ],
-      "id": "3170f427-a702-406a-8307-2942a1c67763",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
-              "name": "users",
-              "value": "={{ $('Get asset').item.json.data[0].users }}",
-              "type": "array"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        6176,
-        176
-      ],
-      "id": "703a9ba1-ee56-4a61-94f9-45319b5f43ef",
-      "name": "Edit Fields1"
+      "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
+      "name": "Get org users - attachment",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
     }
   ],
   "connections": {
@@ -2116,7 +2009,7 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "Get org users - attachment",
             "type": "main",
             "index": 0
           }
@@ -2134,7 +2027,7 @@
         ],
         [
           {
-            "node": "Edit Fields1",
+            "node": "Get org users",
             "type": "main",
             "index": 0
           }
@@ -2494,28 +2387,6 @@
         ]
       ]
     },
-    "Filter": {
-      "main": [
-        [
-          {
-            "node": "Prepare attachements",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Split users": {
-      "main": [
-        [
-          {
-            "node": "Filter",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Post knowshare": {
       "main": [
         [
@@ -2532,17 +2403,6 @@
         [
           {
             "node": "Aggregate inputs",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Filter1": {
-      "main": [
-        [
-          {
-            "node": "Post knowshare - no attachments",
             "type": "main",
             "index": 0
           }
@@ -2573,36 +2433,20 @@
     },
     "Get org users": {
       "main": [
-        []
-      ]
-    },
-    "Split users2": {
-      "main": [
         [
           {
-            "node": "Filter1",
+            "node": "Post knowshare - no attachments",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Edit Fields": {
+    "Get org users - attachment": {
       "main": [
         [
           {
-            "node": "Split users",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields1": {
-      "main": [
-        [
-          {
-            "node": "Split users2",
+            "node": "Prepare attachements",
             "type": "main",
             "index": 0
           }
@@ -2623,19 +2467,19 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "345",
+            "content-length": "381",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9cb34a48b70eeecf-WAW",
+            "cf-ray": "9c9b5717e6bec0bb-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Mon, 09 Feb 2026 12:15:05 GMT",
-            "x-forwarded-for": "51.83.252.104, 162.158.172.182",
+            "date": "Fri, 06 Feb 2026 14:29:31 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.200.119",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
@@ -2647,15 +2491,16 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-02-09T12:15:04.4557434Z",
-            "assetId": "08de6254-f1c1-4016-88c0-4efaddae2202",
-            "subject": "Mysz nie działa",
-            "message": "Konieczna wymiana myszy",
+            "createdAt": "2026-02-06T14:29:30.530872Z",
+            "assetId": "08de1d06-3037-4674-8af0-95b7a664eaef",
+            "subject": "Tankowanie ",
+            "message": "Tankowanie ",
             "type": 0,
-            "createdBy": "Michał Kobielski",
-            "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
+            "createdBy": "Andrzej K",
+            "tenantId": "08de2bee-9961-4d6b-874f-91c45982a9d5",
             "attachments": [
-              "89412814-a4b5-4f34-a92e-38187ea541d06993686214337741947.jpg"
+              "148a0eb8-f6c8-47a7-9613-314c41d902826040978894843519041.jpg",
+              "f2676469-9255-4cae-8a0b-df7fdc7d12421360237830086344696.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2667,8 +2512,8 @@
       }
     ]
   },
-  "versionId": "c377448e-0cf3-438c-8bc6-f1eaed89d63e",
-  "activeVersionId": "c377448e-0cf3-438c-8bc6-f1eaed89d63e",
+  "versionId": "30074b29-fd3a-4246-b667-a0b10a0f29f3",
+  "activeVersionId": "30074b29-fd3a-4246-b667-a0b10a0f29f3",
   "triggerCount": 1,
   "shared": [
     {
@@ -2687,9 +2532,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-02-09T12:17:03.515Z",
-    "createdAt": "2026-02-09T12:17:03.515Z",
-    "versionId": "c377448e-0cf3-438c-8bc6-f1eaed89d63e",
+    "updatedAt": "2026-02-13T12:14:49.329Z",
+    "createdAt": "2026-02-13T12:14:49.329Z",
+    "versionId": "30074b29-fd3a-4246-b667-a0b10a0f29f3",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -2896,7 +2741,7 @@
         "parameters": {
           "content": "## Krok 3a - Tworzenie zzgłoszenia z załącznikiem",
           "height": 568,
-          "width": 1784,
+          "width": 2568,
           "color": 3
         },
         "type": "n8n-nodes-base.stickyNote",
@@ -3358,7 +3203,7 @@
         "parameters": {
           "content": "## Krok 3a - Tworzenie zgłoszenia bez załącznika\n",
           "height": 344,
-          "width": 1784,
+          "width": 2568,
           "color": 3
         },
         "type": "n8n-nodes-base.stickyNote",
@@ -4189,13 +4034,13 @@
           "genericAuthType": "httpBearerAuth",
           "sendBody": true,
           "specifyBody": "json",
-          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Filter').item.json.id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Get org users - attachment').item.json.data[0].id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
           "options": {}
         },
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          8288,
+          8000,
           -224
         ],
         "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -4243,69 +4088,19 @@
       },
       {
         "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "loose",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
-                "leftValue": "={{ $json.nickname }}",
-                "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
-                "operator": {
-                  "type": "string",
-                  "operation": "equals"
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "looseTypeValidation": true,
-          "options": {}
-        },
-        "type": "n8n-nodes-base.filter",
-        "typeVersion": 2.2,
-        "position": [
-          7728,
-          -224
-        ],
-        "id": "bb1ad769-99f7-4876-9085-40f604e2ca72",
-        "name": "Filter",
-        "alwaysOutputData": true,
-        "onError": "continueRegularOutput"
-      },
-      {
-        "parameters": {
-          "fieldToSplitOut": "users",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.splitOut",
-        "typeVersion": 1,
-        "position": [
-          7584,
-          -224
-        ],
-        "id": "ea1d570c-3a42-4128-a5ab-ddfd7bac6f91",
-        "name": "Split users"
-      },
-      {
-        "parameters": {
           "method": "POST",
           "url": "https://nocobase.nazca40.com/api/knowshare",
           "authentication": "genericCredentialType",
           "genericAuthType": "httpBearerAuth",
           "sendBody": true,
           "specifyBody": "json",
-          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.id }}}]\n}",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.data[0].id }}}]\n}",
           "options": {}
         },
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          6704,
+          6208,
           176
         ],
         "id": "c190f4aa-52ec-433a-9019-ed2433410d68",
@@ -4319,48 +4114,12 @@
       },
       {
         "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "loose",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "cd0f35a2-1146-4b3c-9e58-486847ba034e",
-                "leftValue": "={{ $json.nickname }}",
-                "rightValue": "={{ $('Webhook').item.json.body.createdBy }}",
-                "operator": {
-                  "type": "string",
-                  "operation": "equals"
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "looseTypeValidation": true,
-          "options": {}
-        },
-        "type": "n8n-nodes-base.filter",
-        "typeVersion": 2.2,
-        "position": [
-          6528,
-          176
-        ],
-        "id": "2b44d46a-584c-45c6-9fa9-d61a6eca4eed",
-        "name": "Filter1",
-        "alwaysOutputData": true,
-        "onError": "continueRegularOutput"
-      },
-      {
-        "parameters": {
           "jsCode": "// Pobieramy dane bezpośrednio z konkretnego węzła po jego nazwie\nconst nodeData = $('Attachments list').item.json;\n\n// Sprawdzamy, czy pole attachments istnieje\nconst attachments = nodeData.attachments || [];\n\n// Mapujemy dane\nconst formattedAttachments = Array.isArray(attachments) \n  ? attachments.map(attachment => {\n      return {\n        id: attachment.data?.id\n      };\n    })\n  : [];\n\nreturn {\n  attachments: formattedAttachments\n};"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7904,
+          7616,
           -224
         ],
         "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -4374,7 +4133,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          8080,
+          7792,
           -224
         ],
         "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
@@ -4383,15 +4142,19 @@
       },
       {
         "parameters": {
-          "url": "https://nocobase.nazca40.com/api/users?appends=organizations",
+          "url": "https://nocobase.nazca40.com/api/users",
           "authentication": "genericCredentialType",
           "genericAuthType": "httpBearerAuth",
           "sendQuery": true,
           "queryParameters": {
             "parameters": [
               {
+                "name": "appends",
+                "value": "organizations"
+              },
+              {
                 "name": "filter",
-                "value": "={ \"organizations\":[{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}}] }"
+                "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"nickname\":\"{{ $('Webhook').item.json.body.createdBy }}\"}"
               }
             ]
           },
@@ -4400,8 +4163,8 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          7952,
-          -48
+          5984,
+          176
         ],
         "id": "f5d54c79-ad97-46ef-a9d5-81dcaa5f7673",
         "name": "Get org users",
@@ -4414,63 +4177,38 @@
       },
       {
         "parameters": {
-          "fieldToSplitOut": "users",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.splitOut",
-        "typeVersion": 1,
-        "position": [
-          6368,
-          176
-        ],
-        "id": "bcc80713-97c8-4a4d-af38-74a847bf1369",
-        "name": "Split users2"
-      },
-      {
-        "parameters": {
-          "assignments": {
-            "assignments": [
+          "url": "https://nocobase.nazca40.com/api/users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
               {
-                "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
-                "name": "users",
-                "value": "={{ $('Get asset').item.json.data[0].users }}",
-                "type": "array"
+                "name": "appends",
+                "value": "organizations"
+              },
+              {
+                "name": "filter",
+                "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"nickname\":\"{{ $('Webhook').item.json.body.createdBy }}\"}"
               }
             ]
           },
           "options": {}
         },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
         "position": [
-          7424,
+          7440,
           -224
         ],
-        "id": "3170f427-a702-406a-8307-2942a1c67763",
-        "name": "Edit Fields"
-      },
-      {
-        "parameters": {
-          "assignments": {
-            "assignments": [
-              {
-                "id": "00d2bd84-b9c4-4da1-bea2-4d9951c214ac",
-                "name": "users",
-                "value": "={{ $('Get asset').item.json.data[0].users }}",
-                "type": "array"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          6176,
-          176
-        ],
-        "id": "703a9ba1-ee56-4a61-94f9-45319b5f43ef",
-        "name": "Edit Fields1"
+        "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
+        "name": "Get org users - attachment",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
       }
     ],
     "connections": {
@@ -4802,7 +4540,7 @@
         "main": [
           [
             {
-              "node": "Edit Fields",
+              "node": "Get org users - attachment",
               "type": "main",
               "index": 0
             }
@@ -4820,7 +4558,7 @@
           ],
           [
             {
-              "node": "Edit Fields1",
+              "node": "Get org users",
               "type": "main",
               "index": 0
             }
@@ -5180,28 +4918,6 @@
           ]
         ]
       },
-      "Filter": {
-        "main": [
-          [
-            {
-              "node": "Prepare attachements",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Split users": {
-        "main": [
-          [
-            {
-              "node": "Filter",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Post knowshare": {
         "main": [
           [
@@ -5218,17 +4934,6 @@
           [
             {
               "node": "Aggregate inputs",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Filter1": {
-        "main": [
-          [
-            {
-              "node": "Post knowshare - no attachments",
               "type": "main",
               "index": 0
             }
@@ -5259,36 +4964,20 @@
       },
       "Get org users": {
         "main": [
-          []
-        ]
-      },
-      "Split users2": {
-        "main": [
           [
             {
-              "node": "Filter1",
+              "node": "Post knowshare - no attachments",
               "type": "main",
               "index": 0
             }
           ]
         ]
       },
-      "Edit Fields": {
+      "Get org users - attachment": {
         "main": [
           [
             {
-              "node": "Split users",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Edit Fields1": {
-        "main": [
-          [
-            {
-              "node": "Split users2",
+              "node": "Prepare attachements",
               "type": "main",
               "index": 0
             }
