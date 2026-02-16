@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-13T12:14:49.327Z",
+  "updatedAt": "2026-02-16T14:25:39.983Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -427,7 +427,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9952,
+        9712,
         -16
       ],
       "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -459,7 +459,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        9360,
+        9120,
         0
       ],
       "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -479,7 +479,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9184,
+        8944,
         0
       ],
       "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -698,7 +698,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        8992,
+        8752,
         0
       ],
       "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -706,7 +706,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first().json.safe_message || \"\"; \n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim(); \n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Tworzenie nowego pola 'task_description' (podsumowanie)\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 9. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription\n    }\n}];\n"
+        "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output?.[0]?.content?.[0]?.text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first()?.json?.safe_message || \"\";\n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            priority: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Mapowanie typu z Webhook na priority\nconst typeRaw = $('Webhook').first()?.json?.body?.type;\n\nconst priorityMap = {\n    0: \"03_low\",\n    1: \"02_medium\",\n    2: \"01_high\"\n};\n\nconst priority = priorityMap[typeRaw] ?? \"03_low\"; // fallback domyślny\n\n// 9. Tworzenie nowego pola 'task_description'\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 10. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription,\n        priority: priority\n    }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -769,7 +769,7 @@
             {
               "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
               "name": "recipients",
-              "value": "={{ $('Get asset').item.json.data[0].users }}",
+              "value": "={{\n  $if(\n    $(\"Get org users - attachment\").isExecuted,\n    $(\"Get org users - attachment\").first().json.data,\n    $if(\n      $(\"Get org users\").isExecuted,\n      $(\"Get org users\").first().json.data,\n      []\n    )\n  )\n}}",
               "type": "array"
             },
             {
@@ -785,7 +785,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        10160,
+        10176,
         -16
       ],
       "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -982,8 +982,7 @@
         "fromEmail": "nazca4@apagroup.pl",
         "toEmail": "={{ $('Loop over notification data').item.json.email }}",
         "subject": "=Nowa wiadomość knowshare",
-        "emailFormat": "text",
-        "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset').item.json.data[0].name }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+        "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\n\nbody{\n  font-family:'Inter',system-ui,sans-serif;\n  background:#14131f;\n  color:#e9e7f5;\n  padding:28px 16px;\n}\n\n.wrap{\n  max-width:760px;\n  margin:0 auto;\n}\n\n/* Header (match the “status mail” style: no emoji, clean) */\n.top{\n  padding:6px 4px 18px 4px;\n}\n.top h1{\n  font-size:24px;\n  font-weight:800;\n  letter-spacing:.2px;\n  color:#ffffff;\n}\n.top .sub{\n  margin-top:8px;\n  font-size:13px;\n  color:#bdb9d6;\n}\n\n/* One big frame */\n.frame{\n  border:1px solid rgba(255,255,255,.22);\n  border-radius:12px;\n  overflow:hidden;\n  background:rgba(255,255,255,.02);\n}\n\n.content{\n  padding:22px;\n}\n\n/* Minimal inner layout (reduce “box chaos”) */\n.row{margin-top:14px}\n\n.label{\n  font-size:12px;\n  color:#b9b6d3;\n  margin-bottom:6px;\n}\n\n.value{\n  font-size:16px;\n  font-weight:700;\n  color:#d6e6ff;\n  word-break:break-word;\n}\n\n/* Text block (single subtle panel like in comment mail) */\n.text{\n  margin-top:8px;\n  padding:12px 14px;\n  border-radius:10px;\n  background:rgba(255,255,255,.06);\n  border:1px solid rgba(255,255,255,.10);\n  white-space:pre-wrap;\n  word-break:break-word;\n  font-size:14px;\n  line-height:1.65;\n  color:#efeef8;\n  opacity:.95;\n}\n\n/* Section separator */\n.section-title{\n  margin-top:22px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n  font-size:12px;\n  font-weight:800;\n  color:#ffffff;\n  letter-spacing:.25px;\n  text-transform:none;\n}\n\n/* Links section (same as status/comment mail) */\n.links{\n  margin-top:28px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n}\n\n.link{\n  display:inline-block;\n  margin-top:8px;\n  font-size:13px;\n  font-weight:600;\n  color:#8cc3ff;\n  text-decoration:none;\n  padding:6px 10px;\n  border-radius:8px;\n  background:rgba(255,255,255,.05);\n  border:1px solid rgba(255,255,255,.10);\n}\n\n/* Footer band */\n.footer{\n  background:rgba(255,255,255,.18);\n  padding:14px 18px;\n  color:#e7e6f3;\n  font-size:12px;\n  line-height:1.45;\n}\n.footer .small{opacity:.85}\n.footer strong{font-weight:900}\n</style>\n</head>\n<body>\n  <div class=\"wrap\">\n\n    <div class=\"top\">\n      <h1>Knowshare — nowe zgłoszenie</h1>\n      <div class=\"sub\">Powiadomienie z analizy treści i rekomendacji (AI).</div>\n    </div>\n\n    <div class=\"frame\">\n      <div class=\"content\">\n\n        <div class=\"row\">\n          <div class=\"label\">Temat</div>\n          <div class=\"value\">{{ $('Task content').first().json.task_title }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Asset</div>\n          <div class=\"value\">{{ $('Get asset').item.json.data[0].name }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Autor</div>\n          <div class=\"value\">{{ $('Webhook').first().json.body.createdBy }}</div>\n        </div>\n\n        <div class=\"section-title\">Oryginalne zgłoszenie</div>\n        <div class=\"text\">{{ $('Safe subject and message').item.json.safe_message }}</div>\n\n        <div class=\"section-title\">Interpretacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.interpretation }}</div>\n\n        <div class=\"section-title\">Rekomendacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.recommendation }}</div>\n\n        <div class=\"links\">\n          <div class=\"label\">Linki</div>\n          <a class=\"link\" href=\"https://knowshare.nazca40.com\">Otwórz w Knowshare</a>\n        </div>\n\n      </div>\n\n      <div class=\"footer\">\n        <div class=\"small\">\n          Wiadomość wygenerowana automatycznie przez <strong>Knowshare</strong>.\n        </div>\n        <div class=\"small\">\n          © APA Group — Your Technology. Reinvented.\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>\n",
         "options": {
           "appendAttribution": false
         }
@@ -991,7 +990,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        12016,
+        12000,
         176
       ],
       "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -1362,7 +1361,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        9728,
+        9488,
         96
       ],
       "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -1433,7 +1432,7 @@
     },
     {
       "parameters": {
-        "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users",
+        "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users,localization",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendQuery": true,
@@ -1503,7 +1502,7 @@
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Get org users - attachment').item.json.data[0].id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Get org users - attachment').item.json.data[0].id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}],\n\"priority\":\"{{ $('Task content').item.json.priority }}\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -1563,7 +1562,7 @@
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.data[0].id }}}]\n}",
+        "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.data[0].id }}}],\n\"priority\":\"{{ $('Task content').item.json.priority }}\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -1672,6 +1671,41 @@
       ],
       "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
       "name": "Get org users - attachment",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "XjWd4OAeIo2QP5V7",
+          "name": "Nocobase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://nocobase.nazca40.com/api/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "appends",
+              "value": "organizations"
+            },
+            {
+              "name": "filter",
+              "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"managedLocalizations\":{\"id\":{{ $('Get asset').item.json.data[0].localization[0].id }}}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9952,
+        -16
+      ],
+      "id": "11b11ede-fb2b-4443-9ca4-923101c79452",
+      "name": "Get org users - localization admins",
       "credentials": {
         "httpBearerAuth": {
           "id": "XjWd4OAeIo2QP5V7",
@@ -1903,7 +1937,7 @@
       "main": [
         [
           {
-            "node": "Notification data",
+            "node": "Get org users - localization admins",
             "type": "main",
             "index": 0
           }
@@ -2452,6 +2486,17 @@
           }
         ]
       ]
+    },
+    "Get org users - localization admins": {
+      "main": [
+        [
+          {
+            "node": "Notification data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2467,23 +2512,23 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "381",
+            "content-length": "408",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9c9b5717e6bec0bb-WAW",
+            "cf-ray": "9ced6f3394f6eecb-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Fri, 06 Feb 2026 14:29:31 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.64.200.119",
+            "date": "Mon, 16 Feb 2026 13:36:31 GMT",
+            "x-forwarded-for": "51.83.252.104, 162.158.172.183",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-sfczw",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-vzwn5",
             "x-is-trusted": "yes",
             "x-real-ip": "51.83.252.104"
           },
@@ -2491,16 +2536,16 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-02-06T14:29:30.530872Z",
-            "assetId": "08de1d06-3037-4674-8af0-95b7a664eaef",
-            "subject": "Tankowanie ",
-            "message": "Tankowanie ",
-            "type": 0,
-            "createdBy": "Andrzej K",
-            "tenantId": "08de2bee-9961-4d6b-874f-91c45982a9d5",
+            "createdAt": "2026-02-16T13:36:30.5132962Z",
+            "assetId": "08de5a75-48d3-4062-8679-dc089d935187",
+            "subject": "Uszkodzona mysz",
+            "message": "Dostarczono uszkodzoną mysz",
+            "type": 2,
+            "createdBy": "Michał Złoty",
+            "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
             "attachments": [
-              "148a0eb8-f6c8-47a7-9613-314c41d902826040978894843519041.jpg",
-              "f2676469-9255-4cae-8a0b-df7fdc7d12421360237830086344696.jpg"
+              "353d0b32-8348-469d-aa45-4e636d2c1c963631360191807500914.jpg",
+              "b6ac1745-7dd1-4c92-a643-4c83a25496b34833812001520397191.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2512,8 +2557,8 @@
       }
     ]
   },
-  "versionId": "30074b29-fd3a-4246-b667-a0b10a0f29f3",
-  "activeVersionId": "30074b29-fd3a-4246-b667-a0b10a0f29f3",
+  "versionId": "d87bf293-0784-4486-88f3-3e8fbcf18dcd",
+  "activeVersionId": "d87bf293-0784-4486-88f3-3e8fbcf18dcd",
   "triggerCount": 1,
   "shared": [
     {
@@ -2532,9 +2577,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-02-13T12:14:49.329Z",
-    "createdAt": "2026-02-13T12:14:49.329Z",
-    "versionId": "30074b29-fd3a-4246-b667-a0b10a0f29f3",
+    "updatedAt": "2026-02-16T14:25:39.985Z",
+    "createdAt": "2026-02-16T14:25:39.985Z",
+    "versionId": "d87bf293-0784-4486-88f3-3e8fbcf18dcd",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -2958,7 +3003,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          9952,
+          9712,
           -16
         ],
         "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -2990,7 +3035,7 @@
         "type": "@n8n/n8n-nodes-langchain.openAi",
         "typeVersion": 2,
         "position": [
-          9360,
+          9120,
           0
         ],
         "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -3010,7 +3055,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          9184,
+          8944,
           0
         ],
         "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -3229,7 +3274,7 @@
         "type": "n8n-nodes-base.aggregate",
         "typeVersion": 1,
         "position": [
-          8992,
+          8752,
           0
         ],
         "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -3237,7 +3282,7 @@
       },
       {
         "parameters": {
-          "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output[0].content[0].text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first().json.safe_message || \"\"; \n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim(); \n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Tworzenie nowego pola 'task_description' (podsumowanie)\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 9. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription\n    }\n}];\n"
+          "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output?.[0]?.content?.[0]?.text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first()?.json?.safe_message || \"\";\n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            priority: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Mapowanie typu z Webhook na priority\nconst typeRaw = $('Webhook').first()?.json?.body?.type;\n\nconst priorityMap = {\n    0: \"03_low\",\n    1: \"02_medium\",\n    2: \"01_high\"\n};\n\nconst priority = priorityMap[typeRaw] ?? \"03_low\"; // fallback domyślny\n\n// 9. Tworzenie nowego pola 'task_description'\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 10. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription,\n        priority: priority\n    }\n}];\n"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
@@ -3300,7 +3345,7 @@
               {
                 "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
                 "name": "recipients",
-                "value": "={{ $('Get asset').item.json.data[0].users }}",
+                "value": "={{\n  $if(\n    $(\"Get org users - attachment\").isExecuted,\n    $(\"Get org users - attachment\").first().json.data,\n    $if(\n      $(\"Get org users\").isExecuted,\n      $(\"Get org users\").first().json.data,\n      []\n    )\n  )\n}}",
                 "type": "array"
               },
               {
@@ -3316,7 +3361,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          10160,
+          10176,
           -16
         ],
         "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -3513,8 +3558,7 @@
           "fromEmail": "nazca4@apagroup.pl",
           "toEmail": "={{ $('Loop over notification data').item.json.email }}",
           "subject": "=Nowa wiadomość knowshare",
-          "emailFormat": "text",
-          "text": "=Temat: {{ $('Task content').first().json.task_title }}\n\nOryginalne zgłoszenie: {{ $('Safe subject and message').item.json.safe_message }}\nInterpretacja AI: {{ $('Task content').first().json.interpretation }}\nRekomendacja AI: {{ $('Task content').first().json.recommendation }}\n\nAsset: {{ $('Get asset').item.json.data[0].name }}\nAutor: {{ $('Webhook').first().json.body.createdBy }}",
+          "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\n\nbody{\n  font-family:'Inter',system-ui,sans-serif;\n  background:#14131f;\n  color:#e9e7f5;\n  padding:28px 16px;\n}\n\n.wrap{\n  max-width:760px;\n  margin:0 auto;\n}\n\n/* Header (match the “status mail” style: no emoji, clean) */\n.top{\n  padding:6px 4px 18px 4px;\n}\n.top h1{\n  font-size:24px;\n  font-weight:800;\n  letter-spacing:.2px;\n  color:#ffffff;\n}\n.top .sub{\n  margin-top:8px;\n  font-size:13px;\n  color:#bdb9d6;\n}\n\n/* One big frame */\n.frame{\n  border:1px solid rgba(255,255,255,.22);\n  border-radius:12px;\n  overflow:hidden;\n  background:rgba(255,255,255,.02);\n}\n\n.content{\n  padding:22px;\n}\n\n/* Minimal inner layout (reduce “box chaos”) */\n.row{margin-top:14px}\n\n.label{\n  font-size:12px;\n  color:#b9b6d3;\n  margin-bottom:6px;\n}\n\n.value{\n  font-size:16px;\n  font-weight:700;\n  color:#d6e6ff;\n  word-break:break-word;\n}\n\n/* Text block (single subtle panel like in comment mail) */\n.text{\n  margin-top:8px;\n  padding:12px 14px;\n  border-radius:10px;\n  background:rgba(255,255,255,.06);\n  border:1px solid rgba(255,255,255,.10);\n  white-space:pre-wrap;\n  word-break:break-word;\n  font-size:14px;\n  line-height:1.65;\n  color:#efeef8;\n  opacity:.95;\n}\n\n/* Section separator */\n.section-title{\n  margin-top:22px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n  font-size:12px;\n  font-weight:800;\n  color:#ffffff;\n  letter-spacing:.25px;\n  text-transform:none;\n}\n\n/* Links section (same as status/comment mail) */\n.links{\n  margin-top:28px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n}\n\n.link{\n  display:inline-block;\n  margin-top:8px;\n  font-size:13px;\n  font-weight:600;\n  color:#8cc3ff;\n  text-decoration:none;\n  padding:6px 10px;\n  border-radius:8px;\n  background:rgba(255,255,255,.05);\n  border:1px solid rgba(255,255,255,.10);\n}\n\n/* Footer band */\n.footer{\n  background:rgba(255,255,255,.18);\n  padding:14px 18px;\n  color:#e7e6f3;\n  font-size:12px;\n  line-height:1.45;\n}\n.footer .small{opacity:.85}\n.footer strong{font-weight:900}\n</style>\n</head>\n<body>\n  <div class=\"wrap\">\n\n    <div class=\"top\">\n      <h1>Knowshare — nowe zgłoszenie</h1>\n      <div class=\"sub\">Powiadomienie z analizy treści i rekomendacji (AI).</div>\n    </div>\n\n    <div class=\"frame\">\n      <div class=\"content\">\n\n        <div class=\"row\">\n          <div class=\"label\">Temat</div>\n          <div class=\"value\">{{ $('Task content').first().json.task_title }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Asset</div>\n          <div class=\"value\">{{ $('Get asset').item.json.data[0].name }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Autor</div>\n          <div class=\"value\">{{ $('Webhook').first().json.body.createdBy }}</div>\n        </div>\n\n        <div class=\"section-title\">Oryginalne zgłoszenie</div>\n        <div class=\"text\">{{ $('Safe subject and message').item.json.safe_message }}</div>\n\n        <div class=\"section-title\">Interpretacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.interpretation }}</div>\n\n        <div class=\"section-title\">Rekomendacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.recommendation }}</div>\n\n        <div class=\"links\">\n          <div class=\"label\">Linki</div>\n          <a class=\"link\" href=\"https://knowshare.nazca40.com\">Otwórz w Knowshare</a>\n        </div>\n\n      </div>\n\n      <div class=\"footer\">\n        <div class=\"small\">\n          Wiadomość wygenerowana automatycznie przez <strong>Knowshare</strong>.\n        </div>\n        <div class=\"small\">\n          © APA Group — Your Technology. Reinvented.\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>\n",
           "options": {
             "appendAttribution": false
           }
@@ -3522,7 +3566,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          12016,
+          12000,
           176
         ],
         "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -3893,7 +3937,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          9728,
+          9488,
           96
         ],
         "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -3964,7 +4008,7 @@
       },
       {
         "parameters": {
-          "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users",
+          "url": "https://nocobase.nazca40.com/api/assets?appends=organizations,users,localization",
           "authentication": "genericCredentialType",
           "genericAuthType": "httpBearerAuth",
           "sendQuery": true,
@@ -4034,7 +4078,7 @@
           "genericAuthType": "httpBearerAuth",
           "sendBody": true,
           "specifyBody": "json",
-          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Get org users - attachment').item.json.data[0].id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}]\n}",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\n\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"attachments\": {{ JSON.stringify($('Prepare attachements').item.json.attachments) }},\n\"reporter\":[{\"id\":{{ $('Get org users - attachment').item.json.data[0].id }}}],\n\"mainImage\": [{\"id\":{{ $('Prepare main image').item.json.mainImage }}}],\n\"priority\":\"{{ $('Task content').item.json.priority }}\"\n}",
           "options": {}
         },
         "type": "n8n-nodes-base.httpRequest",
@@ -4094,7 +4138,7 @@
           "genericAuthType": "httpBearerAuth",
           "sendBody": true,
           "specifyBody": "json",
-          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.data[0].id }}}]\n}",
+          "jsonBody": "={\n\"asset\":[{\"id\":{{ $('Get asset').item.json.data[0].id }},\"assetId\":\"{{ $('Get asset').item.json.data[0].assetId }}\"}],\n\"title\":\"{{ $('Task content').item.json.task_title }}\",\n\"description\":\"{{ $('Task content').item.json.task_description }}\",\n\"originalTitle\":\"{{ $('Safe subject and message').item.json.safe_subject }}\",\n\"originalDescription\":\"{{ $('Safe subject and message').item.json.safe_message }}\",\n\"reporter\":[{\"id\":{{ $json.data[0].id }}}],\n\"priority\":\"{{ $('Task content').item.json.priority }}\"\n}",
           "options": {}
         },
         "type": "n8n-nodes-base.httpRequest",
@@ -4203,6 +4247,41 @@
         ],
         "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
         "name": "Get org users - attachment",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "XjWd4OAeIo2QP5V7",
+            "name": "Nocobase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://nocobase.nazca40.com/api/users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBearerAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "appends",
+                "value": "organizations"
+              },
+              {
+                "name": "filter",
+                "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"managedLocalizations\":{\"id\":{{ $('Get asset').item.json.data[0].localization[0].id }}}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          9952,
+          -16
+        ],
+        "id": "11b11ede-fb2b-4443-9ca4-923101c79452",
+        "name": "Get org users - localization admins",
         "credentials": {
           "httpBearerAuth": {
             "id": "XjWd4OAeIo2QP5V7",
@@ -4434,7 +4513,7 @@
         "main": [
           [
             {
-              "node": "Notification data",
+              "node": "Get org users - localization admins",
               "type": "main",
               "index": 0
             }
@@ -4978,6 +5057,17 @@
           [
             {
               "node": "Prepare attachements",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get org users - localization admins": {
+        "main": [
+          [
+            {
+              "node": "Notification data",
               "type": "main",
               "index": 0
             }
