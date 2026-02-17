@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-16T14:25:39.983Z",
+  "updatedAt": "2026-02-17T07:22:33.657Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -769,7 +769,7 @@
             {
               "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
               "name": "recipients",
-              "value": "={{\n  $if(\n    $(\"Get org users - attachment\").isExecuted,\n    $(\"Get org users - attachment\").first().json.data,\n    $if(\n      $(\"Get org users\").isExecuted,\n      $(\"Get org users\").first().json.data,\n      []\n    )\n  )\n}}",
+              "value": "={{\n  (() => {\n    const aRaw = $(\"Get org users - attachment\").first()?.json?.data ?? \n                 $(\"Get org users\").first()?.json?.data ?? \n                 [];\n\n    const a = Array.isArray(aRaw) ? aRaw : (aRaw ? [aRaw] : []);\n\n    const bRaw = $json.data ?? [];\n    const b = Array.isArray(bRaw) ? bRaw : (bRaw ? [bRaw] : []);\n\n    return [...a, ...b];\n  })()\n}}",
               "type": "array"
             },
             {
@@ -981,8 +981,8 @@
       "parameters": {
         "fromEmail": "nazca4@apagroup.pl",
         "toEmail": "={{ $('Loop over notification data').item.json.email }}",
-        "subject": "=Nowa wiadomość knowshare",
-        "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\n\nbody{\n  font-family:'Inter',system-ui,sans-serif;\n  background:#14131f;\n  color:#e9e7f5;\n  padding:28px 16px;\n}\n\n.wrap{\n  max-width:760px;\n  margin:0 auto;\n}\n\n/* Header (match the “status mail” style: no emoji, clean) */\n.top{\n  padding:6px 4px 18px 4px;\n}\n.top h1{\n  font-size:24px;\n  font-weight:800;\n  letter-spacing:.2px;\n  color:#ffffff;\n}\n.top .sub{\n  margin-top:8px;\n  font-size:13px;\n  color:#bdb9d6;\n}\n\n/* One big frame */\n.frame{\n  border:1px solid rgba(255,255,255,.22);\n  border-radius:12px;\n  overflow:hidden;\n  background:rgba(255,255,255,.02);\n}\n\n.content{\n  padding:22px;\n}\n\n/* Minimal inner layout (reduce “box chaos”) */\n.row{margin-top:14px}\n\n.label{\n  font-size:12px;\n  color:#b9b6d3;\n  margin-bottom:6px;\n}\n\n.value{\n  font-size:16px;\n  font-weight:700;\n  color:#d6e6ff;\n  word-break:break-word;\n}\n\n/* Text block (single subtle panel like in comment mail) */\n.text{\n  margin-top:8px;\n  padding:12px 14px;\n  border-radius:10px;\n  background:rgba(255,255,255,.06);\n  border:1px solid rgba(255,255,255,.10);\n  white-space:pre-wrap;\n  word-break:break-word;\n  font-size:14px;\n  line-height:1.65;\n  color:#efeef8;\n  opacity:.95;\n}\n\n/* Section separator */\n.section-title{\n  margin-top:22px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n  font-size:12px;\n  font-weight:800;\n  color:#ffffff;\n  letter-spacing:.25px;\n  text-transform:none;\n}\n\n/* Links section (same as status/comment mail) */\n.links{\n  margin-top:28px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n}\n\n.link{\n  display:inline-block;\n  margin-top:8px;\n  font-size:13px;\n  font-weight:600;\n  color:#8cc3ff;\n  text-decoration:none;\n  padding:6px 10px;\n  border-radius:8px;\n  background:rgba(255,255,255,.05);\n  border:1px solid rgba(255,255,255,.10);\n}\n\n/* Footer band */\n.footer{\n  background:rgba(255,255,255,.18);\n  padding:14px 18px;\n  color:#e7e6f3;\n  font-size:12px;\n  line-height:1.45;\n}\n.footer .small{opacity:.85}\n.footer strong{font-weight:900}\n</style>\n</head>\n<body>\n  <div class=\"wrap\">\n\n    <div class=\"top\">\n      <h1>Knowshare — nowe zgłoszenie</h1>\n      <div class=\"sub\">Powiadomienie z analizy treści i rekomendacji (AI).</div>\n    </div>\n\n    <div class=\"frame\">\n      <div class=\"content\">\n\n        <div class=\"row\">\n          <div class=\"label\">Temat</div>\n          <div class=\"value\">{{ $('Task content').first().json.task_title }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Asset</div>\n          <div class=\"value\">{{ $('Get asset').item.json.data[0].name }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Autor</div>\n          <div class=\"value\">{{ $('Webhook').first().json.body.createdBy }}</div>\n        </div>\n\n        <div class=\"section-title\">Oryginalne zgłoszenie</div>\n        <div class=\"text\">{{ $('Safe subject and message').item.json.safe_message }}</div>\n\n        <div class=\"section-title\">Interpretacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.interpretation }}</div>\n\n        <div class=\"section-title\">Rekomendacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.recommendation }}</div>\n\n        <div class=\"links\">\n          <div class=\"label\">Linki</div>\n          <a class=\"link\" href=\"https://knowshare.nazca40.com\">Otwórz w Knowshare</a>\n        </div>\n\n      </div>\n\n      <div class=\"footer\">\n        <div class=\"small\">\n          Wiadomość wygenerowana automatycznie przez <strong>Knowshare</strong>.\n        </div>\n        <div class=\"small\">\n          © APA Group — Your Technology. Reinvented.\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>\n",
+        "subject": "Knowshare - nowe zgłoszenie",
+        "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\n\nbody{\n  font-family:'Inter',system-ui,sans-serif;\n  background:#14131f;\n  color:#e9e7f5;\n  padding:28px 16px;\n}\n\n.wrap{\n  max-width:760px;\n  margin:0 auto;\n}\n\n/* Header (match the “status mail” style: no emoji, clean) */\n.top{\n  padding:6px 4px 18px 4px;\n}\n.top h1{\n  font-size:24px;\n  font-weight:800;\n  letter-spacing:.2px;\n  color:#ffffff;\n}\n.top .sub{\n  margin-top:8px;\n  font-size:13px;\n  color:#bdb9d6;\n}\n\n/* One big frame */\n.frame{\n  border:1px solid rgba(255,255,255,.22);\n  border-radius:12px;\n  overflow:hidden;\n  background:rgba(255,255,255,.02);\n}\n\n.content{\n  padding:22px;\n}\n\n/* Minimal inner layout (reduce “box chaos”) */\n.row{margin-top:14px}\n\n.label{\n  font-size:12px;\n  color:#b9b6d3;\n  margin-bottom:6px;\n}\n\n.value{\n  font-size:16px;\n  font-weight:700;\n  color:#d6e6ff;\n  word-break:break-word;\n}\n\n/* Text block (single subtle panel like in comment mail) */\n.text{\n  margin-top:8px;\n  padding:12px 14px;\n  border-radius:10px;\n  background:rgba(255,255,255,.06);\n  border:1px solid rgba(255,255,255,.10);\n  white-space:pre-wrap;\n  word-break:break-word;\n  font-size:14px;\n  line-height:1.65;\n  color:#efeef8;\n  opacity:.95;\n}\n\n/* Section separator */\n.section-title{\n  margin-top:22px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n  font-size:12px;\n  font-weight:800;\n  color:#ffffff;\n  letter-spacing:.25px;\n  text-transform:none;\n}\n\n/* Links section (same as status/comment mail) */\n.links{\n  margin-top:28px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n}\n\n.link{\n  display:inline-block;\n  margin-top:8px;\n  font-size:13px;\n  font-weight:600;\n  color:#8cc3ff;\n  text-decoration:none;\n  padding:6px 10px;\n  border-radius:8px;\n  background:rgba(255,255,255,.05);\n  border:1px solid rgba(255,255,255,.10);\n}\n\n/* Footer band */\n.footer{\n  background:rgba(255,255,255,.18);\n  padding:14px 18px;\n  color:#e7e6f3;\n  font-size:12px;\n  line-height:1.45;\n}\n.footer .small{opacity:.85}\n.footer strong{font-weight:900}\n</style>\n</head>\n<body>\n  <div class=\"wrap\">\n\n    <div class=\"top\">\n      <h1>Nowe zgłoszenie</h1>\n      <div class=\"sub\">Powiadomienie z analizy treści i rekomendacji (AI).</div>\n    </div>\n\n    <div class=\"frame\">\n      <div class=\"content\">\n\n        <div class=\"row\">\n          <div class=\"label\">Temat</div>\n          <div class=\"value\">{{ $('Task content').first().json.task_title }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Asset</div>\n          <div class=\"value\">{{ $('Get asset').item.json.data[0].name }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Autor</div>\n          <div class=\"value\">{{ $('Webhook').first().json.body.createdBy }}</div>\n        </div>\n\n        <div class=\"section-title\">Oryginalne zgłoszenie</div>\n        <div class=\"text\">{{ $('Safe subject and message').item.json.safe_message }}</div>\n\n        <div class=\"section-title\">Interpretacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.interpretation }}</div>\n\n        <div class=\"section-title\">Rekomendacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.recommendation }}</div>\n\n        <div class=\"links\">\n          <div class=\"label\">Linki</div>\n          <a class=\"link\" href=\"https://knowshare.nazca40.com\">Otwórz w Knowshare</a>\n        </div>\n\n      </div>\n\n      <div class=\"footer\">\n        <div class=\"small\">\n          Wiadomość wygenerowana automatycznie przez <strong>Knowshare</strong>.\n        </div>\n        <div class=\"small\">\n          © APA Group — Your Technology. Reinvented.\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>\n",
         "options": {
           "appendAttribution": false
         }
@@ -1692,7 +1692,7 @@
             },
             {
               "name": "filter",
-              "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"managedLocalizations\":{\"id\":{{ $('Get asset').item.json.data[0].localization[0].id }}}}"
+              "value": "={\"$or\":[{\"organizations.id\":{{ $('Get asset').item.json.data[0].organizations[0].id }},\"managedLocalizations.descendants.id\":{{ $('Get asset').item.json.data[0].localization[0].id }}},{\"organizations.id\":{{ $('Get asset').item.json.data[0].organizations[0].id }},\"managedLocalizations.id\":{{ $('Get asset').item.json.data[0].localization[0].id }}}]}"
             }
           ]
         },
@@ -2512,23 +2512,23 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "408",
+            "content-length": "396",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9ced6f3394f6eecb-WAW",
+            "cf-ray": "9cedbe55b095aef1-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Mon, 16 Feb 2026 13:36:31 GMT",
-            "x-forwarded-for": "51.83.252.104, 162.158.172.183",
+            "date": "Mon, 16 Feb 2026 14:30:32 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.198.34",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-vzwn5",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-sfczw",
             "x-is-trusted": "yes",
             "x-real-ip": "51.83.252.104"
           },
@@ -2536,16 +2536,15 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-02-16T13:36:30.5132962Z",
+            "createdAt": "2026-02-16T14:30:32.2587983Z",
             "assetId": "08de5a75-48d3-4062-8679-dc089d935187",
-            "subject": "Uszkodzona mysz",
-            "message": "Dostarczono uszkodzoną mysz",
+            "subject": "Dostarczono uszkodzony termometr",
+            "message": "Termometr się zepsuł i pokazuje temperaturę w Farenhaitach",
             "type": 2,
             "createdBy": "Michał Złoty",
             "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
             "attachments": [
-              "353d0b32-8348-469d-aa45-4e636d2c1c963631360191807500914.jpg",
-              "b6ac1745-7dd1-4c92-a643-4c83a25496b34833812001520397191.jpg"
+              "e8b67ffa-f2dd-4bb7-9d36-b4a6984291025193742326150425042.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2557,8 +2556,8 @@
       }
     ]
   },
-  "versionId": "d87bf293-0784-4486-88f3-3e8fbcf18dcd",
-  "activeVersionId": "d87bf293-0784-4486-88f3-3e8fbcf18dcd",
+  "versionId": "5f4f4efb-a611-4778-9399-3b5ac69d446c",
+  "activeVersionId": "5f4f4efb-a611-4778-9399-3b5ac69d446c",
   "triggerCount": 1,
   "shared": [
     {
@@ -2577,9 +2576,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-02-16T14:25:39.985Z",
-    "createdAt": "2026-02-16T14:25:39.985Z",
-    "versionId": "d87bf293-0784-4486-88f3-3e8fbcf18dcd",
+    "updatedAt": "2026-02-17T07:22:33.659Z",
+    "createdAt": "2026-02-17T07:22:33.659Z",
+    "versionId": "5f4f4efb-a611-4778-9399-3b5ac69d446c",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -3345,7 +3344,7 @@
               {
                 "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
                 "name": "recipients",
-                "value": "={{\n  $if(\n    $(\"Get org users - attachment\").isExecuted,\n    $(\"Get org users - attachment\").first().json.data,\n    $if(\n      $(\"Get org users\").isExecuted,\n      $(\"Get org users\").first().json.data,\n      []\n    )\n  )\n}}",
+                "value": "={{\n  (() => {\n    const aRaw = $(\"Get org users - attachment\").first()?.json?.data ?? \n                 $(\"Get org users\").first()?.json?.data ?? \n                 [];\n\n    const a = Array.isArray(aRaw) ? aRaw : (aRaw ? [aRaw] : []);\n\n    const bRaw = $json.data ?? [];\n    const b = Array.isArray(bRaw) ? bRaw : (bRaw ? [bRaw] : []);\n\n    return [...a, ...b];\n  })()\n}}",
                 "type": "array"
               },
               {
@@ -3557,8 +3556,8 @@
         "parameters": {
           "fromEmail": "nazca4@apagroup.pl",
           "toEmail": "={{ $('Loop over notification data').item.json.email }}",
-          "subject": "=Nowa wiadomość knowshare",
-          "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\n\nbody{\n  font-family:'Inter',system-ui,sans-serif;\n  background:#14131f;\n  color:#e9e7f5;\n  padding:28px 16px;\n}\n\n.wrap{\n  max-width:760px;\n  margin:0 auto;\n}\n\n/* Header (match the “status mail” style: no emoji, clean) */\n.top{\n  padding:6px 4px 18px 4px;\n}\n.top h1{\n  font-size:24px;\n  font-weight:800;\n  letter-spacing:.2px;\n  color:#ffffff;\n}\n.top .sub{\n  margin-top:8px;\n  font-size:13px;\n  color:#bdb9d6;\n}\n\n/* One big frame */\n.frame{\n  border:1px solid rgba(255,255,255,.22);\n  border-radius:12px;\n  overflow:hidden;\n  background:rgba(255,255,255,.02);\n}\n\n.content{\n  padding:22px;\n}\n\n/* Minimal inner layout (reduce “box chaos”) */\n.row{margin-top:14px}\n\n.label{\n  font-size:12px;\n  color:#b9b6d3;\n  margin-bottom:6px;\n}\n\n.value{\n  font-size:16px;\n  font-weight:700;\n  color:#d6e6ff;\n  word-break:break-word;\n}\n\n/* Text block (single subtle panel like in comment mail) */\n.text{\n  margin-top:8px;\n  padding:12px 14px;\n  border-radius:10px;\n  background:rgba(255,255,255,.06);\n  border:1px solid rgba(255,255,255,.10);\n  white-space:pre-wrap;\n  word-break:break-word;\n  font-size:14px;\n  line-height:1.65;\n  color:#efeef8;\n  opacity:.95;\n}\n\n/* Section separator */\n.section-title{\n  margin-top:22px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n  font-size:12px;\n  font-weight:800;\n  color:#ffffff;\n  letter-spacing:.25px;\n  text-transform:none;\n}\n\n/* Links section (same as status/comment mail) */\n.links{\n  margin-top:28px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n}\n\n.link{\n  display:inline-block;\n  margin-top:8px;\n  font-size:13px;\n  font-weight:600;\n  color:#8cc3ff;\n  text-decoration:none;\n  padding:6px 10px;\n  border-radius:8px;\n  background:rgba(255,255,255,.05);\n  border:1px solid rgba(255,255,255,.10);\n}\n\n/* Footer band */\n.footer{\n  background:rgba(255,255,255,.18);\n  padding:14px 18px;\n  color:#e7e6f3;\n  font-size:12px;\n  line-height:1.45;\n}\n.footer .small{opacity:.85}\n.footer strong{font-weight:900}\n</style>\n</head>\n<body>\n  <div class=\"wrap\">\n\n    <div class=\"top\">\n      <h1>Knowshare — nowe zgłoszenie</h1>\n      <div class=\"sub\">Powiadomienie z analizy treści i rekomendacji (AI).</div>\n    </div>\n\n    <div class=\"frame\">\n      <div class=\"content\">\n\n        <div class=\"row\">\n          <div class=\"label\">Temat</div>\n          <div class=\"value\">{{ $('Task content').first().json.task_title }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Asset</div>\n          <div class=\"value\">{{ $('Get asset').item.json.data[0].name }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Autor</div>\n          <div class=\"value\">{{ $('Webhook').first().json.body.createdBy }}</div>\n        </div>\n\n        <div class=\"section-title\">Oryginalne zgłoszenie</div>\n        <div class=\"text\">{{ $('Safe subject and message').item.json.safe_message }}</div>\n\n        <div class=\"section-title\">Interpretacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.interpretation }}</div>\n\n        <div class=\"section-title\">Rekomendacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.recommendation }}</div>\n\n        <div class=\"links\">\n          <div class=\"label\">Linki</div>\n          <a class=\"link\" href=\"https://knowshare.nazca40.com\">Otwórz w Knowshare</a>\n        </div>\n\n      </div>\n\n      <div class=\"footer\">\n        <div class=\"small\">\n          Wiadomość wygenerowana automatycznie przez <strong>Knowshare</strong>.\n        </div>\n        <div class=\"small\">\n          © APA Group — Your Technology. Reinvented.\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>\n",
+          "subject": "Knowshare - nowe zgłoszenie",
+          "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n<style>\n*{margin:0;padding:0;box-sizing:border-box}\n\nbody{\n  font-family:'Inter',system-ui,sans-serif;\n  background:#14131f;\n  color:#e9e7f5;\n  padding:28px 16px;\n}\n\n.wrap{\n  max-width:760px;\n  margin:0 auto;\n}\n\n/* Header (match the “status mail” style: no emoji, clean) */\n.top{\n  padding:6px 4px 18px 4px;\n}\n.top h1{\n  font-size:24px;\n  font-weight:800;\n  letter-spacing:.2px;\n  color:#ffffff;\n}\n.top .sub{\n  margin-top:8px;\n  font-size:13px;\n  color:#bdb9d6;\n}\n\n/* One big frame */\n.frame{\n  border:1px solid rgba(255,255,255,.22);\n  border-radius:12px;\n  overflow:hidden;\n  background:rgba(255,255,255,.02);\n}\n\n.content{\n  padding:22px;\n}\n\n/* Minimal inner layout (reduce “box chaos”) */\n.row{margin-top:14px}\n\n.label{\n  font-size:12px;\n  color:#b9b6d3;\n  margin-bottom:6px;\n}\n\n.value{\n  font-size:16px;\n  font-weight:700;\n  color:#d6e6ff;\n  word-break:break-word;\n}\n\n/* Text block (single subtle panel like in comment mail) */\n.text{\n  margin-top:8px;\n  padding:12px 14px;\n  border-radius:10px;\n  background:rgba(255,255,255,.06);\n  border:1px solid rgba(255,255,255,.10);\n  white-space:pre-wrap;\n  word-break:break-word;\n  font-size:14px;\n  line-height:1.65;\n  color:#efeef8;\n  opacity:.95;\n}\n\n/* Section separator */\n.section-title{\n  margin-top:22px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n  font-size:12px;\n  font-weight:800;\n  color:#ffffff;\n  letter-spacing:.25px;\n  text-transform:none;\n}\n\n/* Links section (same as status/comment mail) */\n.links{\n  margin-top:28px;\n  padding-top:18px;\n  border-top:1px solid rgba(255,255,255,.18);\n}\n\n.link{\n  display:inline-block;\n  margin-top:8px;\n  font-size:13px;\n  font-weight:600;\n  color:#8cc3ff;\n  text-decoration:none;\n  padding:6px 10px;\n  border-radius:8px;\n  background:rgba(255,255,255,.05);\n  border:1px solid rgba(255,255,255,.10);\n}\n\n/* Footer band */\n.footer{\n  background:rgba(255,255,255,.18);\n  padding:14px 18px;\n  color:#e7e6f3;\n  font-size:12px;\n  line-height:1.45;\n}\n.footer .small{opacity:.85}\n.footer strong{font-weight:900}\n</style>\n</head>\n<body>\n  <div class=\"wrap\">\n\n    <div class=\"top\">\n      <h1>Nowe zgłoszenie</h1>\n      <div class=\"sub\">Powiadomienie z analizy treści i rekomendacji (AI).</div>\n    </div>\n\n    <div class=\"frame\">\n      <div class=\"content\">\n\n        <div class=\"row\">\n          <div class=\"label\">Temat</div>\n          <div class=\"value\">{{ $('Task content').first().json.task_title }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Asset</div>\n          <div class=\"value\">{{ $('Get asset').item.json.data[0].name }}</div>\n        </div>\n\n        <div class=\"row\">\n          <div class=\"label\">Autor</div>\n          <div class=\"value\">{{ $('Webhook').first().json.body.createdBy }}</div>\n        </div>\n\n        <div class=\"section-title\">Oryginalne zgłoszenie</div>\n        <div class=\"text\">{{ $('Safe subject and message').item.json.safe_message }}</div>\n\n        <div class=\"section-title\">Interpretacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.interpretation }}</div>\n\n        <div class=\"section-title\">Rekomendacja AI</div>\n        <div class=\"text\">{{ $('Task content').first().json.recommendation }}</div>\n\n        <div class=\"links\">\n          <div class=\"label\">Linki</div>\n          <a class=\"link\" href=\"https://knowshare.nazca40.com\">Otwórz w Knowshare</a>\n        </div>\n\n      </div>\n\n      <div class=\"footer\">\n        <div class=\"small\">\n          Wiadomość wygenerowana automatycznie przez <strong>Knowshare</strong>.\n        </div>\n        <div class=\"small\">\n          © APA Group — Your Technology. Reinvented.\n        </div>\n      </div>\n    </div>\n\n  </div>\n</body>\n</html>\n",
           "options": {
             "appendAttribution": false
           }
@@ -4268,7 +4267,7 @@
               },
               {
                 "name": "filter",
-                "value": "={\"organizations\":{\"id\":{{ $('Get asset').item.json.data[0].organizations[0].id }}},\"managedLocalizations\":{\"id\":{{ $('Get asset').item.json.data[0].localization[0].id }}}}"
+                "value": "={\"$or\":[{\"organizations.id\":{{ $('Get asset').item.json.data[0].organizations[0].id }},\"managedLocalizations.descendants.id\":{{ $('Get asset').item.json.data[0].localization[0].id }}},{\"organizations.id\":{{ $('Get asset').item.json.data[0].organizations[0].id }},\"managedLocalizations.id\":{{ $('Get asset').item.json.data[0].localization[0].id }}}]}"
               }
             ]
           },
