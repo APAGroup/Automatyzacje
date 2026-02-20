@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2025-12-02T10:19:03.000Z",
+  "updatedAt": "2026-02-20T09:34:36.562Z",
   "createdAt": "2025-11-24T11:06:30.826Z",
   "id": "GBFX9PHHchJIF7sp",
   "name": "Knowshare - car service",
@@ -217,9 +217,9 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "chatgpt-4o-latest",
+          "value": "gpt-4o",
           "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
+          "cachedResultName": "GPT-4O"
         },
         "messages": {
           "values": [
@@ -299,9 +299,9 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "chatgpt-4o-latest",
+          "value": "gpt-4o",
           "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
+          "cachedResultName": "GPT-4O"
         },
         "text": "=Otrzymujesz zdjęcie, które może przedstawiać:\n- licznik przebiegu pojazdu (wartość w kilometrach),\n- kod QR zawierający identyfikator pojazdu (ID),\n- numer rejestracyjny pojazdu.\n\nTwoje zadanie:\n1. Odczytaj z obrazu wszystkie możliwe informacje:\n   - przebieg w kilometrach (z dokładnie jedną spacją przed \"km\"),\n   - ID z kodu QR (surowy, bez prefixów, suffixów ani opisów),\n   - numer rejestracyjny pojazdu (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\" – format alfanumeryczny, czasem z odstępem lub podkreśleniem).\n2. Jeśli na zdjęciu znajduje się tylko część z tych informacji, brakujące pola ustaw jako null.\n3. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"{{ $('Get car data').item.json['Plate number'] }}\",\n  \"carId\": \"<odczytane ID z kodu QR lub null>\",\n  \"worker\": \"{{ $('Webhook').item.json.body.createdBy }}\",\n  \"datetime\": \"{{ $now.format('yyyy-MM-dd HH:mmZZ') }}\",\n  \"mileage\": \"<wartość przebiegu w formacie 'XXXXXX km' lub null>\",\n  \"subject\": \"{{ $('Webhook').item.json.body.subject }}\"\n}\n\n4. Zasady dotyczące pola \"name\":\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma wartość null lub pustą, a na zdjęciu znajduje się numer rejestracyjny, **nadpisz pole \"name\" odczytanym numerem rejestracyjnym**.\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma już wartość tekstową, pozostaw ją bez zmian.\n   - Nie dodawaj żadnych opisów ani komunikatów o tej decyzji.\n\n5. Zasady dotyczące pola \"id\":\n   - ID w kodzie QR to zwykle numer rejestracyjny zapisany z podkreśleniem zamiast spacji (np. \"SM_5669C\") lub prosty identyfikator typu \"car1\", \"car2\", itp.\n   - **Zwróć wartość z QR tylko wtedy, gdy jesteś niemal w 100% pewny poprawnego odczytu.**\n   - Jeśli QR jest nieczytelny, niepewny lub częściowy — ustaw `\"id\": null`.\n   - Nie próbuj zgadywać ani uzupełniać brakujących znaków.\n\nWymagania:\n- JSON musi być poprawny składniowo.\n- Wartość przebiegu zapisz z dokładnie jedną spacją między liczbą a jednostką (np. \"249415 km\").\n- Wartość ID z QR zwróć dokładnie tak, jak jest zakodowana (bez zmian).\n- Nie dodawaj żadnych opisów, komentarzy, tłumaczeń ani tekstów poza JSON-em.\n- Jeśli nie uda się odczytać któregokolwiek pola, ustaw je na null.\n",
         "inputType": "base64",
@@ -454,7 +454,7 @@
       "webhookId": "cf7f5d98-7f66-41ec-a19d-444ebbe427d2",
       "credentials": {
         "microsoftOutlookOAuth2Api": {
-          "id": "y05ybOzVHHFzrA9a",
+          "id": "Etv69Nz1BksTtxiI",
           "name": "Microsoft Outlook account 2"
         }
       }
@@ -761,7 +761,7 @@
       "webhookId": "4f32fe48-6a83-40b2-ba04-42ca581416db",
       "credentials": {
         "microsoftOutlookOAuth2Api": {
-          "id": "y05ybOzVHHFzrA9a",
+          "id": "Etv69Nz1BksTtxiI",
           "name": "Microsoft Outlook account 2"
         }
       }
@@ -1440,8 +1440,8 @@
       }
     ]
   },
-  "versionId": "95aeaab3-681b-48c2-8b3d-15ccac523504",
-  "activeVersionId": "95aeaab3-681b-48c2-8b3d-15ccac523504",
+  "versionId": "3dcf6318-07d4-4e55-9e7e-1b3cd1c1b9bd",
+  "activeVersionId": "3dcf6318-07d4-4e55-9e7e-1b3cd1c1b9bd",
   "triggerCount": 1,
   "shared": [
     {
@@ -1460,9 +1460,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2025-12-05T05:43:07.618Z",
-    "createdAt": "2025-12-05T05:43:07.618Z",
-    "versionId": "95aeaab3-681b-48c2-8b3d-15ccac523504",
+    "updatedAt": "2026-02-20T09:34:36.563Z",
+    "createdAt": "2026-02-20T09:34:36.563Z",
+    "versionId": "3dcf6318-07d4-4e55-9e7e-1b3cd1c1b9bd",
     "workflowId": "GBFX9PHHchJIF7sp",
     "nodes": [
       {
@@ -1676,9 +1676,9 @@
         "parameters": {
           "modelId": {
             "__rl": true,
-            "value": "chatgpt-4o-latest",
+            "value": "gpt-4o",
             "mode": "list",
-            "cachedResultName": "CHATGPT-4O-LATEST"
+            "cachedResultName": "GPT-4O"
           },
           "messages": {
             "values": [
@@ -1758,9 +1758,9 @@
           "operation": "analyze",
           "modelId": {
             "__rl": true,
-            "value": "chatgpt-4o-latest",
+            "value": "gpt-4o",
             "mode": "list",
-            "cachedResultName": "CHATGPT-4O-LATEST"
+            "cachedResultName": "GPT-4O"
           },
           "text": "=Otrzymujesz zdjęcie, które może przedstawiać:\n- licznik przebiegu pojazdu (wartość w kilometrach),\n- kod QR zawierający identyfikator pojazdu (ID),\n- numer rejestracyjny pojazdu.\n\nTwoje zadanie:\n1. Odczytaj z obrazu wszystkie możliwe informacje:\n   - przebieg w kilometrach (z dokładnie jedną spacją przed \"km\"),\n   - ID z kodu QR (surowy, bez prefixów, suffixów ani opisów),\n   - numer rejestracyjny pojazdu (np. \"SM 5669C\", \"SG195EK\", \"SK_029PH\" – format alfanumeryczny, czasem z odstępem lub podkreśleniem).\n2. Jeśli na zdjęciu znajduje się tylko część z tych informacji, brakujące pola ustaw jako null.\n3. Zwróć wynik jako poprawny JSON w dokładnie poniższym formacie:\n\n{\n  \"name\": \"{{ $('Get car data').item.json['Plate number'] }}\",\n  \"carId\": \"<odczytane ID z kodu QR lub null>\",\n  \"worker\": \"{{ $('Webhook').item.json.body.createdBy }}\",\n  \"datetime\": \"{{ $now.format('yyyy-MM-dd HH:mmZZ') }}\",\n  \"mileage\": \"<wartość przebiegu w formacie 'XXXXXX km' lub null>\",\n  \"subject\": \"{{ $('Webhook').item.json.body.subject }}\"\n}\n\n4. Zasady dotyczące pola \"name\":\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma wartość null lub pustą, a na zdjęciu znajduje się numer rejestracyjny, **nadpisz pole \"name\" odczytanym numerem rejestracyjnym**.\n   - Jeśli {{ $('Get car data').item.json['Plate number'] }} ma już wartość tekstową, pozostaw ją bez zmian.\n   - Nie dodawaj żadnych opisów ani komunikatów o tej decyzji.\n\n5. Zasady dotyczące pola \"id\":\n   - ID w kodzie QR to zwykle numer rejestracyjny zapisany z podkreśleniem zamiast spacji (np. \"SM_5669C\") lub prosty identyfikator typu \"car1\", \"car2\", itp.\n   - **Zwróć wartość z QR tylko wtedy, gdy jesteś niemal w 100% pewny poprawnego odczytu.**\n   - Jeśli QR jest nieczytelny, niepewny lub częściowy — ustaw `\"id\": null`.\n   - Nie próbuj zgadywać ani uzupełniać brakujących znaków.\n\nWymagania:\n- JSON musi być poprawny składniowo.\n- Wartość przebiegu zapisz z dokładnie jedną spacją między liczbą a jednostką (np. \"249415 km\").\n- Wartość ID z QR zwróć dokładnie tak, jak jest zakodowana (bez zmian).\n- Nie dodawaj żadnych opisów, komentarzy, tłumaczeń ani tekstów poza JSON-em.\n- Jeśli nie uda się odczytać któregokolwiek pola, ustaw je na null.\n",
           "inputType": "base64",
@@ -1913,7 +1913,7 @@
         "webhookId": "cf7f5d98-7f66-41ec-a19d-444ebbe427d2",
         "credentials": {
           "microsoftOutlookOAuth2Api": {
-            "id": "y05ybOzVHHFzrA9a",
+            "id": "Etv69Nz1BksTtxiI",
             "name": "Microsoft Outlook account 2"
           }
         }
@@ -2220,7 +2220,7 @@
         "webhookId": "4f32fe48-6a83-40b2-ba04-42ca581416db",
         "credentials": {
           "microsoftOutlookOAuth2Api": {
-            "id": "y05ybOzVHHFzrA9a",
+            "id": "Etv69Nz1BksTtxiI",
             "name": "Microsoft Outlook account 2"
           }
         }
@@ -2845,7 +2845,7 @@
         ]
       }
     },
-    "authors": "system migration",
+    "authors": "APA DS Team",
     "name": null,
     "description": null
   },
