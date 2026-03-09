@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-20T14:23:28.497Z",
+  "updatedAt": "2026-03-09T09:07:29.430Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -130,7 +130,7 @@
       "type": "n8n-nodes-base.twilio",
       "typeVersion": 1,
       "position": [
-        11184,
+        11600,
         -64
       ],
       "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
@@ -427,7 +427,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9712,
+        10128,
         -16
       ],
       "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -459,7 +459,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        9120,
+        9536,
         0
       ],
       "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -479,7 +479,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8944,
+        9360,
         0
       ],
       "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -600,7 +600,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        6912,
+        7120,
         -224
       ],
       "id": "c47a436d-ea9d-4144-9fe5-bf78c429485f",
@@ -615,7 +615,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        7104,
+        7312,
         -224
       ],
       "id": "ca9ae6c5-5c35-4742-8726-8b174046eb10",
@@ -628,7 +628,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7264,
+        7472,
         -224
       ],
       "id": "04e471bb-b277-4a9d-b2db-20dab8b2c0d0",
@@ -698,7 +698,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        8752,
+        9168,
         0
       ],
       "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -756,7 +756,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        10912,
+        11328,
         176
       ],
       "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
@@ -769,7 +769,7 @@
             {
               "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
               "name": "recipients",
-              "value": "={{\n  (() => {\n    const aRaw = $(\"Get org users - attachment\").first()?.json?.data ?? \n                 $(\"Get org users\").first()?.json?.data ?? \n                 [];\n\n    const a = Array.isArray(aRaw) ? aRaw : (aRaw ? [aRaw] : []);\n\n    const bRaw = $json.data ?? [];\n    const b = Array.isArray(bRaw) ? bRaw : (bRaw ? [bRaw] : []);\n\n    return [...a, ...b];\n  })()\n}}",
+              "value": "={{\n(() => {\n\n  const aRaw = $(\"Get org users - attachment\").isExecuted\n    ? $(\"Get org users - attachment\").first()?.json?.data\n    : $(\"Get org users\").first()?.json?.data ?? [];\n\n  const a = Array.isArray(aRaw) ? aRaw : (aRaw ? [aRaw] : []);\n\n  const bRaw = $json.data ?? [];\n  const b = Array.isArray(bRaw) ? bRaw : (bRaw ? [bRaw] : []);\n\n  return [...a, ...b];\n\n})()\n}}",
               "type": "array"
             },
             {
@@ -785,7 +785,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        10176,
+        10592,
         -16
       ],
       "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -799,7 +799,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        10368,
+        10784,
         -16
       ],
       "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
@@ -812,7 +812,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        10576,
+        10992,
         160
       ],
       "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
@@ -857,7 +857,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11744,
+        12160,
         192
       ],
       "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
@@ -990,7 +990,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        12000,
+        12416,
         176
       ],
       "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -1215,7 +1215,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        11728,
+        12144,
         -464
       ],
       "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
@@ -1235,7 +1235,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        11184,
+        11600,
         -448
       ],
       "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
@@ -1269,7 +1269,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11456,
+        11872,
         -448
       ],
       "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
@@ -1361,7 +1361,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        9488,
+        9904,
         96
       ],
       "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -1384,7 +1384,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        11408,
+        11824,
         128
       ],
       "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
@@ -1508,7 +1508,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8000,
+        8208,
         -224
       ],
       "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -1552,7 +1552,8 @@
           "id": "XjWd4OAeIo2QP5V7",
           "name": "Nocobase"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1587,7 +1588,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7616,
+        7824,
         -224
       ],
       "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -1601,7 +1602,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7792,
+        8000,
         -224
       ],
       "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
@@ -1666,7 +1667,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7440,
+        7648,
         -224
       ],
       "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
@@ -1701,7 +1702,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        9952,
+        10368,
         -16
       ],
       "id": "11b11ede-fb2b-4443-9ca4-923101c79452",
@@ -1712,6 +1713,52 @@
           "name": "Nocobase"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "412ab4df-6721-4234-bc00-91e74ba979f9",
+              "leftValue": "={{ $json.retry }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        6992,
+        -112
+      ],
+      "id": "e8ccf256-0e3b-4467-ada8-de32d3aaa257",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "if ($json.retry === undefined) {\n  $json.retry = 1;\n} else {\n  $json.retry++;\n}\n\nreturn [{ json: $json }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6832,
+        -160
+      ],
+      "id": "37058e37-622d-4509-a811-cf36a1f09870",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
@@ -2418,6 +2465,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -2497,6 +2551,35 @@
           }
         ]
       ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Loop over attachments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2512,23 +2595,23 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "321",
+            "content-length": "438",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9d0db06fb2f34bf9-WAW",
+            "cf-ray": "9d9228743dc0cc60-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Fri, 20 Feb 2026 11:33:27 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.64.198.34",
+            "date": "Sun, 08 Mar 2026 13:24:03 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.200.34",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-6f9f659dd9-vzwn5",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-67884c675c-r7pbk",
             "x-is-trusted": "yes",
             "x-real-ip": "51.83.252.104"
           },
@@ -2536,15 +2619,16 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-02-20T11:33:26.7428386Z",
-            "assetId": "08dd9922-b430-4372-87e1-bd636f11182a",
-            "subject": "Ups",
-            "message": "Ups nie działa",
+            "createdAt": "2026-03-08T13:24:03.7228635Z",
+            "assetId": "08de7b80-2d8e-4ea6-882b-7c383235f209",
+            "subject": "Kurtyna ",
+            "message": "W sklepie nad wejsciem jest kurtyna zabudowana w sufir. Do rozdzielni na oko okolo 150 - 200m kabla do przejscia jest cala dlugosc sklepu i poziomu 0 do  -1",
             "type": 0,
-            "createdBy": "Grzegorz Bojdo",
-            "tenantId": "08dd5714-941b-4e58-817b-934c403cebb5",
+            "createdBy": "Bartosz Kowal",
+            "tenantId": "08de7b76-1778-4952-8af8-ed07c10c7aad",
             "attachments": [
-              "08f64f0a-e8a5-434c-bd10-20c19447f7a13838012802338887298.jpg"
+              "1000002089.jpg",
+              "1000002088.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2556,8 +2640,8 @@
       }
     ]
   },
-  "versionId": "24853303-676e-4635-9b74-a2222950c67a",
-  "activeVersionId": "24853303-676e-4635-9b74-a2222950c67a",
+  "versionId": "c018ed33-288a-47b5-a60a-a047e05319b3",
+  "activeVersionId": "c018ed33-288a-47b5-a60a-a047e05319b3",
   "triggerCount": 1,
   "shared": [
     {
@@ -2576,9 +2660,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-02-20T14:23:28.499Z",
-    "createdAt": "2026-02-20T14:23:28.499Z",
-    "versionId": "24853303-676e-4635-9b74-a2222950c67a",
+    "updatedAt": "2026-03-09T09:07:29.432Z",
+    "createdAt": "2026-03-09T09:07:29.432Z",
+    "versionId": "c018ed33-288a-47b5-a60a-a047e05319b3",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -2705,7 +2789,7 @@
         "type": "n8n-nodes-base.twilio",
         "typeVersion": 1,
         "position": [
-          11184,
+          11600,
           -64
         ],
         "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
@@ -3002,7 +3086,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          9712,
+          10128,
           -16
         ],
         "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -3034,7 +3118,7 @@
         "type": "@n8n/n8n-nodes-langchain.openAi",
         "typeVersion": 2,
         "position": [
-          9120,
+          9536,
           0
         ],
         "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -3054,7 +3138,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          8944,
+          9360,
           0
         ],
         "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -3175,7 +3259,7 @@
         "type": "n8n-nodes-base.splitInBatches",
         "typeVersion": 3,
         "position": [
-          6912,
+          7120,
           -224
         ],
         "id": "c47a436d-ea9d-4144-9fe5-bf78c429485f",
@@ -3190,7 +3274,7 @@
         "type": "n8n-nodes-base.aggregate",
         "typeVersion": 1,
         "position": [
-          7104,
+          7312,
           -224
         ],
         "id": "ca9ae6c5-5c35-4742-8726-8b174046eb10",
@@ -3203,7 +3287,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7264,
+          7472,
           -224
         ],
         "id": "04e471bb-b277-4a9d-b2db-20dab8b2c0d0",
@@ -3273,7 +3357,7 @@
         "type": "n8n-nodes-base.aggregate",
         "typeVersion": 1,
         "position": [
-          8752,
+          9168,
           0
         ],
         "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -3331,7 +3415,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          10912,
+          11328,
           176
         ],
         "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
@@ -3344,7 +3428,7 @@
               {
                 "id": "45988ecf-6ec1-4a69-bf28-b8cac853e764",
                 "name": "recipients",
-                "value": "={{\n  (() => {\n    const aRaw = $(\"Get org users - attachment\").first()?.json?.data ?? \n                 $(\"Get org users\").first()?.json?.data ?? \n                 [];\n\n    const a = Array.isArray(aRaw) ? aRaw : (aRaw ? [aRaw] : []);\n\n    const bRaw = $json.data ?? [];\n    const b = Array.isArray(bRaw) ? bRaw : (bRaw ? [bRaw] : []);\n\n    return [...a, ...b];\n  })()\n}}",
+                "value": "={{\n(() => {\n\n  const aRaw = $(\"Get org users - attachment\").isExecuted\n    ? $(\"Get org users - attachment\").first()?.json?.data\n    : $(\"Get org users\").first()?.json?.data ?? [];\n\n  const a = Array.isArray(aRaw) ? aRaw : (aRaw ? [aRaw] : []);\n\n  const bRaw = $json.data ?? [];\n  const b = Array.isArray(bRaw) ? bRaw : (bRaw ? [bRaw] : []);\n\n  return [...a, ...b];\n\n})()\n}}",
                 "type": "array"
               },
               {
@@ -3360,7 +3444,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          10176,
+          10592,
           -16
         ],
         "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -3374,7 +3458,7 @@
         "type": "n8n-nodes-base.splitOut",
         "typeVersion": 1,
         "position": [
-          10368,
+          10784,
           -16
         ],
         "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
@@ -3387,7 +3471,7 @@
         "type": "n8n-nodes-base.splitInBatches",
         "typeVersion": 3,
         "position": [
-          10576,
+          10992,
           160
         ],
         "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
@@ -3432,7 +3516,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          11744,
+          12160,
           192
         ],
         "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
@@ -3565,7 +3649,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          12000,
+          12416,
           176
         ],
         "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -3790,7 +3874,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          11728,
+          12144,
           -464
         ],
         "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
@@ -3810,7 +3894,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          11184,
+          11600,
           -448
         ],
         "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
@@ -3844,7 +3928,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          11456,
+          11872,
           -448
         ],
         "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
@@ -3936,7 +4020,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          9488,
+          9904,
           96
         ],
         "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -3959,7 +4043,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          11408,
+          11824,
           128
         ],
         "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
@@ -4083,7 +4167,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          8000,
+          8208,
           -224
         ],
         "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -4127,7 +4211,8 @@
             "id": "XjWd4OAeIo2QP5V7",
             "name": "Nocobase"
           }
-        }
+        },
+        "onError": "continueErrorOutput"
       },
       {
         "parameters": {
@@ -4162,7 +4247,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7616,
+          7824,
           -224
         ],
         "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -4176,7 +4261,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7792,
+          8000,
           -224
         ],
         "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
@@ -4241,7 +4326,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          7440,
+          7648,
           -224
         ],
         "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
@@ -4276,7 +4361,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          9952,
+          10368,
           -16
         ],
         "id": "11b11ede-fb2b-4443-9ca4-923101c79452",
@@ -4287,6 +4372,52 @@
             "name": "Nocobase"
           }
         }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "412ab4df-6721-4234-bc00-91e74ba979f9",
+                "leftValue": "={{ $json.retry }}",
+                "rightValue": 5,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          6992,
+          -112
+        ],
+        "id": "e8ccf256-0e3b-4467-ada8-de32d3aaa257",
+        "name": "If1"
+      },
+      {
+        "parameters": {
+          "jsCode": "if ($json.retry === undefined) {\n  $json.retry = 1;\n} else {\n  $json.retry++;\n}\n\nreturn [{ json: $json }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          6832,
+          -160
+        ],
+        "id": "37058e37-622d-4509-a811-cf36a1f09870",
+        "name": "Code in JavaScript"
       }
     ],
     "connections": {
@@ -4993,6 +5124,13 @@
               "type": "main",
               "index": 0
             }
+          ],
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
           ]
         ]
       },
@@ -5067,6 +5205,35 @@
           [
             {
               "node": "Notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [
+            {
+              "node": "Loop over attachments",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Upload image",
               "type": "main",
               "index": 0
             }
