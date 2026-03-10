@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-09T09:07:29.430Z",
+  "updatedAt": "2026-03-10T10:28:28.603Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -130,7 +130,7 @@
       "type": "n8n-nodes-base.twilio",
       "typeVersion": 1,
       "position": [
-        11600,
+        11808,
         -64
       ],
       "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
@@ -216,8 +216,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5632,
-        -528
+        5552,
+        -544
       ],
       "id": "5a1f01cb-cca8-4889-bbd0-9ed284b6affc",
       "name": "Sticky Note7"
@@ -427,7 +427,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        10128,
+        10336,
         -16
       ],
       "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -459,7 +459,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2,
       "position": [
-        9536,
+        9744,
         0
       ],
       "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -479,7 +479,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9360,
+        9568,
         0
       ],
       "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -503,7 +503,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        5936,
+        5888,
         -224
       ],
       "id": "cc5e7cf5-02c7-4a8f-8435-c8237f42a5bd",
@@ -516,7 +516,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6112,
+        6064,
         -224
       ],
       "id": "14c7af07-c1f3-45b2-9c72-abd2622859bb",
@@ -531,7 +531,7 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        6304,
+        6256,
         -224
       ],
       "id": "a889f389-770a-4956-a5ee-3d534ef79bca",
@@ -545,12 +545,12 @@
     },
     {
       "parameters": {
-        "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;\n"
+        "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.is_image = type_ok === 1;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6496,
+        6448,
         -224
       ],
       "id": "f48ddf57-2bf1-452b-b636-313f23b8cc5d",
@@ -600,7 +600,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        7120,
+        7328,
         -224
       ],
       "id": "c47a436d-ea9d-4144-9fe5-bf78c429485f",
@@ -615,7 +615,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        7312,
+        7520,
         -224
       ],
       "id": "ca9ae6c5-5c35-4742-8726-8b174046eb10",
@@ -628,7 +628,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7472,
+        7680,
         -224
       ],
       "id": "04e471bb-b277-4a9d-b2db-20dab8b2c0d0",
@@ -698,7 +698,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        9168,
+        9376,
         0
       ],
       "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -756,7 +756,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11328,
+        11536,
         176
       ],
       "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
@@ -785,7 +785,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        10592,
+        10800,
         -16
       ],
       "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -799,7 +799,7 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        10784,
+        10992,
         -16
       ],
       "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
@@ -812,7 +812,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        10992,
+        11200,
         160
       ],
       "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
@@ -857,7 +857,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        12160,
+        12368,
         192
       ],
       "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
@@ -990,7 +990,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        12416,
+        12624,
         176
       ],
       "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -1215,7 +1215,7 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        12144,
+        12352,
         -464
       ],
       "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
@@ -1235,7 +1235,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        11600,
+        11808,
         -448
       ],
       "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
@@ -1269,7 +1269,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        11872,
+        12080,
         -448
       ],
       "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
@@ -1361,7 +1361,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        9904,
+        10112,
         96
       ],
       "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -1384,7 +1384,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        11824,
+        12032,
         128
       ],
       "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
@@ -1508,7 +1508,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8208,
+        8416,
         -224
       ],
       "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -1542,8 +1542,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6688,
-        -224
+        6944,
+        -176
       ],
       "id": "d25bc207-3361-4e24-8c6e-51a7d9cf511b",
       "name": "Upload image",
@@ -1588,7 +1588,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7824,
+        8032,
         -224
       ],
       "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -1602,7 +1602,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8000,
+        8208,
         -224
       ],
       "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
@@ -1667,7 +1667,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7648,
+        7856,
         -224
       ],
       "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
@@ -1702,7 +1702,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        10368,
+        10576,
         -16
       ],
       "id": "11b11ede-fb2b-4443-9ca4-923101c79452",
@@ -1713,52 +1713,6 @@
           "name": "Nocobase"
         }
       }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "412ab4df-6721-4234-bc00-91e74ba979f9",
-              "leftValue": "={{ $json.retry }}",
-              "rightValue": 5,
-              "operator": {
-                "type": "number",
-                "operation": "gt"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        6992,
-        -112
-      ],
-      "id": "e8ccf256-0e3b-4467-ada8-de32d3aaa257",
-      "name": "If1"
-    },
-    {
-      "parameters": {
-        "jsCode": "if ($json.retry === undefined) {\n  $json.retry = 1;\n} else {\n  $json.retry++;\n}\n\nreturn [{ json: $json }];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        6832,
-        -160
-      ],
-      "id": "37058e37-622d-4509-a811-cf36a1f09870",
-      "name": "Code in JavaScript"
     }
   ],
   "connections": {
@@ -2468,7 +2422,7 @@
         ],
         [
           {
-            "node": "Code in JavaScript",
+            "node": "Loop over attachments",
             "type": "main",
             "index": 0
           }
@@ -2551,35 +2505,6 @@
           }
         ]
       ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "If1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If1": {
-      "main": [
-        [
-          {
-            "node": "Loop over attachments",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Upload image",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "settings": {
@@ -2595,19 +2520,19 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "438",
+            "content-length": "359",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9d9228743dc0cc60-WAW",
+            "cf-ray": "9da11cdd3f77b5f7-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Sun, 08 Mar 2026 13:24:03 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.64.200.34",
+            "date": "Tue, 10 Mar 2026 08:57:35 GMT",
+            "x-forwarded-for": "51.83.252.104, 162.158.172.183",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
@@ -2619,16 +2544,16 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-03-08T13:24:03.7228635Z",
-            "assetId": "08de7b80-2d8e-4ea6-882b-7c383235f209",
-            "subject": "Kurtyna ",
-            "message": "W sklepie nad wejsciem jest kurtyna zabudowana w sufir. Do rozdzielni na oko okolo 150 - 200m kabla do przejscia jest cala dlugosc sklepu i poziomu 0 do  -1",
+            "createdAt": "2026-03-10T08:57:34.8480789Z",
+            "assetId": "08de7b7e-0683-4b4b-819b-e0bbd1134a04",
+            "subject": "Sswin",
+            "message": "Centrala alarmowa satel integra 64, lokalizacja obok rozdzielnic oswietlenia ",
             "type": 0,
-            "createdBy": "Bartosz Kowal",
+            "createdBy": "Grzegorz Adamski",
             "tenantId": "08de7b76-1778-4952-8af8-ed07c10c7aad",
             "attachments": [
-              "1000002089.jpg",
-              "1000002088.jpg"
+              "1000015176.jpg",
+              "1000015187.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2640,8 +2565,8 @@
       }
     ]
   },
-  "versionId": "c018ed33-288a-47b5-a60a-a047e05319b3",
-  "activeVersionId": "c018ed33-288a-47b5-a60a-a047e05319b3",
+  "versionId": "af059efe-a94f-4aef-b689-352c19df92fd",
+  "activeVersionId": "af059efe-a94f-4aef-b689-352c19df92fd",
   "triggerCount": 1,
   "shared": [
     {
@@ -2660,9 +2585,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-03-09T09:07:29.432Z",
-    "createdAt": "2026-03-09T09:07:29.432Z",
-    "versionId": "c018ed33-288a-47b5-a60a-a047e05319b3",
+    "updatedAt": "2026-03-10T10:28:28.606Z",
+    "createdAt": "2026-03-10T10:28:28.606Z",
+    "versionId": "af059efe-a94f-4aef-b689-352c19df92fd",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -2789,7 +2714,7 @@
         "type": "n8n-nodes-base.twilio",
         "typeVersion": 1,
         "position": [
-          11600,
+          11808,
           -64
         ],
         "id": "4f25fb82-b059-4568-94d7-96fe172e9f68",
@@ -2875,8 +2800,8 @@
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
         "position": [
-          5632,
-          -528
+          5552,
+          -544
         ],
         "id": "5a1f01cb-cca8-4889-bbd0-9ed284b6affc",
         "name": "Sticky Note7"
@@ -3086,7 +3011,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          10128,
+          10336,
           -16
         ],
         "id": "e2496bdd-3742-40ae-904b-7a24fd216899",
@@ -3118,7 +3043,7 @@
         "type": "@n8n/n8n-nodes-langchain.openAi",
         "typeVersion": 2,
         "position": [
-          9536,
+          9744,
           0
         ],
         "id": "29a54969-6c9b-4af2-b93b-02f2cef4ea8e",
@@ -3138,7 +3063,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          9360,
+          9568,
           0
         ],
         "id": "64854a7f-53c3-49de-89c8-8b1bdeda4246",
@@ -3162,7 +3087,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          5936,
+          5888,
           -224
         ],
         "id": "cc5e7cf5-02c7-4a8f-8435-c8237f42a5bd",
@@ -3175,7 +3100,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          6112,
+          6064,
           -224
         ],
         "id": "14c7af07-c1f3-45b2-9c72-abd2622859bb",
@@ -3190,7 +3115,7 @@
         "type": "n8n-nodes-base.s3",
         "typeVersion": 1,
         "position": [
-          6304,
+          6256,
           -224
         ],
         "id": "a889f389-770a-4956-a5ee-3d534ef79bca",
@@ -3204,12 +3129,12 @@
       },
       {
         "parameters": {
-          "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;\n"
+          "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.is_image = type_ok === 1;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          6496,
+          6448,
           -224
         ],
         "id": "f48ddf57-2bf1-452b-b636-313f23b8cc5d",
@@ -3259,7 +3184,7 @@
         "type": "n8n-nodes-base.splitInBatches",
         "typeVersion": 3,
         "position": [
-          7120,
+          7328,
           -224
         ],
         "id": "c47a436d-ea9d-4144-9fe5-bf78c429485f",
@@ -3274,7 +3199,7 @@
         "type": "n8n-nodes-base.aggregate",
         "typeVersion": 1,
         "position": [
-          7312,
+          7520,
           -224
         ],
         "id": "ca9ae6c5-5c35-4742-8726-8b174046eb10",
@@ -3287,7 +3212,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7472,
+          7680,
           -224
         ],
         "id": "04e471bb-b277-4a9d-b2db-20dab8b2c0d0",
@@ -3357,7 +3282,7 @@
         "type": "n8n-nodes-base.aggregate",
         "typeVersion": 1,
         "position": [
-          9168,
+          9376,
           0
         ],
         "id": "0b3aceb7-f0ca-4ed1-8138-5d4121f1cac1",
@@ -3415,7 +3340,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          11328,
+          11536,
           176
         ],
         "id": "e3046efb-8122-4fd3-83ca-d5aa714695e9",
@@ -3444,7 +3369,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          10592,
+          10800,
           -16
         ],
         "id": "7aff7071-3305-4fad-aa07-d94aa69b3b81",
@@ -3458,7 +3383,7 @@
         "type": "n8n-nodes-base.splitOut",
         "typeVersion": 1,
         "position": [
-          10784,
+          10992,
           -16
         ],
         "id": "9fb98e11-dec9-4d09-8371-0409e3d13285",
@@ -3471,7 +3396,7 @@
         "type": "n8n-nodes-base.splitInBatches",
         "typeVersion": 3,
         "position": [
-          10992,
+          11200,
           160
         ],
         "id": "3d93f6af-a545-4720-aa54-73eaec475d27",
@@ -3516,7 +3441,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          12160,
+          12368,
           192
         ],
         "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
@@ -3649,7 +3574,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          12416,
+          12624,
           176
         ],
         "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
@@ -3874,7 +3799,7 @@
         "type": "n8n-nodes-base.emailSend",
         "typeVersion": 2.1,
         "position": [
-          12144,
+          12352,
           -464
         ],
         "id": "085d6da6-5ee8-489c-9e45-cb0b22c1655a",
@@ -3894,7 +3819,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          11600,
+          11808,
           -448
         ],
         "id": "29dc12c2-0419-47ad-9864-43f6bbc6d2aa",
@@ -3928,7 +3853,7 @@
         "type": "n8n-nodes-base.if",
         "typeVersion": 2.2,
         "position": [
-          11872,
+          12080,
           -448
         ],
         "id": "0723d23d-dfd9-4e7f-854f-5bd4024c41ee",
@@ -4020,7 +3945,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          9904,
+          10112,
           96
         ],
         "id": "7d207702-929a-4501-8c3f-a5e3cbb3125d",
@@ -4043,7 +3968,7 @@
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4,
         "position": [
-          11824,
+          12032,
           128
         ],
         "id": "5fbf3248-66ee-4edf-96af-b319be59a8da",
@@ -4167,7 +4092,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          8208,
+          8416,
           -224
         ],
         "id": "f6b1ad98-7bc8-4af0-82a3-f061f2c505e1",
@@ -4201,8 +4126,8 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          6688,
-          -224
+          6944,
+          -176
         ],
         "id": "d25bc207-3361-4e24-8c6e-51a7d9cf511b",
         "name": "Upload image",
@@ -4247,7 +4172,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          7824,
+          8032,
           -224
         ],
         "id": "6f9cb0e2-387e-4939-9a13-594b38c2b347",
@@ -4261,7 +4186,7 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "position": [
-          8000,
+          8208,
           -224
         ],
         "id": "1f8594f3-7d09-4bb7-bb6a-ac6dddfd9c93",
@@ -4326,7 +4251,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          7648,
+          7856,
           -224
         ],
         "id": "8ed57b10-77b4-4fd4-872e-e1fc80823972",
@@ -4361,7 +4286,7 @@
         "type": "n8n-nodes-base.httpRequest",
         "typeVersion": 4.3,
         "position": [
-          10368,
+          10576,
           -16
         ],
         "id": "11b11ede-fb2b-4443-9ca4-923101c79452",
@@ -4372,52 +4297,6 @@
             "name": "Nocobase"
           }
         }
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 3
-            },
-            "conditions": [
-              {
-                "id": "412ab4df-6721-4234-bc00-91e74ba979f9",
-                "leftValue": "={{ $json.retry }}",
-                "rightValue": 5,
-                "operator": {
-                  "type": "number",
-                  "operation": "gt"
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.3,
-        "position": [
-          6992,
-          -112
-        ],
-        "id": "e8ccf256-0e3b-4467-ada8-de32d3aaa257",
-        "name": "If1"
-      },
-      {
-        "parameters": {
-          "jsCode": "if ($json.retry === undefined) {\n  $json.retry = 1;\n} else {\n  $json.retry++;\n}\n\nreturn [{ json: $json }];"
-        },
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          6832,
-          -160
-        ],
-        "id": "37058e37-622d-4509-a811-cf36a1f09870",
-        "name": "Code in JavaScript"
       }
     ],
     "connections": {
@@ -5127,7 +5006,7 @@
           ],
           [
             {
-              "node": "Code in JavaScript",
+              "node": "Loop over attachments",
               "type": "main",
               "index": 0
             }
@@ -5205,35 +5084,6 @@
           [
             {
               "node": "Notification data",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Code in JavaScript": {
-        "main": [
-          [
-            {
-              "node": "If1",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "If1": {
-        "main": [
-          [
-            {
-              "node": "Loop over attachments",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Upload image",
               "type": "main",
               "index": 0
             }
