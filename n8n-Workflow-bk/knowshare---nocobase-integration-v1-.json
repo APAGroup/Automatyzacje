@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-12T11:31:10.932Z",
+  "updatedAt": "2026-03-26T10:58:11.937Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -706,7 +706,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output?.[0]?.content?.[0]?.text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first()?.json?.safe_message || \"\";\n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            priority: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Mapowanie typu z Webhook na priority\nconst typeRaw = $('Webhook').first()?.json?.body?.type;\n\nconst priorityMap = {\n    0: \"03_low\",\n    1: \"02_medium\",\n    2: \"01_high\"\n};\n\nconst priority = priorityMap[typeRaw] ?? \"03_low\"; // fallback domyślny\n\n// 9. Tworzenie nowego pola 'task_description'\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 10. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription,\n        priority: priority\n    }\n}];\n"
+        "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output?.[0]?.content?.[0]?.text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first()?.json?.safe_message || \"\";\n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            priority: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Mapowanie typu z Webhook na priority\nconst typeRaw = $('Webhook').first()?.json?.body?.type;\n\nconst priorityMap = {\n    0: \"03_low\",\n    1: \"02_medium\",\n    2: \"01_high\",\n    3: \"04_unknown\",\n    \"03_low\": \"03_low\",\n    \"02_medium\": \"02_medium\",\n    \"01_high\": \"01_high\",\n    \"04_unknown\": \"04_unknown\"\n};\n\nconst priority = priorityMap[typeRaw] ?? \"03_low\"; // fallback domyślny\n\n// 9. Tworzenie nowego pola 'task_description'\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 10. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription,\n        priority: priority\n    }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -894,50 +894,6 @@
       ],
       "id": "01577578-35e4-41d3-a0a7-f210861a1fdd",
       "name": "Sticky Note14"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "12b4257d-5980-4e27-a4b3-bbd3222e6fab",
-              "leftValue": "={{ $json.data[0] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "object",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
-              "leftValue": "={{ $json.data[0].carAsset }}",
-              "rightValue": "notices",
-              "operator": {
-                "type": "boolean",
-                "operation": "false",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        2832,
-        176
-      ],
-      "id": "e705ec63-c8fd-44dd-877d-c833617fa80d",
-      "name": "If it's not a car"
     },
     {
       "parameters": {
@@ -1714,6 +1670,53 @@
           "name": "Nocobase"
         }
       }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9d5cd56-d0e9-499d-9ff7-e5192819ea11",
+              "name": "task_title",
+              "value": "={{ $('Task content').first().json.task_title }}",
+              "type": "string"
+            },
+            {
+              "id": "f6130010-bc5f-48f7-ad39-2669a18dae12",
+              "name": "interpretation",
+              "value": "={{ $('Task content').first().json.interpretation }}",
+              "type": "string"
+            },
+            {
+              "id": "134f6718-030a-4dec-91cd-154c29163d9a",
+              "name": "recommendation",
+              "value": "={{ $('Task content').first().json.recommendation }}",
+              "type": "string"
+            },
+            {
+              "id": "07f12975-b47b-482b-9617-59e2c43bfa8c",
+              "name": "task_description",
+              "value": "={{ $('Task content').first().json.task_description }}",
+              "type": "string"
+            },
+            {
+              "id": "cb848497-542f-4ed4-a62a-25d7f134f60f",
+              "name": "priority",
+              "value": "={{ $('Task content').first().json.priority }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        12560,
+        -464
+      ],
+      "id": "ce0c39a5-d3a1-4816-bf47-f5cd96682c2c",
+      "name": "Notice"
     }
   ],
   "connections": {
@@ -2168,17 +2171,6 @@
         ]
       ]
     },
-    "If it's not a car": {
-      "main": [
-        [
-          {
-            "node": "If there are attachments",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Create summary": {
       "main": [
         [
@@ -2321,6 +2313,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Notice",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -2394,7 +2393,7 @@
       "main": [
         [
           {
-            "node": "If it's not a car",
+            "node": "If there are attachments",
             "type": "main",
             "index": 0
           }
@@ -2506,6 +2505,17 @@
           }
         ]
       ]
+    },
+    "Send email1": {
+      "main": [
+        [
+          {
+            "node": "Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2521,40 +2531,40 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "359",
+            "user-agent": "axios/1.13.5",
+            "content-length": "278",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
-            "cf-connecting-ip": "51.83.252.104",
+            "cf-connecting-ip": "20.218.238.116",
             "cf-ew-via": "15",
-            "cf-ipcountry": "PL",
-            "cf-ray": "9da11cdd3f77b5f7-WAW",
+            "cf-ipcountry": "DE",
+            "cf-ray": "9e255d022e079004-FRA",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Tue, 10 Mar 2026 08:57:35 GMT",
-            "x-forwarded-for": "51.83.252.104, 162.158.172.183",
+            "x-forwarded-for": "20.218.238.116, 172.70.247.81",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-67884c675c-r7pbk",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-67884c675c-kzr4z",
             "x-is-trusted": "yes",
-            "x-real-ip": "51.83.252.104"
+            "x-real-ip": "20.218.238.116"
           },
           "params": {},
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-03-10T08:57:34.8480789Z",
-            "assetId": "08de7b7e-0683-4b4b-819b-e0bbd1134a04",
-            "subject": "Sswin",
-            "message": "Centrala alarmowa satel integra 64, lokalizacja obok rozdzielnic oswietlenia ",
-            "type": 0,
-            "createdBy": "Grzegorz Adamski",
-            "tenantId": "08de7b76-1778-4952-8af8-ed07c10c7aad",
+            "createdAt": "2025-11-12T08:22:40.1315895Z",
+            "assetId": "08de7dd7-5d47-47f7-85fe-a60927075f28",
+            "subject": "Awaria",
+            "message": "Awaria pojazdu",
+            "type": 2,
+            "createdBy": "Michał Złoty",
+            "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
             "attachments": [
-              "1000015176.jpg",
-              "1000015187.jpg"
+              "1000029474.jpg"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2566,8 +2576,8 @@
       }
     ]
   },
-  "versionId": "511868c9-40af-479e-ba2f-dc82ca96f5a2",
-  "activeVersionId": "511868c9-40af-479e-ba2f-dc82ca96f5a2",
+  "versionId": "f972b72d-a834-4bc4-a768-05fcf40c5370",
+  "activeVersionId": "f972b72d-a834-4bc4-a768-05fcf40c5370",
   "triggerCount": 1,
   "shared": [
     {
@@ -2586,9 +2596,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-03-12T11:31:10.934Z",
-    "createdAt": "2026-03-12T11:31:10.934Z",
-    "versionId": "511868c9-40af-479e-ba2f-dc82ca96f5a2",
+    "updatedAt": "2026-03-26T10:58:11.938Z",
+    "createdAt": "2026-03-26T10:58:11.938Z",
+    "versionId": "f972b72d-a834-4bc4-a768-05fcf40c5370",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -3291,7 +3301,7 @@
       },
       {
         "parameters": {
-          "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output?.[0]?.content?.[0]?.text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first()?.json?.safe_message || \"\";\n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            priority: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Mapowanie typu z Webhook na priority\nconst typeRaw = $('Webhook').first()?.json?.body?.type;\n\nconst priorityMap = {\n    0: \"03_low\",\n    1: \"02_medium\",\n    2: \"01_high\"\n};\n\nconst priority = priorityMap[typeRaw] ?? \"03_low\"; // fallback domyślny\n\n// 9. Tworzenie nowego pola 'task_description'\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 10. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription,\n        priority: priority\n    }\n}];\n"
+          "jsCode": "// 1. Pobierz surowy tekst JSON z OpenAI\nlet raw = $input.first().json.output?.[0]?.content?.[0]?.text || \"\";\n\n// 2. Pobranie oryginalnej wiadomości (dla pola task_description)\nconst originalMessage = $('Safe subject and message').first()?.json?.safe_message || \"\";\n\n// 3. Usuń potencjalne znaczniki kodu ```json ... ```\nif (raw.includes(\"```\")) {\n    raw = raw.replace(/```json|```/g, \"\").trim();\n}\n\n// 4. Usuń nadmiarowe białe znaki\nraw = raw.replace(/[\\n\\r\\t\\u00A0\\uFEFF]/g, \" \").trim();\n\nlet parsed;\n\n// 5. Parsowanie JSON z obsługą błędów\ntry {\n    parsed = JSON.parse(raw);\n} catch (error) {\n    return [{\n        json: {\n            task_title: \"\",\n            interpretation: \"\",\n            recommendation: \"\",\n            task_description: \"\",\n            priority: \"\",\n            _error: \"Błąd parsowania JSON: \" + error.message + \" | Czysty ciąg: \" + raw.substring(0, 100) + \"...\"\n        }\n    }];\n}\n\n// 6. Transformacja do oczekiwanego formatu\nconst obj = (Array.isArray(parsed) && parsed.length > 0) ? parsed[0] : parsed;\nconst taskDescriptionData = obj.task_description || {};\n\n// 7. Pobieranie wartości generowanych przez AI\nconst interpretation = taskDescriptionData.interpretation || \"\";\nconst recommendation = taskDescriptionData.recommendation || \"\";\nconst taskTitle = obj.task_title || \"\";\n\n// 8. Mapowanie typu z Webhook na priority\nconst typeRaw = $('Webhook').first()?.json?.body?.type;\n\nconst priorityMap = {\n    0: \"03_low\",\n    1: \"02_medium\",\n    2: \"01_high\",\n    3: \"04_unknown\",\n    \"03_low\": \"03_low\",\n    \"02_medium\": \"02_medium\",\n    \"01_high\": \"01_high\",\n    \"04_unknown\": \"04_unknown\"\n};\n\nconst priority = priorityMap[typeRaw] ?? \"03_low\"; // fallback domyślny\n\n// 9. Tworzenie nowego pola 'task_description'\nconst newTaskDescription = `1: ${originalMessage} | 2: ${interpretation} | 3: ${recommendation}`;\n\n// 10. Zwrócenie finalnego formatu\nreturn [{\n    json: {\n        task_title: taskTitle,\n        interpretation: interpretation,\n        recommendation: recommendation,\n        task_description: newTaskDescription,\n        priority: priority\n    }\n}];\n"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
@@ -3479,50 +3489,6 @@
         ],
         "id": "01577578-35e4-41d3-a0a7-f210861a1fdd",
         "name": "Sticky Note14"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "12b4257d-5980-4e27-a4b3-bbd3222e6fab",
-                "leftValue": "={{ $json.data[0] }}",
-                "rightValue": "",
-                "operator": {
-                  "type": "object",
-                  "operation": "notEmpty",
-                  "singleValue": true
-                }
-              },
-              {
-                "id": "945dfa76-3c1d-436a-aef2-617ef8539061",
-                "leftValue": "={{ $json.data[0].carAsset }}",
-                "rightValue": "notices",
-                "operator": {
-                  "type": "boolean",
-                  "operation": "false",
-                  "singleValue": true
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.2,
-        "position": [
-          2832,
-          176
-        ],
-        "id": "e705ec63-c8fd-44dd-877d-c833617fa80d",
-        "name": "If it's not a car"
       },
       {
         "parameters": {
@@ -4299,6 +4265,53 @@
             "name": "Nocobase"
           }
         }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b9d5cd56-d0e9-499d-9ff7-e5192819ea11",
+                "name": "task_title",
+                "value": "={{ $('Task content').first().json.task_title }}",
+                "type": "string"
+              },
+              {
+                "id": "f6130010-bc5f-48f7-ad39-2669a18dae12",
+                "name": "interpretation",
+                "value": "={{ $('Task content').first().json.interpretation }}",
+                "type": "string"
+              },
+              {
+                "id": "134f6718-030a-4dec-91cd-154c29163d9a",
+                "name": "recommendation",
+                "value": "={{ $('Task content').first().json.recommendation }}",
+                "type": "string"
+              },
+              {
+                "id": "07f12975-b47b-482b-9617-59e2c43bfa8c",
+                "name": "task_description",
+                "value": "={{ $('Task content').first().json.task_description }}",
+                "type": "string"
+              },
+              {
+                "id": "cb848497-542f-4ed4-a62a-25d7f134f60f",
+                "name": "priority",
+                "value": "={{ $('Task content').first().json.priority }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          12560,
+          -464
+        ],
+        "id": "ce0c39a5-d3a1-4816-bf47-f5cd96682c2c",
+        "name": "Notice"
       }
     ],
     "connections": {
@@ -4753,17 +4766,6 @@
           ]
         ]
       },
-      "If it's not a car": {
-        "main": [
-          [
-            {
-              "node": "If there are attachments",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Create summary": {
         "main": [
           [
@@ -4906,6 +4908,13 @@
               "type": "main",
               "index": 0
             }
+          ],
+          [
+            {
+              "node": "Notice",
+              "type": "main",
+              "index": 0
+            }
           ]
         ]
       },
@@ -4979,7 +4988,7 @@
         "main": [
           [
             {
-              "node": "If it's not a car",
+              "node": "If there are attachments",
               "type": "main",
               "index": 0
             }
@@ -5086,6 +5095,17 @@
           [
             {
               "node": "Notification data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send email1": {
+        "main": [
+          [
+            {
+              "node": "Notice",
               "type": "main",
               "index": 0
             }
