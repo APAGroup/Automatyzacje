@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-27T08:53:04.279Z",
+  "updatedAt": "2026-04-01T10:52:04.688Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -821,50 +821,6 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
-              "leftValue": "={{ $('Loop over notification data').item.json.email }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "b92055c7-b7ec-469e-967a-8011056a838c",
-              "leftValue": "={{ $('Loop over notification data').item.json.emailNotification }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        12368,
-        192
-      ],
-      "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
-      "name": "If email notification enabled"
-    },
-    {
-      "parameters": {
         "content": "## Krok 4 - Powiadomienie sms (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia sms o zgłoszeniu w knowshare. ",
         "height": 476,
         "width": 300,
@@ -932,33 +888,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "fromEmail": "nazca4@apagroup.pl",
-        "toEmail": "={{ $('Loop over notification data').item.json.email }}",
-        "subject": "=[Knowshare] {{ $('Get asset').item.json.data[0].organizations[0].name }} - {{ $('Task content').item.json.task_title }} | Nowe zgłoszenie",
-        "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>Nowe zgłoszenie</title>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f6f7fb;\">\n<center style=\"width:100%;background:#f6f7fb;\">\n\n<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f6f7fb;\">\n<tr>\n<td align=\"center\" style=\"padding:34px 16px;\">\n\n  <!-- CONTAINER -->\n  <table role=\"presentation\" width=\"760\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:760px;\">\n\n    <!-- HEADER -->\n    <tr>\n      <td align=\"center\"\n          style=\"padding:6px 4px 20px 4px;\n                 font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                 text-align:center;\">\n        <div style=\"font-size:24px;font-weight:800;color:#111827;letter-spacing:.2px;line-height:1.2;\">\n          Nowe zgłoszenie\n        </div>\n        <div style=\"margin-top:8px;font-size:13px;color:#6b7280;line-height:1.55;\">\n          Powiadomienie z analizy treści i rekomendacji (AI).\n        </div>\n      </td>\n    </tr>\n\n    <!-- CARD -->\n    <tr>\n      <td>\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n               style=\"border:1px solid #e5e7eb;border-radius:16px;background:#ffffff;\">\n\n          <!-- CONTENT -->\n          <tr>\n            <td style=\"padding:28px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#1f2937;\">\n\n              <!-- Temat -->\n              <div style=\"font-size:12px;color:#6b7280;margin-bottom:6px;\">Temat</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1d4ed8;line-height:1.45;\">\n                {{ $('Task content').first().json.task_title }}\n              </div>\n\n              <!-- Asset -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Asset</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n              <!-- Autor -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Autor</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Webhook').first().json.body.createdBy }}\n              </div>\n\n              <!-- separator -->\n              <div style=\"margin-top:24px;border-top:1px solid #e5e7eb;\"></div>\n\n              <!-- Oryginalne zgłoszenie -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Oryginalne zgłoszenie\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Safe subject and message').item.json.safe_message }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Interpretacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Interpretacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.interpretation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Rekomendacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Rekomendacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.recommendation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Meta -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;line-height:1.6;\">\n                Lokalizacja: {{ $('Get asset').item.json.data[0].localization[0].localizationPath }}<br/>\n                Asset: {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n            </td>\n          </tr>\n\n          <!-- FOOTER -->\n          <tr>\n            <td align=\"center\"\n                style=\"background:#f1f3f8;\n                       padding:18px 16px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#6b7280;\n                       font-size:12px;\n                       line-height:1.6;\n                       text-align:center;\n                       border-top:1px solid #e5e7eb;\">\n              Wiadomość wygenerowana automatycznie przez <strong style=\"color:#111827;\">Knowshare</strong>.<br/>\n              © APA Group — Your Technology. Reinvented.\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n\n  </table>\n\n</td>\n</tr>\n</table>\n\n</center>\n</body>\n</html>",
-        "options": {
-          "appendAttribution": false,
-          "ccEmail": "={{ $('Loop over notification data').item.json.notificationCcEmail }}"
-        }
-      },
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.1,
-      "position": [
-        12624,
-        176
-      ],
-      "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
-      "name": "Send email",
-      "webhookId": "2e63aa1b-5409-47ac-968d-b14d710da16e",
-      "credentials": {
-        "smtp": {
-          "id": "bTsU09ZudpWPlOEp",
-          "name": "SMTP account 3"
-        }
-      }
     },
     {
       "parameters": {
@@ -1717,6 +1646,77 @@
       ],
       "id": "ce0c39a5-d3a1-4816-bf47-f5cd96682c2c",
       "name": "Notice"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
+              "leftValue": "={{ $('Loop over notification data').item.json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b92055c7-b7ec-469e-967a-8011056a838c",
+              "leftValue": "={{ $('Loop over notification data').item.json.emailNotification }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        12240,
+        112
+      ],
+      "id": "8c17d3a6-30e9-4a54-a1c2-9b1092476934",
+      "name": "If email notification enabled"
+    },
+    {
+      "parameters": {
+        "fromEmail": "nazca4@apagroup.pl",
+        "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+        "subject": "=[Knowshare] {{ $('Get asset').item.json.data[0].organizations[0].name }} - {{ $('Task content').item.json.task_title }} | Nowe zgłoszenie",
+        "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>Nowe zgłoszenie</title>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f6f7fb;\">\n<center style=\"width:100%;background:#f6f7fb;\">\n\n<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f6f7fb;\">\n<tr>\n<td align=\"center\" style=\"padding:34px 16px;\">\n\n  <!-- CONTAINER -->\n  <table role=\"presentation\" width=\"760\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:760px;\">\n\n    <!-- HEADER -->\n    <tr>\n      <td align=\"center\"\n          style=\"padding:6px 4px 20px 4px;\n                 font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                 text-align:center;\">\n        <div style=\"font-size:24px;font-weight:800;color:#111827;letter-spacing:.2px;line-height:1.2;\">\n          Nowe zgłoszenie\n        </div>\n        <div style=\"margin-top:8px;font-size:13px;color:#6b7280;line-height:1.55;\">\n          Powiadomienie z analizy treści i rekomendacji (AI).\n        </div>\n      </td>\n    </tr>\n\n    <!-- CARD -->\n    <tr>\n      <td>\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n               style=\"border:1px solid #e5e7eb;border-radius:16px;background:#ffffff;\">\n\n          <!-- CONTENT -->\n          <tr>\n            <td style=\"padding:28px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#1f2937;\">\n\n              <!-- Temat -->\n              <div style=\"font-size:12px;color:#6b7280;margin-bottom:6px;\">Temat</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1d4ed8;line-height:1.45;\">\n                {{ $('Task content').first().json.task_title }}\n              </div>\n\n              <!-- Asset -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Asset</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n              <!-- Autor -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Autor</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Webhook').first().json.body.createdBy }}\n              </div>\n\n              <!-- separator -->\n              <div style=\"margin-top:24px;border-top:1px solid #e5e7eb;\"></div>\n\n              <!-- Oryginalne zgłoszenie -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Oryginalne zgłoszenie\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Safe subject and message').item.json.safe_message }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Interpretacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Interpretacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.interpretation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Rekomendacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Rekomendacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.recommendation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Meta -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;line-height:1.6;\">\n                Lokalizacja: {{ $('Get asset').item.json.data[0].localization[0].localizationPath }}<br/>\n                Asset: {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n            </td>\n          </tr>\n\n          <!-- FOOTER -->\n          <tr>\n            <td align=\"center\"\n                style=\"background:#f1f3f8;\n                       padding:18px 16px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#6b7280;\n                       font-size:12px;\n                       line-height:1.6;\n                       text-align:center;\n                       border-top:1px solid #e5e7eb;\">\n              Wiadomość wygenerowana automatycznie przez <strong style=\"color:#111827;\">Knowshare</strong>.<br/>\n              © APA Group — Your Technology. Reinvented.\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n\n  </table>\n\n</td>\n</tr>\n</table>\n\n</center>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "={{ $('Loop over notification data').item.json.notificationCcEmail }}"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        12496,
+        96
+      ],
+      "id": "b6826ac9-a9d9-41ae-aae0-69dab1443050",
+      "name": "Send email",
+      "webhookId": "2e63aa1b-5409-47ac-968d-b14d710da16e",
+      "credentials": {
+        "smtp": {
+          "id": "bTsU09ZudpWPlOEp",
+          "name": "SMTP account 3"
+        }
+      }
     }
   ],
   "connections": {
@@ -1804,7 +1804,7 @@
       "main": [
         [
           {
-            "node": "If email notification enabled",
+            "node": "Loop over notification data",
             "type": "main",
             "index": 0
           }
@@ -2106,7 +2106,7 @@
         ],
         [
           {
-            "node": "If email notification enabled",
+            "node": "Loop over notification data",
             "type": "main",
             "index": 0
           }
@@ -2153,24 +2153,6 @@
         ]
       ]
     },
-    "If email notification enabled": {
-      "main": [
-        [
-          {
-            "node": "Send email",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Loop over notification data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Create summary": {
       "main": [
         [
@@ -2183,17 +2165,6 @@
         [
           {
             "node": "Create summary - error handling",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send email": {
-      "main": [
-        [
-          {
-            "node": "Loop over notification data",
             "type": "main",
             "index": 0
           }
@@ -2371,7 +2342,7 @@
       "main": [
         [
           {
-            "node": "If email notification enabled",
+            "node": "Loop over notification data",
             "type": "main",
             "index": 0
           }
@@ -2516,6 +2487,17 @@
           }
         ]
       ]
+    },
+    "If email notification enabled": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2575,8 +2557,8 @@
       }
     ]
   },
-  "versionId": "2c5ab7b7-9eaa-4869-b845-bdf54da6424b",
-  "activeVersionId": "2c5ab7b7-9eaa-4869-b845-bdf54da6424b",
+  "versionId": "9c5ce30e-ab48-4d88-809e-ad2bc8bfd601",
+  "activeVersionId": "9c5ce30e-ab48-4d88-809e-ad2bc8bfd601",
   "triggerCount": 1,
   "shared": [
     {
@@ -2595,9 +2577,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-03-27T08:53:04.281Z",
-    "createdAt": "2026-03-27T08:53:04.281Z",
-    "versionId": "2c5ab7b7-9eaa-4869-b845-bdf54da6424b",
+    "updatedAt": "2026-04-01T10:52:04.690Z",
+    "createdAt": "2026-04-01T10:52:04.690Z",
+    "versionId": "9c5ce30e-ab48-4d88-809e-ad2bc8bfd601",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -3415,50 +3397,6 @@
       },
       {
         "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
-                "leftValue": "={{ $('Loop over notification data').item.json.email }}",
-                "rightValue": "",
-                "operator": {
-                  "type": "string",
-                  "operation": "notEmpty",
-                  "singleValue": true
-                }
-              },
-              {
-                "id": "b92055c7-b7ec-469e-967a-8011056a838c",
-                "leftValue": "={{ $('Loop over notification data').item.json.emailNotification }}",
-                "rightValue": "",
-                "operator": {
-                  "type": "boolean",
-                  "operation": "true",
-                  "singleValue": true
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.2,
-        "position": [
-          12368,
-          192
-        ],
-        "id": "298bb8d0-a8ac-4aad-8313-9cc8e062c358",
-        "name": "If email notification enabled"
-      },
-      {
-        "parameters": {
           "content": "## Krok 4 - Powiadomienie sms (opcjonalne)\n\nW ramach tego kroku wysyłąne są powiadomienia sms o zgłoszeniu w knowshare. ",
           "height": 476,
           "width": 300,
@@ -3526,33 +3464,6 @@
           }
         },
         "onError": "continueErrorOutput"
-      },
-      {
-        "parameters": {
-          "fromEmail": "nazca4@apagroup.pl",
-          "toEmail": "={{ $('Loop over notification data').item.json.email }}",
-          "subject": "=[Knowshare] {{ $('Get asset').item.json.data[0].organizations[0].name }} - {{ $('Task content').item.json.task_title }} | Nowe zgłoszenie",
-          "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>Nowe zgłoszenie</title>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f6f7fb;\">\n<center style=\"width:100%;background:#f6f7fb;\">\n\n<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f6f7fb;\">\n<tr>\n<td align=\"center\" style=\"padding:34px 16px;\">\n\n  <!-- CONTAINER -->\n  <table role=\"presentation\" width=\"760\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:760px;\">\n\n    <!-- HEADER -->\n    <tr>\n      <td align=\"center\"\n          style=\"padding:6px 4px 20px 4px;\n                 font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                 text-align:center;\">\n        <div style=\"font-size:24px;font-weight:800;color:#111827;letter-spacing:.2px;line-height:1.2;\">\n          Nowe zgłoszenie\n        </div>\n        <div style=\"margin-top:8px;font-size:13px;color:#6b7280;line-height:1.55;\">\n          Powiadomienie z analizy treści i rekomendacji (AI).\n        </div>\n      </td>\n    </tr>\n\n    <!-- CARD -->\n    <tr>\n      <td>\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n               style=\"border:1px solid #e5e7eb;border-radius:16px;background:#ffffff;\">\n\n          <!-- CONTENT -->\n          <tr>\n            <td style=\"padding:28px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#1f2937;\">\n\n              <!-- Temat -->\n              <div style=\"font-size:12px;color:#6b7280;margin-bottom:6px;\">Temat</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1d4ed8;line-height:1.45;\">\n                {{ $('Task content').first().json.task_title }}\n              </div>\n\n              <!-- Asset -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Asset</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n              <!-- Autor -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Autor</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Webhook').first().json.body.createdBy }}\n              </div>\n\n              <!-- separator -->\n              <div style=\"margin-top:24px;border-top:1px solid #e5e7eb;\"></div>\n\n              <!-- Oryginalne zgłoszenie -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Oryginalne zgłoszenie\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Safe subject and message').item.json.safe_message }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Interpretacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Interpretacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.interpretation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Rekomendacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Rekomendacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.recommendation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Meta -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;line-height:1.6;\">\n                Lokalizacja: {{ $('Get asset').item.json.data[0].localization[0].localizationPath }}<br/>\n                Asset: {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n            </td>\n          </tr>\n\n          <!-- FOOTER -->\n          <tr>\n            <td align=\"center\"\n                style=\"background:#f1f3f8;\n                       padding:18px 16px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#6b7280;\n                       font-size:12px;\n                       line-height:1.6;\n                       text-align:center;\n                       border-top:1px solid #e5e7eb;\">\n              Wiadomość wygenerowana automatycznie przez <strong style=\"color:#111827;\">Knowshare</strong>.<br/>\n              © APA Group — Your Technology. Reinvented.\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n\n  </table>\n\n</td>\n</tr>\n</table>\n\n</center>\n</body>\n</html>",
-          "options": {
-            "appendAttribution": false,
-            "ccEmail": "={{ $('Loop over notification data').item.json.notificationCcEmail }}"
-          }
-        },
-        "type": "n8n-nodes-base.emailSend",
-        "typeVersion": 2.1,
-        "position": [
-          12624,
-          176
-        ],
-        "id": "2e457a2c-b414-4433-9711-b1b0115b794d",
-        "name": "Send email",
-        "webhookId": "2e63aa1b-5409-47ac-968d-b14d710da16e",
-        "credentials": {
-          "smtp": {
-            "id": "bTsU09ZudpWPlOEp",
-            "name": "SMTP account 3"
-          }
-        }
       },
       {
         "parameters": {
@@ -4311,6 +4222,77 @@
         ],
         "id": "ce0c39a5-d3a1-4816-bf47-f5cd96682c2c",
         "name": "Notice"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "17e1c3b9-d842-4667-b6a9-ab06839b7007",
+                "leftValue": "={{ $('Loop over notification data').item.json.email }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "b92055c7-b7ec-469e-967a-8011056a838c",
+                "leftValue": "={{ $('Loop over notification data').item.json.emailNotification }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          12240,
+          112
+        ],
+        "id": "8c17d3a6-30e9-4a54-a1c2-9b1092476934",
+        "name": "If email notification enabled"
+      },
+      {
+        "parameters": {
+          "fromEmail": "nazca4@apagroup.pl",
+          "toEmail": "={{ $('Loop over notification data').item.json.email }}",
+          "subject": "=[Knowshare] {{ $('Get asset').item.json.data[0].organizations[0].name }} - {{ $('Task content').item.json.task_title }} | Nowe zgłoszenie",
+          "html": "=<!DOCTYPE html>\n<html lang=\"pl\">\n<head>\n<meta charset=\"UTF-8\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n<title>Nowe zgłoszenie</title>\n</head>\n\n<body style=\"margin:0;padding:0;background:#f6f7fb;\">\n<center style=\"width:100%;background:#f6f7fb;\">\n\n<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f6f7fb;\">\n<tr>\n<td align=\"center\" style=\"padding:34px 16px;\">\n\n  <!-- CONTAINER -->\n  <table role=\"presentation\" width=\"760\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:760px;\">\n\n    <!-- HEADER -->\n    <tr>\n      <td align=\"center\"\n          style=\"padding:6px 4px 20px 4px;\n                 font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                 text-align:center;\">\n        <div style=\"font-size:24px;font-weight:800;color:#111827;letter-spacing:.2px;line-height:1.2;\">\n          Nowe zgłoszenie\n        </div>\n        <div style=\"margin-top:8px;font-size:13px;color:#6b7280;line-height:1.55;\">\n          Powiadomienie z analizy treści i rekomendacji (AI).\n        </div>\n      </td>\n    </tr>\n\n    <!-- CARD -->\n    <tr>\n      <td>\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n               style=\"border:1px solid #e5e7eb;border-radius:16px;background:#ffffff;\">\n\n          <!-- CONTENT -->\n          <tr>\n            <td style=\"padding:28px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#1f2937;\">\n\n              <!-- Temat -->\n              <div style=\"font-size:12px;color:#6b7280;margin-bottom:6px;\">Temat</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1d4ed8;line-height:1.45;\">\n                {{ $('Task content').first().json.task_title }}\n              </div>\n\n              <!-- Asset -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Asset</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n              <!-- Autor -->\n              <div style=\"margin-top:14px;font-size:12px;color:#6b7280;margin-bottom:6px;\">Autor</div>\n              <div style=\"font-size:16px;font-weight:700;color:#1f2937;line-height:1.45;\">\n                {{ $('Webhook').first().json.body.createdBy }}\n              </div>\n\n              <!-- separator -->\n              <div style=\"margin-top:24px;border-top:1px solid #e5e7eb;\"></div>\n\n              <!-- Oryginalne zgłoszenie -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Oryginalne zgłoszenie\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Safe subject and message').item.json.safe_message }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Interpretacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Interpretacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.interpretation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Rekomendacja -->\n              <div style=\"margin-top:22px;border-top:1px solid #e5e7eb;\"></div>\n\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;margin-bottom:8px;\">\n                Rekomendacja AI\n              </div>\n\n              <table role=\"presentation\" width=\"100%\">\n                <tr>\n                  <td style=\"background:#f9fafc;\n                             border:1px solid #e5e7eb;\n                             border-radius:12px;\n                             padding:18px 24px;\n                             font-size:14px;\n                             line-height:1.65;\n                             color:#374151;\n                             font-weight:500;\">\n                    {{ $('Task content').first().json.recommendation }}\n                  </td>\n                </tr>\n              </table>\n\n              <!-- Meta -->\n              <div style=\"margin-top:18px;font-size:12px;color:#6b7280;line-height:1.6;\">\n                Lokalizacja: {{ $('Get asset').item.json.data[0].localization[0].localizationPath }}<br/>\n                Asset: {{ $('Get asset').item.json.data[0].name }}\n              </div>\n\n            </td>\n          </tr>\n\n          <!-- FOOTER -->\n          <tr>\n            <td align=\"center\"\n                style=\"background:#f1f3f8;\n                       padding:18px 16px;\n                       font-family:Inter,'Segoe UI',Arial,Helvetica,sans-serif;\n                       color:#6b7280;\n                       font-size:12px;\n                       line-height:1.6;\n                       text-align:center;\n                       border-top:1px solid #e5e7eb;\">\n              Wiadomość wygenerowana automatycznie przez <strong style=\"color:#111827;\">Knowshare</strong>.<br/>\n              © APA Group — Your Technology. Reinvented.\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n\n  </table>\n\n</td>\n</tr>\n</table>\n\n</center>\n</body>\n</html>",
+          "options": {
+            "appendAttribution": false,
+            "ccEmail": "={{ $('Loop over notification data').item.json.notificationCcEmail }}"
+          }
+        },
+        "type": "n8n-nodes-base.emailSend",
+        "typeVersion": 2.1,
+        "position": [
+          12496,
+          96
+        ],
+        "id": "b6826ac9-a9d9-41ae-aae0-69dab1443050",
+        "name": "Send email",
+        "webhookId": "2e63aa1b-5409-47ac-968d-b14d710da16e",
+        "credentials": {
+          "smtp": {
+            "id": "bTsU09ZudpWPlOEp",
+            "name": "SMTP account 3"
+          }
+        }
       }
     ],
     "connections": {
@@ -4398,7 +4380,7 @@
         "main": [
           [
             {
-              "node": "If email notification enabled",
+              "node": "Loop over notification data",
               "type": "main",
               "index": 0
             }
@@ -4700,7 +4682,7 @@
           ],
           [
             {
-              "node": "If email notification enabled",
+              "node": "Loop over notification data",
               "type": "main",
               "index": 0
             }
@@ -4747,24 +4729,6 @@
           ]
         ]
       },
-      "If email notification enabled": {
-        "main": [
-          [
-            {
-              "node": "Send email",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Loop over notification data",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Create summary": {
         "main": [
           [
@@ -4777,17 +4741,6 @@
           [
             {
               "node": "Create summary - error handling",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Send email": {
-        "main": [
-          [
-            {
-              "node": "Loop over notification data",
               "type": "main",
               "index": 0
             }
@@ -4965,7 +4918,7 @@
         "main": [
           [
             {
-              "node": "If email notification enabled",
+              "node": "Loop over notification data",
               "type": "main",
               "index": 0
             }
@@ -5105,6 +5058,17 @@
           [
             {
               "node": "Notice",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If email notification enabled": {
+        "main": [
+          [
+            {
+              "node": "Send email",
               "type": "main",
               "index": 0
             }
