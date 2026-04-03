@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-01T10:52:04.688Z",
+  "updatedAt": "2026-04-03T10:32:23.969Z",
   "createdAt": "2026-01-23T12:27:18.180Z",
   "id": "EGw60IW0w70woWR5",
   "name": "Knowshare - nocobase integration V1",
@@ -545,7 +545,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.is_image = type_ok === 1;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;"
+        "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.is_image = type_ok === 1;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -2513,23 +2513,23 @@
         "json": {
           "headers": {
             "host": "apagroup.app.n8n.cloud",
-            "content-length": "336",
+            "content-length": "341",
             "accept-encoding": "gzip, br",
             "authorization": "Basic bmF6Y2E6IyRrbm93c2hhcmUkIw==",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
             "cf-connecting-ip": "51.83.252.104",
             "cf-ew-via": "15",
             "cf-ipcountry": "PL",
-            "cf-ray": "9e2ca32b1b2d6332-WAW",
+            "cf-ray": "9e57bf8f39248a94-WAW",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "date": "Fri, 27 Mar 2026 07:21:17 GMT",
-            "x-forwarded-for": "51.83.252.104, 172.64.200.35",
+            "date": "Wed, 01 Apr 2026 12:55:27 GMT",
+            "x-forwarded-for": "51.83.252.104, 172.64.200.34",
             "x-forwarded-host": "apagroup.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-38-67884c675c-r7pbk",
+            "x-forwarded-server": "traefik-prod-users-gwc-38-67884c675c-tm947",
             "x-is-trusted": "yes",
             "x-real-ip": "51.83.252.104"
           },
@@ -2537,15 +2537,15 @@
           "query": {},
           "body": {
             "index": "notices",
-            "createdAt": "2026-03-27T07:21:16.1507204Z",
-            "assetId": "08de6254-f1c1-4016-88c0-4efaddae2202",
-            "subject": "Zepsuty kubek",
-            "message": "Zepsuto kubek admina",
-            "type": 2,
-            "createdBy": "Michał Złoty",
-            "tenantId": "08de5726-7f5f-4005-8428-11c6ddd6ad6d",
+            "createdAt": "2026-04-01T12:55:26.2933616Z",
+            "assetId": "08de8fec-9694-4411-88d9-a0a062f4536a",
+            "subject": "Silnik krokowy",
+            "message": "Bardzo glosno pracuje",
+            "type": 1,
+            "createdBy": "Robert Dziembała",
+            "tenantId": "08dd5714-941b-4e58-817b-934c403cebb5",
             "attachments": [
-              "ac5e34a1-2853-4e5a-9df9-c2bf465226ec4681572307114456420.jpg"
+              "aa4110a3-d01e-4ff7-9421-b005179b15665648149678706671152.mp4"
             ]
           },
           "webhookUrl": "https://apagroup.app.n8n.cloud/webhook/24108748-476b-4243-8dd3-647268254fb9",
@@ -2557,8 +2557,8 @@
       }
     ]
   },
-  "versionId": "9c5ce30e-ab48-4d88-809e-ad2bc8bfd601",
-  "activeVersionId": "9c5ce30e-ab48-4d88-809e-ad2bc8bfd601",
+  "versionId": "c60dbcc9-10d6-4762-a4d0-9559add135e8",
+  "activeVersionId": "c60dbcc9-10d6-4762-a4d0-9559add135e8",
   "triggerCount": 1,
   "shared": [
     {
@@ -2577,9 +2577,9 @@
     }
   ],
   "activeVersion": {
-    "updatedAt": "2026-04-01T10:52:04.690Z",
-    "createdAt": "2026-04-01T10:52:04.690Z",
-    "versionId": "9c5ce30e-ab48-4d88-809e-ad2bc8bfd601",
+    "updatedAt": "2026-04-03T10:32:23.970Z",
+    "createdAt": "2026-04-03T10:32:23.970Z",
+    "versionId": "c60dbcc9-10d6-4762-a4d0-9559add135e8",
     "workflowId": "EGw60IW0w70woWR5",
     "nodes": [
       {
@@ -3121,7 +3121,7 @@
       },
       {
         "parameters": {
-          "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mp4','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.is_image = type_ok === 1;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;"
+          "jsCode": "// === Listy rozszerzeń ===\nconst IMAGE_EXT = ['png', 'jpg', 'jpeg', 'gif', 'webp'];\nconst AUDIO_EXT = ['mp3','wav','m4a','flac','ogg','oga','webm','mpeg','mpga','aac'];\nconst VIDEO_EXT = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mpg', 'wmv', 'flv', '3gp'];\n\n// === Lista MIME, które traktujemy jak octet-stream ===\nconst UNKNOWN_MIME = ['application/octet-stream','binary/octet-stream','application/x-binary'];\n\nfor (const item of items) {\n  if (!item.binary) continue;\n\n  const bin = Object.values(item.binary)[0];\n  if (!bin || !bin.fileName) continue;\n\n  const fileName = bin.fileName.toLowerCase();\n  const ext = fileName.split('.').pop();\n\n  // === Klasyfikacja logiczna ===\n  let type_ok = 0; // 0=unknown, 1=image, 2=audio, 3=video\n\n  if (IMAGE_EXT.includes(ext)) type_ok = 1;\n  else if (AUDIO_EXT.includes(ext)) type_ok = 2;\n  else if (VIDEO_EXT.includes(ext)) type_ok = 3;\n\n  // === Naprawa MIME type (tylko jeśli nieznany) ===\n  if (UNKNOWN_MIME.includes(bin.mimeType)) {\n    if (type_ok === 1) {\n      bin.mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';\n    } else if (type_ok === 2) {\n      if (ext === 'wav') bin.mimeType = 'audio/wav';\n      else if (ext === 'ogg' || ext === 'oga') bin.mimeType = 'audio/ogg';\n      else bin.mimeType = 'audio/mpeg';\n    } else if (type_ok === 3) {\n      bin.mimeType = ext === 'webm' ? 'video/webm' : 'video/mp4';\n    }\n  }\n\n  // === Zapisz wynik do JSON ===\n  item.json.type_ok = type_ok;\n  item.json.is_image = type_ok === 1;\n  item.json.file_extension = ext;\n  item.json.final_mime = bin.mimeType;\n}\n\nreturn items;"
         },
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
